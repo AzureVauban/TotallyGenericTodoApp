@@ -1,4 +1,8 @@
-// SETTINGS.tsx
+// MENU2.tsx
+/*
+This menu is currently a placeholder.
+Future updates will replace this with the actual menu implementation.
+*/
 import React, { useRef, useState } from "react";
 import { View, Text, Image } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
@@ -9,7 +13,7 @@ import {
   PanGestureHandlerEventPayload,
 } from "react-native-gesture-handler";
 
-export default function SettingsScreen() {
+export default function Menu2Screen() {
   const router = useRouter();
   const hasNavigated = useRef(false);
   const [bgColor, setBgColor] = useState("#fff");
@@ -40,7 +44,7 @@ export default function SettingsScreen() {
       if (translationX > 100 && !hasNavigated.current) {
         hasNavigated.current = true;
         setBgColor("#b6fcb6");
-        router.push("/menu2");
+        router.push("/settings");
       }
     }
     // Handle left swipe (negative translationX)
@@ -58,7 +62,7 @@ export default function SettingsScreen() {
       if (absTranslation > 100 && !hasNavigated.current) {
         hasNavigated.current = true;
         setBgColor("fff");
-        router.push("/");
+        router.push("/menu1");
       }
     }
     // Optionally reset background if no significant swipe
@@ -96,9 +100,12 @@ export default function SettingsScreen() {
             marginBottom: 40, // space below the image
             marginTop: -80, // move image higher up (adjust as needed)
           }}
-          source={require("../assets/images/test4.png")}
+          source={require("../assets/images/test3.png")}
         />
-        <Text style={{ fontWeight: "bold" }}>swipe RIGHT to go to HOME</Text>
+        <Text style={{ fontWeight: "bold" }}>
+          swipe RIGHT to go to SETTINGS
+        </Text>
+        <Text style={{ fontWeight: "bold" }}>swipe LEFT to go to MENU1</Text>
       </View>
     </PanGestureHandler>
   );

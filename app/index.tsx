@@ -1,8 +1,13 @@
 import * as Notifications from "expo-notifications";
 import React, { useEffect, useRef, useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Image } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
-import { PanGestureHandler, State, GestureHandlerGestureEvent, PanGestureHandlerEventPayload } from "react-native-gesture-handler";
+import {
+  PanGestureHandler,
+  State,
+  GestureHandlerGestureEvent,
+  PanGestureHandlerEventPayload,
+} from "react-native-gesture-handler";
 
 // THIS IS THE HOME SCREEN
 export default function HomeScreen() {
@@ -15,6 +20,7 @@ export default function HomeScreen() {
   const [bgColor, setBgColor] = useState("#fff");
 
   // Reset hasNavigated when screen is focused
+
   useFocusEffect(
     React.useCallback(() => {
       hasNavigated.current = false;
@@ -23,8 +29,27 @@ export default function HomeScreen() {
   );
 
   const onGestureEvent = (event: GestureHandlerGestureEvent) => {
-    const translationX = ((event.nativeEvent as unknown) as PanGestureHandlerEventPayload).translationX;
+    const translationX = (
+      event.nativeEvent as unknown as PanGestureHandlerEventPayload
+    ).translationX;
 
+    // Visual feedback: interpolate color as user swipes left
+    if (translationX < 0 && translationX > -150) {
+      const percent = Math.min(Math.abs(translationX) / 150, 1);
+      const r = 255;
+      const g = Math.floor(255 - 90 * percent);
+      const b = Math.floor(255 - 255 * percent);
+      setBgColor(`rgb(${r},${g},${b})`);
+    } else if (translationX >= 0) {
+      setBgColor("#fff");
+    }
+
+    // Navigate to settings if swiped far enough left
+    if (translationX < -100 && !hasNavigated.current) {
+      hasNavigated.current = true;
+      setBgColor("#b6fcb6");
+      router.push("/menu1");
+    }
     // Visual feedback: interpolate color as user swipes right
     if (translationX > 0 && translationX < 150) {
       const percent = Math.min(translationX / 150, 1);
@@ -36,7 +61,7 @@ export default function HomeScreen() {
       setBgColor("#fff");
     }
 
-    // Navigate to settings if swiped far enough right
+    // Navigate to menu1 if swiped far enough right
     if (translationX > 100 && !hasNavigated.current) {
       hasNavigated.current = true;
       setBgColor("#b6fcb6");
@@ -58,8 +83,25 @@ export default function HomeScreen() {
 
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent}>
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: bgColor }}>
-        <Text style={{ fontWeight: 'bold' }}>HOME swipe right to go to SETTINGS</Text>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: bgColor,
+        }}
+      >
+        <Image
+          style={{
+            width: 200,
+            height: 200,
+            marginBottom: 40, // space below the image
+            marginTop: -80, // move image higher up (adjust as needed)
+          }}
+          source={require("../assets/images/test1.png")}
+        />
+        <Text style={{ fontWeight: "bold" }}>swipe LEFT to go to SETTINGS</Text>
+        <Text style={{ fontWeight: "bold" }}>swipe RIGHT to go to MENU1</Text>
       </View>
     </PanGestureHandler>
   );
