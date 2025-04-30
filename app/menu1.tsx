@@ -103,9 +103,7 @@ export default function Menu1Screen() {
           }}
           source={require("../assets/images/test2.png")}
         />
-        /*
         <Text style={{ fontWeight: "bold" }}> MENU1</Text>
-        */
       </View>
     </PanGestureHandler>
   );
