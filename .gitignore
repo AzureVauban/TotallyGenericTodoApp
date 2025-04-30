@@ -2,7 +2,13 @@
 
 # example project
 
-my-expo-app/
+my-expo-app
+
+# other build artifacts
+
+android
+ios
+
 # dependencies
 node_modules/
 

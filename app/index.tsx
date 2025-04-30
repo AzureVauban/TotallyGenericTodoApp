@@ -1,44 +1,66 @@
-import { Text, View } from "react-native";
-import { Button } from "@/components/ui/button"
 import * as Notifications from "expo-notifications";
-import { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { View, Text } from "react-native";
+import { useRouter, useFocusEffect } from "expo-router";
+import { PanGestureHandler, State, GestureHandlerGestureEvent, PanGestureHandlerEventPayload } from "react-native-gesture-handler";
 
-export default function Index() {
+// THIS IS THE HOME SCREEN
+export default function HomeScreen() {
   useEffect(() => {
     Notifications.requestPermissionsAsync();
   }, []);
 
-  const handlePress = async () => {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "Button pressed!",
-        body: "You tapped the button.",
-      },
-      trigger: null, // send immediately
-    });
+  const router = useRouter();
+  const hasNavigated = useRef(false);
+  const [bgColor, setBgColor] = useState("#fff");
+
+  // Reset hasNavigated when screen is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      hasNavigated.current = false;
+      setBgColor("#fff");
+    }, [])
+  );
+
+  const onGestureEvent = (event: GestureHandlerGestureEvent) => {
+    const translationX = ((event.nativeEvent as unknown) as PanGestureHandlerEventPayload).translationX;
+
+    // Visual feedback: interpolate color as user swipes right
+    if (translationX > 0 && translationX < 150) {
+      const percent = Math.min(translationX / 150, 1);
+      const r = 255;
+      const g = Math.floor(255 - 90 * percent);
+      const b = Math.floor(255 - 255 * percent);
+      setBgColor(`rgb(${r},${g},${b})`);
+    } else if (translationX <= 0) {
+      setBgColor("#fff");
+    }
+
+    // Navigate to settings if swiped far enough right
+    if (translationX > 100 && !hasNavigated.current) {
+      hasNavigated.current = true;
+      setBgColor("#b6fcb6");
+      router.push("/settings");
+    }
+
+    // Reset when gesture ends after a delay
+    if (
+      event.nativeEvent.state === State.END ||
+      event.nativeEvent.state === State.CANCELLED ||
+      event.nativeEvent.state === State.FAILED
+    ) {
+      setTimeout(() => {
+        hasNavigated.current = false;
+        setBgColor("#fff");
+      }, 1500);
+    }
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Button
-        variant="outline"
-        style={{ backgroundColor: "black", borderRadius: 12 }}
-        onPress={handlePress}
-      >
-        <Text style={{ color: "white" }}>
-          PRESS ME
-        </Text>
-      </Button>
-
-      <Text>
-        PRESS THE BUTTON IF YOU THINK MILO{"\n"}FARTS TOO MUCH FOR THIS OWN GOOD
-      </Text>
-    </View>
+    <PanGestureHandler onGestureEvent={onGestureEvent}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: bgColor }}>
+        <Text style={{ fontWeight: 'bold' }}>HOME swipe right to go to SETTINGS</Text>
+      </View>
+    </PanGestureHandler>
   );
 }

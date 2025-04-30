@@ -42,7 +42,3 @@ The main goal of the mobile app is to solve the problems of roommates and famili
 - As a developer, I want to sync chore data across multiple devices (e.g., shared across everyone’s phones in real-time). <span style="color: red;">(Critical Priority)</span>
 
 - As a developer, I want to integrate push notifications and gentle reminders that are smart (e.g., "Hey, looks like you forgot to take out the trash today!"). <span style="color: red;">(Critical Priority)</span>
-
-Developer: Michael Elder
-
-Designer: Nani Guaba

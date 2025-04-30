@@ -12,9 +12,7 @@ export function Button({ children, onPress, variant = "default", style }: Button
   return (
     <TouchableOpacity
       style={[
-        styles.button,
-        variant === "outline" && styles.outline,
-        style,
+        styles.button
       ]}
       onPressIn={() => {console.log("HOMESCREEN BUTTON PRESSED");}}
       onLongPress={() => {console.log("HOMESCREEN BUTTON LONG PRESSED");}}
@@ -31,23 +29,25 @@ export function Button({ children, onPress, variant = "default", style }: Button
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: "#007bff",
+    backgroundColor: "#b16286",
+    //color: "#d65d0e",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 6,
     alignItems: "center",
   },
   outline: {
-    backgroundColor: "#fff",
+    backgroundColor: "black",
+    color:"#689d6a",
     borderWidth: 1,
-    borderColor: "#007bff",
+    borderColor: "black",
   },
   text: {
-    color: "#fff",
+    color: "#d65d0e",
     fontWeight: "bold",
   },
   outlineText: {
-    color: "#007bff",
+    color: "#689d6a",
   },
 })
 
