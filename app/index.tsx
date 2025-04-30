@@ -48,7 +48,7 @@ export default function HomeScreen() {
     if (translationX < -100 && !hasNavigated.current) {
       hasNavigated.current = true;
       setBgColor("#b6fcb6");
-      router.push("/menu1");
+      router.push("/settings");
     }
     // Visual feedback: interpolate color as user swipes right
     if (translationX > 0 && translationX < 150) {
@@ -65,7 +65,7 @@ export default function HomeScreen() {
     if (translationX > 100 && !hasNavigated.current) {
       hasNavigated.current = true;
       setBgColor("#b6fcb6");
-      router.push("/settings");
+      router.push("/menu1");
     }
 
     // Reset when gesture ends after a delay
@@ -100,8 +100,9 @@ export default function HomeScreen() {
           }}
           source={require("../assets/images/test1.png")}
         />
-        <Text style={{ fontWeight: "bold" }}>swipe LEFT to go to SETTINGS</Text>
-        <Text style={{ fontWeight: "bold" }}>swipe RIGHT to go to MENU1</Text>
+        {
+          <Text style={{ fontWeight: "bold" }}>INDEX</Text>
+        }
       </View>
     </PanGestureHandler>
   );

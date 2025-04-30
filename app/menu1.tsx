@@ -45,7 +45,7 @@ export default function Menu1Screen() {
       if (translationX > 100 && !hasNavigated.current) {
         hasNavigated.current = true;
         setBgColor("#b6fcb6");
-        router.push("/");
+        router.push("/menu2");
       }
     }
     // Handle left swipe (negative translationX)
@@ -63,7 +63,7 @@ export default function Menu1Screen() {
       if (absTranslation > 100 && !hasNavigated.current) {
         hasNavigated.current = true;
         setBgColor("fff");
-        router.push("/menu2");
+        router.push("/");
       }
     }
     // Optionally reset background if no significant swipe
@@ -103,8 +103,9 @@ export default function Menu1Screen() {
           }}
           source={require("../assets/images/test2.png")}
         />
-        <Text style={{ fontWeight: "bold" }}>swipe RIGHT to go to MENU2</Text>
-        <Text style={{ fontWeight: "bold" }}>swipe LEFT to go to HOME</Text>
+        /*
+        <Text style={{ fontWeight: "bold" }}> MENU1</Text>
+        */
       </View>
     </PanGestureHandler>
   );

@@ -40,7 +40,7 @@ export default function SettingsScreen() {
       if (translationX > 100 && !hasNavigated.current) {
         hasNavigated.current = true;
         setBgColor("#b6fcb6");
-        router.push("/menu2");
+        router.push("/");
       }
     }
     // Handle left swipe (negative translationX)
@@ -58,7 +58,7 @@ export default function SettingsScreen() {
       if (absTranslation > 100 && !hasNavigated.current) {
         hasNavigated.current = true;
         setBgColor("fff");
-        router.push("/");
+        router.push("/menu2");
       }
     }
     // Optionally reset background if no significant swipe
@@ -98,7 +98,7 @@ export default function SettingsScreen() {
           }}
           source={require("../assets/images/test4.png")}
         />
-        <Text style={{ fontWeight: "bold" }}>swipe RIGHT to go to HOME</Text>
+        <Text style={{ fontWeight: "bold" }}>SETTINGS</Text>
       </View>
     </PanGestureHandler>
   );

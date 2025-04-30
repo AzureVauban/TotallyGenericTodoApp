@@ -103,9 +103,8 @@ export default function Menu2Screen() {
           source={require("../assets/images/test3.png")}
         />
         <Text style={{ fontWeight: "bold" }}>
-          swipe RIGHT to go to SETTINGS
+          MENU2
         </Text>
-        <Text style={{ fontWeight: "bold" }}>swipe LEFT to go to MENU1</Text>
       </View>
     </PanGestureHandler>
   );
