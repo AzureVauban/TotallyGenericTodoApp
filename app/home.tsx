@@ -60,8 +60,8 @@ export default function HomeScreen() {
       }
       if (translationX > 100 && !hasNavigated.current) {
         hasNavigated.current = true;
-        console.log("USER: HOME => MENU1");
-        router.push("/menu1");
+        console.log("USER: HOME => LEADERBOARD");
+        router.push("/leaderboard");
       }
     } else {
       setBgColor("#eef2ff");

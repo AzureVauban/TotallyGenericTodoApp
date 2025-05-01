@@ -1,22 +1,36 @@
-import * as React from "react"
-import { TouchableOpacity, Text, StyleSheet, GestureResponderEvent } from "react-native"
+import * as React from "react";
+import {
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  GestureResponderEvent,
+} from "react-native";
 
 type ButtonProps = {
-  children: React.ReactNode
-  onPress?: (event: GestureResponderEvent) => void
-  variant?: "default" | "outline"
-  style?: any
-}
+  children: React.ReactNode;
+  onPress?: (event: GestureResponderEvent) => void;
+  variant?: "default" | "outline";
+  style?: any;
+};
 
-export function Button({ children, onPress, variant = "default", style }: ButtonProps) {
+export function Button({
+  children,
+  onPress,
+  variant = "default",
+  style,
+}: ButtonProps) {
   return (
     <TouchableOpacity
-      style={[
-        styles.button
-      ]}
-      onPressIn={() => {console.log("HOMESCREEN BUTTON PRESSED");}}
-      onLongPress={() => {console.log("HOMESCREEN BUTTON LONG PRESSED");}}
-      onPressOut={() => {console.log("HOMESCREEN BUTTON RELEASED");}}
+      style={[styles.button]}
+      onPressIn={() => {
+        console.log("HOMESCREEN BUTTON PRESSED");
+      }}
+      onLongPress={() => {
+        console.log("HOMESCREEN BUTTON LONG PRESSED");
+      }}
+      onPressOut={() => {
+        console.log("HOMESCREEN BUTTON RELEASED");
+      }}
       onPress={onPress}
       activeOpacity={0.8}
     >
@@ -24,7 +38,7 @@ export function Button({ children, onPress, variant = "default", style }: Button
         {children}
       </Text>
     </TouchableOpacity>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -38,7 +52,7 @@ const styles = StyleSheet.create({
   },
   outline: {
     backgroundColor: "black",
-    color:"#689d6a",
+    color: "#689d6a",
     borderWidth: 1,
     borderColor: "black",
   },
@@ -49,17 +63,4 @@ const styles = StyleSheet.create({
   outlineText: {
     color: "#689d6a",
   },
-})
-
-
-
-
-
-
-
-
-
-
-
-
-// (no extraneous code)
+});

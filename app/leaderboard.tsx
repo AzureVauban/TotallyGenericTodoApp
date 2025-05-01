@@ -1,8 +1,3 @@
-// MENU1.tsx
-/*
-This menu is currently a placeholder.
-Future updates will replace this with the actual menu implementation.
-*/
 import React, { useRef, useState } from "react";
 import { View, Text, Image } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
@@ -13,7 +8,7 @@ import {
   PanGestureHandlerEventPayload,
 } from "react-native-gesture-handler";
 
-export default function Menu1Screen() {
+export default function ChoreLeaderboard() {
   const router = useRouter();
   const hasNavigated = useRef(false);
   const [bgColor, setBgColor] = useState("#eef2ff");
@@ -45,7 +40,7 @@ export default function Menu1Screen() {
       if (translationX < -100 && !hasNavigated.current) {
         hasNavigated.current = true;
         // ...existing navigation logic...
-        console.log("USER: MENU1 <= HOME");
+        console.log("USER: LEADERBOARD <= HOME");
         router.push("/home");
       }
     } else if (translationX > 0) {
@@ -62,8 +57,8 @@ export default function Menu1Screen() {
       if (translationX > 100 && !hasNavigated.current) {
         hasNavigated.current = true;
         // ...existing navigation logic...
-        console.log("USER: MENU1 => MENU2");
-        router.push("/menu2");
+        console.log("USER: LEADERBOARD => SETTINGS");
+        router.push("/settings");
       }
     } else {
       setBgColor("#eef2ff");
@@ -100,7 +95,7 @@ export default function Menu1Screen() {
           }}
           source={require("../assets/images/test3.png")}
         />
-        <Text style={{ fontWeight: "bold" }}> MENU1</Text>
+        <Text style={{ fontWeight: "bold" }}> LEADERBOARD</Text>
       </View>
     </PanGestureHandler>
   );

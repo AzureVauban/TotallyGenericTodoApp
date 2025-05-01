@@ -55,8 +55,8 @@ export default function SettingsScreen() {
       }
       if (translationX < -100 && !hasNavigated.current) {
         hasNavigated.current = true;
-        console.log("USER: SETTINGS <= MENU2");
-        router.push("/menu2");
+        console.log("USER: SETTINGS <= LEADERBOARD");
+        router.push("/leaderboard");
       }
     } else if (translationX > 0) {
       // Right swipe: interpolate from white to blue
