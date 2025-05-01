@@ -23,7 +23,7 @@ export default function RootLayout() {
           gestureEnabled: true, // enables swipe gestures
           gestureDirection: "horizontal", // swipe right/left
           headerShown: false, // hides the header
-          contentStyle: { backgroundColor: "#ffffff" }, // background color for the content
+          contentStyle: { backgroundColor: "#eef2ff" }, // background color for the content
         }}
       />
     </GestureHandlerRootView>

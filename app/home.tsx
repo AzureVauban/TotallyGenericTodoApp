@@ -1,49 +1,38 @@
-// SETTINGS.tsx
-import React, { useRef, useState } from "react";
-import { View, Text, Button, Image, TouchableOpacity } from "react-native";
+import * as Notifications from "expo-notifications";
+import React, { useEffect, useRef, useState } from "react";
+import { View, Text, Image } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import {
   PanGestureHandler,
   State,
   GestureHandlerGestureEvent,
+  PanGestureHandlerEventPayload,
 } from "react-native-gesture-handler";
 
-export function RedirectToLogin() {
-  const router = useRouter();
-  const isUserLoggedIn: boolean = false; // Replace with your actual login check
-
-  React.useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (!isUserLoggedIn) {
-        console.log("USER REDIRECTED TO LOGIN FROM SETTINGS");
-        router.replace("/login");
-      } else {
-        router.replace("/home");
-      }
-    }, 0);
-    return () => clearTimeout(timeout);
-  }, [isUserLoggedIn, router]);
-}
-
-export default function SettingsScreen() {
+// THIS IS THE HOME SCREEN
+export default function HomeScreen() {
   const router = useRouter();
   const hasNavigated = useRef(false);
   const [bgColor, setBgColor] = useState("#eef2ff");
 
+  useEffect(() => {
+    Notifications.requestPermissionsAsync();
+  }, []);
+
   useFocusEffect(
     React.useCallback(() => {
-      setBgColor("#eef2ff");
       hasNavigated.current = false;
+      setBgColor("#eef2ff");
     }, [])
   );
 
   const onGestureEvent = (event: GestureHandlerGestureEvent) => {
     const translationX = (
-      event.nativeEvent as unknown as { translationX: number }
+      event.nativeEvent as unknown as PanGestureHandlerEventPayload
     ).translationX;
 
     if (translationX < 0) {
-      // Left swipe: interpolate from white to orange
+      // For left swipe, interpolate from white to orange (rgb(255,165,0))
       if (translationX > -150) {
         const percent = Math.min(Math.abs(translationX) / 150, 1);
         const r = 255;
@@ -55,11 +44,11 @@ export default function SettingsScreen() {
       }
       if (translationX < -100 && !hasNavigated.current) {
         hasNavigated.current = true;
-        console.log("USER: SETTINGS <= MENU2");
-        router.push("/menu2");
+        console.log("USER: HOME <= SETTINGS");
+        router.push("/settings");
       }
     } else if (translationX > 0) {
-      // Right swipe: interpolate from white to blue
+      // For right swipe, interpolate from white to blue (rgb(0,0,255))
       if (translationX < 150) {
         const percent = Math.min(translationX / 150, 1);
         const r = Math.floor(255 - 255 * percent);
@@ -71,8 +60,8 @@ export default function SettingsScreen() {
       }
       if (translationX > 100 && !hasNavigated.current) {
         hasNavigated.current = true;
-        console.log("USER: SETTINGS => HOME");
-        router.push("/home");
+        console.log("USER: HOME => MENU1");
+        router.push("/menu1");
       }
     } else {
       setBgColor("#eef2ff");
@@ -107,26 +96,9 @@ export default function SettingsScreen() {
             marginBottom: 40,
             marginTop: -80,
           }}
-          source={require("../assets/images/test4.png")}
+          source={require("../assets/images/test1.png")}
         />
-        <Text style={{ fontWeight: "bold" }}>SETTINGS</Text>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "#b91c1c",
-            paddingVertical: 12,
-            paddingHorizontal: 20,
-            borderRadius: 5,
-            alignItems: "center",
-            justifyContent: "center",
-            marginTop: 50,
-          }}
-          onPress={() => {
-            console.log("USER LOGGED OUT");
-            router.push("/login");
-          }}
-        >
-          <Text style={{ color: "#fee2e2", fontWeight: "bold" }}>Log Out</Text>
-        </TouchableOpacity>
+        <Text style={{ fontWeight: "bold" }}>HOME</Text>
       </View>
     </PanGestureHandler>
   );
