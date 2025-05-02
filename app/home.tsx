@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { View, Text, Modal, Pressable } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { StyleSheet } from "react-native";
-import FiBrburger from "../assets/icons/svg/fi-br-hamburger.svg";
+import FiBrburger from "../assets/icons/svg/fi-br-list.svg";
 import FiBrplus from "../assets/icons/svg/fi-br-plus.svg";
 import { TouchableOpacity } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "absolute",
     bottom: 24,
-    right: 24,
+    right: 25,
     borderColor: COLORS.dark_accents,
     borderWidth: 2,
     top: 20,
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: COLORS.dark_secondary,
+    borderColor: COLORS.dark_accents,
     marginRight: 12,
   },
   squareDone: {
@@ -200,6 +200,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.dark_primary,
     alignItems: "center",
     position: "absolute",
+    justifyContent: "center",
     bottom: 24,
     left: 24,
     borderColor: COLORS.dark_accents,
@@ -371,6 +372,9 @@ export default function HomeScreen() {
           style={styles.addTaskButton}
           onPress={() => {
             // Add a new task
+            console.log("Add Task");
+            // Show the task creation modal
+            setShowTaskActions(true);
             setTasks((prev) =>
               prev.concat({
                 id: Date.now().toString(),
