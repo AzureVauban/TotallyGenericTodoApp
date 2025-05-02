@@ -8,6 +8,8 @@ my-expo-app
 
 android
 ios
+*.apk
+.vscode
 
 # dependencies
 node_modules/

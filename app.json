@@ -4,7 +4,7 @@
     "slug": "DivideNDo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "jsEngine": "hermes",
+    "jsEngine": "hermes", //use EXPO GO INSTEAD
     "icon": "./assets/images/appicon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",

@@ -1,26 +1,15 @@
-// metro.config.js
-const { getDefaultConfig } = require("expo/metro-config");
+// metro.config.js  ⟵‑‑ ensure this is CommonJS, **not** JSON
+const { getDefaultConfig } = require("@expo/metro-config");
 
-module.exports = (async () => {
-  const config = await getDefaultConfig(__dirname);
+const config = getDefaultConfig(__dirname);
 
-  const {
-    transformer: { babelTransformerPath, ...transformerRest },
-    resolver: { assetExts, sourceExts, ...resolverRest },
-  } = config;
+// ▸ Add SVG support
+config.resolver.assetExts = config.resolver.assetExts.filter(
+  (ext) => ext !== "svg"
+);
+config.resolver.sourceExts.push("svg");
+config.transformer.babelTransformerPath = require.resolve(
+  "react-native-svg-transformer"
+);
 
-  return {
-    transformer: {
-      ...transformerRest,
-      // point Metro at react-native-svg-transformer
-      babelTransformerPath: require.resolve("react-native-svg-transformer"),
-    },
-    resolver: {
-      ...resolverRest,
-      // remove svg from assetExts so Metro treats them as source
-      assetExts: assetExts.filter((ext) => ext !== "svg"),
-      // add svg to sourceExts so Metro will process .svg with the above transformer
-      sourceExts: [...sourceExts, "svg"],
-    },
-  };
-})();
+module.exports = config;

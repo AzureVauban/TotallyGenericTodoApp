@@ -13,8 +13,6 @@ import {
   GestureHandlerGestureEvent,
   PanGestureHandlerEventPayload,
 } from "react-native-gesture-handler";
-import { Colors } from "react-native/Libraries/NewAppScreen";
-
 /*
   Dark theme palette (left UI) with original hex codes:
     dark_primary:    #101010
