@@ -4,7 +4,8 @@ import { View, Text, Image } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { StyleSheet } from "react-native";
 import FiBr from "../assets/icons/svg/fi-br-house-chimney-blank.svg";
-
+import FiBrplus from "../assets/icons/svg/fi-br-plus.svg";
+import { TouchableOpacity } from "react-native";
 import {
   PanGestureHandler,
   State,
@@ -20,8 +21,6 @@ import {
     dark_tertiary:   #373737
     dark_accents:    #F26C4F
     dark_subaccents: #C5C5C5
-    dark_senary:     #808080
-    dark_icon_text:  #F26C4F
 
   Light theme palette (right UI) with original hex codes:
     light_primary:   #F26C4F
@@ -29,8 +28,6 @@ import {
     light_tertiary:  #CCCCCC
     light_accents:   #101010
     light_subaccents:#373737
-    light_senary:    #E8A87C
-    light_icon_text: #101010
 */
 const COLORS = {
   //  Dark theme palette (left UI) with original hex codes:
@@ -39,17 +36,13 @@ const COLORS = {
   dark_tertiary: "#373737", // #373737
   dark_accents: "#F26C4F", // #F26C4F
   dark_subaccents: "#C5C5C5", // #C5C5C5
-  dark_senary: "#808080", // #808080
-  dark_icon_text: "#F26C4F", // #F26C4F
 
   // Light theme palette (right UI) with original hex codes:
-  light_primary: "#F26C4F", // #F26C4F
-  light_secondary: "#FFFFFF", // #FFFFFF
-  light_tertiary: "#CCCCCC", // #CCCCCC
-  light_accents: "#101010", // #101010
-  light_subaccents: "#373737", // #373737
-  light_senary: "#E8A87C", // #E8A87C
-  light_icon_text: "#101010", // #101010
+  light_primary: "#E76F51", // #E76F51
+  light_secondary: "#F4A261", // #F4A261
+  light_tertiary: "#E9C46A", // #E9C46A
+  light_accents: "#2A9D8F", // #2A9D8F
+  light_subaccents: "#264653", // #264653
 };
 const styles = StyleSheet.create({
   screenbackground: {
@@ -73,7 +66,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
-    color: COLORS.dark_subaccents,
+    color: COLORS.dark_accents,
   },
   subtitle: {
     fontSize: 16,
@@ -82,7 +75,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   button: {
-    backgroundColor: " #D59D80",
+    backgroundColor: COLORS.dark_secondary,
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -95,7 +88,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   buttonSecondary: {
-    backgroundColor: " #104C64",
+    backgroundColor: COLORS.dark_secondary,
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -107,7 +100,18 @@ const styles = StyleSheet.create({
     height: 100,
     marginBottom: 20,
     //color: " #D59D80",
-    //backgroundColor: " #D59D80",
+    //fill: COLORS.dark_secondary,
+  },
+  addButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 12,
+    backgroundColor: COLORS.dark_secondary,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    bottom: 24,
+    right: 24,
   },
 });
 
@@ -159,10 +163,20 @@ export default function HomeScreen() {
         <FiBr
           width={50}
           height={50}
-          fill={COLORS.dark_subaccents}
+          fill={COLORS.dark_accents}
           style={styles.icon}
         />
         <Text style={styles.title}>HOME</Text>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => {
+            // todo feature/add-task
+            console.log("ADD TASK NOT IMPLEMENTED");
+            console.log("USER: HOME => ADD");
+          }}
+        >
+          <FiBrplus width={25} height={25} fill={COLORS.dark_accents} />
+        </TouchableOpacity>
       </View>
     </PanGestureHandler>
   );
