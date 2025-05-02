@@ -13,31 +13,49 @@ import {
 } from "react-native-gesture-handler";
 //import { Container } from "@/my-expo-app/components/Container";
 
-const COLORS = {
-  //! make sure to change these colors to match design when the times comes
-  // color scheme (dark)
-  dark_primary: "#1B2929", // #1B2929
-  dark_secondary: "#453F43", // #453F43
-  dark_tertiary: "#5B6264", // #5B6264
-  dark_accents: "#9E9190", // #9E9190
-  dark_subaccents: "#C6C6D0", // #C6C6D0
-  dark_senary: "#FEA57E", // #FEA57E
-  dark_icon_text: "#FEA57E", // #FEA57E
+/*
+  Dark theme palette (left UI) with original hex codes:
+    dark_primary:    #101010
+    dark_secondary:  #1A1A1A
+    dark_tertiary:   #373737
+    dark_accents:    #F26C4F
+    dark_subaccents: #C5C5C5
+    dark_senary:     #808080
+    dark_icon_text:  #F26C4F
 
-  // color scheme (light)
-  light_primary: "#0D1D25", // #0D1D25
-  light_secondary: "#104C64", // #104C64
-  light_tertiary: "#C6C6D0", // #C6C6D0
-  light_accents: "#D59D80", // #D59D80
-  light_subaccents: "#C0754D", // #C0754D
-  light_senary: "#B6410F", // #B6410F
-  light_icon_text: "#C6C6D0", // #C6C6D0
+  Light theme palette (right UI) with original hex codes:
+    light_primary:   #F26C4F
+    light_secondary: #FFFFFF
+    light_tertiary:  #CCCCCC
+    light_accents:   #101010
+    light_subaccents:#373737
+    light_senary:    #E8A87C
+    light_icon_text: #101010
+*/
+const COLORS = {
+  //  Dark theme palette (left UI) with original hex codes:
+  dark_primary: "#101010", // #101010
+  dark_secondary: "#1A1A1A", // #1A1A1A
+  dark_tertiary: "#373737", // #373737
+  dark_accents: "#F26C4F", // #F26C4F
+  dark_subaccents: "#C5C5C5", // #C5C5C5
+  dark_senary: "#808080", // #808080
+  dark_icon_text: "#F26C4F", // #F26C4F
+
+  // Light theme palette (right UI) with original hex codes:
+  light_primary: "#F26C4F", // #F26C4F
+  light_secondary: "#FFFFFF", // #FFFFFF
+  light_tertiary: "#CCCCCC", // #CCCCCC
+  light_accents: "#101010", // #101010
+  light_subaccents: "#373737", // #373737
+  light_senary: "#E8A87C", // #E8A87C
+  light_icon_text: "#101010", // #101010
 };
 const styles = StyleSheet.create({
   screenbackground: {
     flex: 1,
     backgroundColor: COLORS.dark_primary,
-    color: " #104C64",
+    color: COLORS.dark_primary,
     justifyContent: "center",
     alignItems: "center",
   },
