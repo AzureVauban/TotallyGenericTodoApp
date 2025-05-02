@@ -48,3 +48,7 @@ app-example
 *.zip
 assets/icons/
 *.log
+
+# npm
+package-lock.json
+npm-shrinkwrap.json
