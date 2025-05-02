@@ -106,8 +106,8 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginBottom: 20,
-    color: " #D59D80",
-    backgroundColor: " #D59D80",
+    //color: " #D59D80",
+    //backgroundColor: " #D59D80",
   },
 });
 
