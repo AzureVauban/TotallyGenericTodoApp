@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { View, Text, Modal, Pressable } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { StyleSheet } from "react-native";
-import FiBrhouse from "../assets/icons/svg/fi-br-house-chimney-blank.svg";
+import FiBrburger from "../assets/icons/svg/fi-br-hamburger.svg";
 import FiBrplus from "../assets/icons/svg/fi-br-plus.svg";
 import { TouchableOpacity } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
@@ -195,6 +195,19 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: COLORS.dark_tertiary,
   },
+  showListsButtons: {
+    width: 56,
+    height: 56,
+    borderRadius: 15,
+    backgroundColor: COLORS.dark_primary,
+    alignItems: "center",
+    position: "absolute",
+    bottom: 24,
+    left: 24,
+    borderColor: COLORS.dark_accents,
+    borderWidth: 1.5,
+    color: COLORS.dark_accents,
+  },
 });
 
 // dummy tasks data
@@ -320,8 +333,7 @@ export default function HomeScreen() {
             paddingHorizontal: 16,
           }}
         />
-        {
-        /* 
+        {/* 
         <TouchableOpacity // HOME BUTTON
         >
           <FiBrhouse
@@ -331,7 +343,7 @@ export default function HomeScreen() {
             style={styles.homeButton}
           />
         </TouchableOpacity> */}
-  <Text
+        <Text
           style={styles.subtitle}
 
           //paddingHorizontal={15}
@@ -372,6 +384,14 @@ export default function HomeScreen() {
           }}
         >
           <FiBrplus width={25} height={25} fill={COLORS.dark_accents} />
+        </TouchableOpacity>
+        <TouchableOpacity // buttton for adding task
+          style={styles.showListsButtons}
+          onPress={() => {
+            showModal ? setShowModal(false) : setShowModal(true);
+          }}
+        >
+          <FiBrburger width={25} height={25} fill={COLORS.dark_accents} />
         </TouchableOpacity>
       </View>
     </PanGestureHandler>
