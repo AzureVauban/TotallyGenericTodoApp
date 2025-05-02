@@ -1,18 +1,19 @@
 import * as Notifications from "expo-notifications";
 import React, { useEffect, useRef, useState } from "react";
-import { View, Text, Image } from "react-native";
+import { View, Text, Modal, Pressable } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { StyleSheet } from "react-native";
-import FiBr from "../assets/icons/svg/fi-br-house-chimney-blank.svg";
+import FiBrhouse from "../assets/icons/svg/fi-br-house-chimney-blank.svg";
 import FiBrplus from "../assets/icons/svg/fi-br-plus.svg";
 import { TouchableOpacity } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
 import {
   PanGestureHandler,
   State,
   GestureHandlerGestureEvent,
   PanGestureHandlerEventPayload,
 } from "react-native-gesture-handler";
-//import { Container } from "@/my-expo-app/components/Container";
+import { Colors } from "react-native/Libraries/NewAppScreen";
 
 /*
   Dark theme palette (left UI) with original hex codes:
@@ -70,9 +71,13 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: "#C6C6D0",
-    marginBottom: 20,
+    color: COLORS.dark_accents,
+    marginTop: 10,
     fontWeight: "bold",
+    paddingHorizontal: 15,
+    paddingTop: 20,
+    textAlign: "left",
+    width: "100%",
   },
   button: {
     backgroundColor: COLORS.dark_secondary,
@@ -102,24 +107,149 @@ const styles = StyleSheet.create({
     //color: " #D59D80",
     //fill: COLORS.dark_secondary,
   },
-  addButton: {
+  addTaskButton: {
     width: 56,
     height: 56,
-    borderRadius: 12,
-    backgroundColor: COLORS.dark_secondary,
+    borderRadius: 15,
+    backgroundColor: COLORS.dark_primary,
     justifyContent: "center",
     alignItems: "center",
     position: "absolute",
     bottom: 24,
     right: 24,
+    borderColor: COLORS.dark_accents,
+    borderWidth: 1.5,
+  },
+  homeButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 12,
+    backgroundColor: COLORS.dark_primary,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    bottom: 24,
+    right: 24,
+    borderColor: COLORS.dark_accents,
+    borderWidth: 2,
+    top: 20,
+  },
+  taskRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.dark_tertiary,
+    borderRadius: 12,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    height: 60,
+    width: "100%",
+    justifyContent: "space-between",
+    borderColor: COLORS.dark_accents,
+  },
+  square: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: COLORS.dark_secondary,
+    marginRight: 12,
+  },
+  squareDone: {
+    backgroundColor: COLORS.dark_secondary,
+  },
+  taskText: {
+    flex: 1,
+    color: COLORS.dark_subaccents,
+    fontSize: 16,
+  },
+  taskTextDone: {
+    textDecorationLine: "line-through",
+    color: COLORS.dark_tertiary,
+  },
+  taskDue: {
+    color: COLORS.dark_accents,
+    fontSize: 14,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: COLORS.dark_accents,
+    opacity: 0.8,
+    position: "absolute",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    width: "80%",
+    backgroundColor: COLORS.dark_secondary,
+    borderRadius: 12,
+    padding: 16,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: COLORS.dark_subaccents,
+    marginBottom: 12,
+  },
+  modalOption: {
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.dark_tertiary,
   },
 });
 
-// THIS IS THE HOME SCREEN
+// dummy tasks data
+
+const initialTasks = [
+  { id: "1", text: "Buy Nani gifts", due: "5/1/25", done: false },
+  { id: "2", text: "Buy doggy food for Marty", due: "12/12/25", done: false },
+  { id: "3", text: "Call Ariana goofy", due: "5/1/25", done: false },
+  {
+    id: "4",
+    text: "Remind myself to not do big back activities",
+    due: "5/20/25",
+    done: false,
+  },
+  { id: "5", text: "Deez nuts", due: "5/20/25", done: false },
+];
+const completedTasks = [
+  { id: "6", text: "Buy Nani gifts", due: "5/1/25", done: true },
+  { id: "7", text: "Buy doggy food for Marty", due: "12/12/25", done: true },
+  { id: "8", text: "Call Ariana goofy", due: "5/1/25", done: true },
+];
+
+function TaskItem({
+  text,
+  due,
+  done,
+}: {
+  text: string;
+  due: string;
+  done: boolean;
+}) {
+  return (
+    <View style={styles.taskRow}>
+      <View style={[styles.square, done && styles.squareDone]} />
+      <Text style={[styles.taskText, done && styles.taskTextDone]}>{text}</Text>
+      {!!due && <Text style={styles.taskDue}>{due}</Text>}
+    </View>
+  );
+}
+
 export default function HomeScreen() {
+  // Home screen component
   const router = useRouter();
   const hasNavigated = useRef(false);
-
+  // Modal state for task actions
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<{
+    id: string;
+    text: string;
+    due: string;
+    done: boolean;
+  } | null>(null);
+  const [showCompleted, setShowCompleted] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [showTaskActions, setShowTaskActions] = useState(false);
   useEffect(() => {
     Notifications.requestPermissionsAsync();
   }, []);
@@ -129,6 +259,9 @@ export default function HomeScreen() {
       hasNavigated.current = false;
     }, [])
   );
+
+  // Manage tasks state
+  const [tasks, setTasks] = useState(initialTasks);
 
   const onGestureEvent = (event: GestureHandlerGestureEvent) => {
     const translationX = (
@@ -160,19 +293,82 @@ export default function HomeScreen() {
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent}>
       <View style={styles.screenbackground}>
-        <FiBr
-          width={50}
-          height={50}
-          fill={COLORS.dark_accents}
-          style={styles.icon}
+        {/* Screen title */}
+        <Text
+          style={styles.subtitle}
+
+          //paddingHorizontal={15}
+        >
+          Ongoing Chores
+        </Text>
+        <FlatList
+          data={tasks.slice(0, 3)}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <Pressable
+              onPress={() => {
+                setSelectedTask(item);
+                setModalVisible(true);
+              }}
+            >
+              <TaskItem text={item.text} due={item.due} done={item.done} />
+            </Pressable>
+          )}
+          ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+          contentContainerStyle={{
+            paddingVertical: 5,
+            paddingHorizontal: 16,
+          }}
         />
-        <Text style={styles.title}>HOME</Text>
-        <TouchableOpacity
-          style={styles.addButton}
+        {
+        /* 
+        <TouchableOpacity // HOME BUTTON
+        >
+          <FiBrhouse
+            width={50}
+            height={50}
+            fill={COLORS.dark_accents}
+            style={styles.homeButton}
+          />
+        </TouchableOpacity> */}
+  <Text
+          style={styles.subtitle}
+
+          //paddingHorizontal={15}
+        >
+          Completed Chores
+        </Text>
+        <FlatList
+          data={tasks.slice(0, 3)}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <Pressable
+              onPress={() => {
+                setSelectedTask(item);
+                setModalVisible(true);
+              }}
+            >
+              <TaskItem text={item.text} due={item.due} done={item.done} />
+            </Pressable>
+          )}
+          ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+          contentContainerStyle={{
+            paddingVertical: 5,
+            paddingHorizontal: 16,
+          }}
+        />
+        <TouchableOpacity // buttton for adding task
+          style={styles.addTaskButton}
           onPress={() => {
-            // todo feature/add-task
-            console.log("ADD TASK NOT IMPLEMENTED");
-            console.log("USER: HOME => ADD");
+            // Add a new task
+            setTasks((prev) =>
+              prev.concat({
+                id: Date.now().toString(),
+                text: "New Task",
+                due: Date.now().toString(),
+                done: false,
+              })
+            );
           }}
         >
           <FiBrplus width={25} height={25} fill={COLORS.dark_accents} />
