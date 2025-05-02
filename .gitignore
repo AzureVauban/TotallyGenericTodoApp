@@ -8,6 +8,8 @@ my-expo-app
 
 android
 ios
+*.apk
+.vscode
 
 # dependencies
 node_modules/
@@ -45,3 +47,10 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+*.zip
+assets/icons/
+*.log
+
+# npm
+package-lock.json
+npm-shrinkwrap.json
