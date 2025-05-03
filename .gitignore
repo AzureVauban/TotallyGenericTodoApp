@@ -48,7 +48,7 @@ yarn-error.*
 
 app-example
 *.zip
-assets/icons/
+assets/uicons-bold-rounded-2.6.0.zip
 *.log
 
 # npm

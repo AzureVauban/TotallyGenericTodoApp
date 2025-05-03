@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { View, Text, Modal, Pressable } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { StyleSheet } from "react-native";
-import FiBrburger from "../assets/icons/svg/fi-br-list.svg";
+import FiBrburger from "../assets/icons/svg/fi-br-0.svg";
 import FiBrplus from "../assets/icons/svg/fi-br-plus.svg";
 import { TouchableOpacity } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
