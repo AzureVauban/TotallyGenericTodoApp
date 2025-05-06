@@ -197,6 +197,21 @@ export default function LoginScreen() {
             Login with Email
           </Text>
         </TouchableOpacity>
+        {/* Reset password button */}
+        <TouchableOpacity
+          style={[
+            styles.buttonSecondary,
+            { flexDirection: "row", width: BUTTON_WIDTH, marginBottom: 20 },
+          ]}
+          onPress={() => {
+            console.log("User pressed reset password");
+            router.push("/resetPassword");
+          }}
+        >
+          <Text style={{ color: COLORS.dark_subaccents, fontWeight: "600" }}>
+            Forgot Password?
+          </Text>
+        </TouchableOpacity>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Text style={[styles.subtitle, { fontWeight: "500" }]}>
             Don't have an account?{" "}
