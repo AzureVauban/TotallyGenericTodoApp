@@ -9,6 +9,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { PanGestureHandler } from "react-native-gesture-handler";
 
 /* ---------- Palette shared through the app ---------- */
 const COLORS = {
@@ -33,62 +34,113 @@ const COLORS = {
 
 export default function ResetPassword() {
   const router = useRouter();
+  const [username, setUsername] = useState("");
+  const [usernameError, setUsernameError] = useState(false);
   const [pwd, setPwd] = useState("");
+  const [pwdError, setPwdError] = useState(false);
   const [confirm, setConfirm] = useState("");
+  const [confirmError, setConfirmError] = useState(false);
 
   const handleNext = () => {
-    // TODO: connect to backend / validation
-    router.back(); // for now just pop the screen
+    let hasError = false;
+
+    if (!username) {
+      setUsernameError(true);
+      hasError = true;
+    } else {
+      setUsernameError(false);
+    }
+
+    if (!pwd) {
+      setPwdError(true);
+      hasError = true;
+    } else {
+      setPwdError(false);
+    }
+
+    if (!confirm || confirm !== pwd) {
+      setConfirmError(true);
+      hasError = true;
+    } else {
+      setConfirmError(false);
+    }
+
+    if (hasError) return;
+
+    console.log("User pressed reset password");
+    router.push("/verificationMethod");
+  };
+
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  const handleSwipe = ({ nativeEvent }) => {
+    if (nativeEvent.translationX > 50 && !isNavigating) {
+      setIsNavigating(true);
+      router.push("/login");
+      setTimeout(() => setIsNavigating(false), 500);
+    }
   };
 
   return (
-    <SafeAreaView style={s.screen}>
-      <ScrollView
-        contentContainerStyle={s.content}
-        keyboardShouldPersistTaps="handled"
-      >
-        {/* ---------- header ---------- */}
-        <View style={s.headerBlock}>
-          <Text style={s.title}>Reset{"\n"}Password</Text>
-          <Text style={s.subtitle}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod.
-          </Text>
-        </View>
-
-        {/* ---------- form ---------- */}
-        <View style={s.form}>
-          <TextInput
-            placeholder="Password"
-            placeholderTextColor={COLORS.dark_senary}
-            secureTextEntry
-            value={pwd}
-            onChangeText={setPwd}
-            style={s.input}
-          />
-
-          <TextInput
-            placeholder="Confirm password"
-            placeholderTextColor={COLORS.dark_senary}
-            secureTextEntry
-            value={confirm}
-            onChangeText={setConfirm}
-            style={s.input}
-          />
-        </View>
-
-        {/* ---------- CTA ---------- */}
-        <TouchableOpacity
-          style={s.nextBtn}
-          onPress={() => {
-            console.log("User pressed reset password");
-            router.push("/confirmPassword");
-          }}
+    <PanGestureHandler onGestureEvent={handleSwipe}>
+      <SafeAreaView style={s.screen}>
+        <ScrollView
+          contentContainerStyle={s.content}
+          keyboardShouldPersistTaps="handled"
         >
-          <Text style={s.nextTxt}>Next ›</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </SafeAreaView>
+          {/* ---------- header ---------- */}
+          <View style={s.headerBlock}>
+            <Text style={s.title}>Reset{"\n"}Password</Text>
+            <Text style={s.subtitle}>
+              input your username, phone number, or email
+            </Text>
+          </View>
+
+          {/* ---------- form ---------- */}
+          <View style={s.form}>
+            <TextInput
+              placeholder="Username or Email"
+              placeholderTextColor={COLORS.dark_senary}
+              value={username}
+              onChangeText={(text) => {
+                setUsername(text);
+                if (text) setUsernameError(false);
+              }}
+              style={[s.input, usernameError ? s.inputBackgroundError : null]}
+            />
+
+            <TextInput
+              placeholder="Password"
+              placeholderTextColor={COLORS.dark_senary}
+              secureTextEntry
+              value={pwd}
+              onChangeText={(text) => {
+                setPwd(text);
+                if (text) setPwdError(false);
+              }}
+              style={[s.input, pwdError ? s.inputBackgroundError : null]}
+            />
+
+            <TextInput
+              placeholder="Confirm password"
+              placeholderTextColor={COLORS.dark_senary}
+              secureTextEntry
+              value={confirm}
+              onChangeText={(text) => {
+                setConfirm(text);
+                if (text === pwd) setConfirmError(false);
+              }}
+              style={[s.input, confirmError ? s.inputBackgroundError : null]}
+            />
+          </View>
+
+          {/* ---------- CTA ---------- */}
+          <TouchableOpacity style={s.nextBtn} onPress={handleNext}>
+            <Text style={s.nextTxt}>Next ›</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </SafeAreaView>
+    </PanGestureHandler>
   );
 }
 
@@ -131,6 +183,10 @@ const s = StyleSheet.create({
     paddingVertical: 14,
     fontSize: 16,
     color: COLORS.light_secondary,
+  },
+
+  inputBackgroundError: {
+    backgroundColor: "#450a0a", // Darker shade of red (Firebrick)
   },
 
   nextBtn: {
