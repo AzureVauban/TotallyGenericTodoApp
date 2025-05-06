@@ -532,7 +532,14 @@ export default function HomeScreen() {
                 )}
               >
                 <Pressable
-                // onPress moved-to-done logic removed
+                  onPress={() => {
+                    // Move this task to done list
+                    setTasks((prev) => prev.filter((t) => t.id !== item.id));
+                    setDoneTasks((prev) => [
+                      ...prev,
+                      { ...item, done: true },
+                    ]);
+                  }}
                 >
                   <TaskItem
                     text={item.text}
