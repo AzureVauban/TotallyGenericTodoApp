@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { View, Image, TouchableOpacity, Text, ViewStyle } from "react-native";
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  Text,
+  ViewStyle,
+  Dimensions,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { StyleSheet } from "react-native";
+import { Link } from "@react-navigation/native";
+import FISignatureIcon from "../assets/icons/svg/fi-br-chart-scatter-3d.svg";
+const SCREEN_WIDTH = Dimensions.get("window").width;
+const BUTTON_WIDTH = SCREEN_WIDTH * 0.7;
 
 /*
   Dark theme palette (left UI) with original hex codes:
@@ -67,25 +78,31 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: "#C6C6D0",
+    color: COLORS.dark_senary,
+    marginBottom: 20,
+  },
+  linktext: {
+    fontSize: 16,
+    color: COLORS.dark_senary,
     marginBottom: 20,
     fontWeight: "bold",
   },
   button: {
-    backgroundColor: " #D59D80",
+    backgroundColor: COLORS.dark_accents,
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 5,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
+    // width removed
   },
   buttonText: {
-    color: "#C6C6D0",
+    color: COLORS.dark_secondary,
     fontWeight: "bold",
   },
   buttonSecondary: {
-    backgroundColor: " #104C64",
+    backgroundColor: "#104C64",
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -96,14 +113,26 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginBottom: 20,
-    color: " #D59D80",
-    backgroundColor: " #D59D80",
   },
 });
 export default function LoginScreen() {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
   const router = useRouter();
+  // Helper to compute the complementary color of a hex code
+  const getComplement = (hex: string): string => {
+    // Remove the hash if it exists
+    hex = hex.replace("#", "");
+    // Parse the red, green, blue components
+    const r = 255 - parseInt(hex.substring(0, 2), 16);
+    const g = 255 - parseInt(hex.substring(2, 4), 16);
+    const b = 255 - parseInt(hex.substring(4, 6), 16);
 
+    // Convert the components back to hex, ensuring 2 digits for each
+    const rHex = r.toString(16).padStart(2, "0");
+    const gHex = g.toString(16).padStart(2, "0");
+    const bHex = b.toString(16).padStart(2, "0");
+    return `#${rHex}${gHex}${bHex}`;
+  };
   useEffect(() => {
     if (isUserLoggedIn) {
       router.replace("/home");
@@ -111,49 +140,92 @@ export default function LoginScreen() {
   }, [isUserLoggedIn, router]);
 
   // Shared button style so both buttons have the same width.
-  const sharedButtonStyle: ViewStyle = {
-    width: 250, // Adjust the width as needed
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignItems: "center",
-  };
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Image
+    <View style={styles.screenbackground}>
+      <View
         style={{
-          width: 200,
-          height: 200,
-          marginBottom: 40,
-          marginTop: -80,
-        }}
-        source={require("../assets/images/test6.png")}
-      />
-      <TouchableOpacity
-        style={{
-          ...sharedButtonStyle,
-          backgroundColor: "#007aff",
-          marginBottom: 12,
-        }}
-        onPress={() => {
-          console.log("USER LOGGED IN");
-          setIsUserLoggedIn(true);
+          flex: 1,
+          justifyContent: "flex-end",
+          alignItems: "center",
+          marginBottom: 150,
         }}
       >
-        <Text style={{ color: "#bae6fd", fontSize: 16 }}>Log In</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{
-          ...sharedButtonStyle,
-          backgroundColor: "#4da6ff",
-        }}
-        onPress={() => router.push("/signup")}
-      >
-        <Text style={{ color: "#bae6fd", fontSize: 16 }}>
-          Create an Account
+        <FISignatureIcon
+          style={styles.icon}
+          width={300}
+          height={300}
+          fill={COLORS.dark_accents}
+        />
+        <Text
+          style={[
+            styles.title,
+            {
+              /* NONE */
+            },
+          ]}
+        >
+          Welcome to{" "}
+          <Text style={{ color: getComplement(COLORS.dark_accents) }}>
+            Divide
+          </Text>
+          &
+          <Text style={{ color: COLORS.dark_accents, fontWeight: "bold" }}>
+            Do
+          </Text>
+          !
         </Text>
-      </TouchableOpacity>
+        <Text
+          style={[
+            styles.subtitle,
+            {
+              paddingBottom: 50,
+              /* NONE */
+            },
+          ]}
+        >
+          Compete with your friends to be the best!
+        </Text>
+        <TouchableOpacity
+          style={[styles.button, { flexDirection: "row", width: BUTTON_WIDTH }]}
+          onPress={() => {
+            console.log("USER LOGGED IN");
+            setIsUserLoggedIn(true);
+          }}
+        >
+          <Text style={{ fontSize: 16, fontWeight: "600" }}>
+            Login with Email
+          </Text>
+        </TouchableOpacity>
+        {/* Reset password button */}
+        <TouchableOpacity
+          style={[
+            styles.buttonSecondary,
+            { flexDirection: "row", width: BUTTON_WIDTH, marginBottom: 20 },
+          ]}
+          onPress={() => {
+            console.log("User pressed reset password");
+            router.push("/resetPassword");
+          }}
+        >
+          <Text style={{ color: COLORS.dark_subaccents, fontWeight: "600" }}>
+            Forgot Password?
+          </Text>
+        </TouchableOpacity>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={[styles.subtitle, { fontWeight: "500" }]}>
+            Don't have an account?{" "}
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              console.log("User pressed signup");
+              router.push("/signup");
+            }}
+          >
+            <Text style={[styles.linktext]}>Sign Up</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 }

@@ -535,10 +535,7 @@ export default function HomeScreen() {
                   onPress={() => {
                     // Move this task to done list
                     setTasks((prev) => prev.filter((t) => t.id !== item.id));
-                    setDoneTasks((prev) => [
-                      ...prev,
-                      { ...item, done: true },
-                    ]);
+                    setDoneTasks((prev) => [...prev, { ...item, done: true }]);
                   }}
                 >
                   <TaskItem
