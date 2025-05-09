@@ -99,14 +99,20 @@ export default function ResetPassword() {
           {/* ---------- form ---------- */}
           <View style={s.form}>
             <TextInput
+              style={{
+                backgroundColor: COLORS.dark_secondary,
+                borderRadius: 8,
+                padding: 12,
+                color: COLORS.dark_subaccents,
+                fontSize: 18,
+                textAlign: "left",
+                letterSpacing: 0,
+                marginBottom: 16,
+              }}
               placeholder="Username or Email"
               placeholderTextColor={COLORS.dark_senary}
-              value={username}
-              onChangeText={(text) => {
-                setUsername(text);
-                if (text) setUsernameError(false);
-              }}
-              style={[s.input, usernameError ? s.inputBackgroundError : null]}
+              autoCapitalize="none"
+              keyboardType="email-address"
             />
 
             <TextInput
