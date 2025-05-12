@@ -1,26 +1,154 @@
-import * as Notifications from "expo-notifications";
+import { useFocusEffect, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
-import { View, Text, Modal, Pressable, Alert, TextInput } from "react-native";
-import { useRouter, useFocusEffect } from "expo-router";
-import { StyleSheet } from "react-native";
-import FiBrburger from "../assets/icons/svg/fi-br-0.svg";
-import FiBrplus from "../assets/icons/svg/fi-br-plus.svg";
-import FiBrtrash from "../assets/icons/svg/fi-br-trash.svg";
-import FiBrcheck from "../assets/icons/svg/fi-br-list-check.svg";
-import FiBredit from "../assets/icons/svg/fi-br-text-box-edit.svg";
-import FiBrArrowTurnLeftUp from "../assets/icons/svg/fi-br-arrow-turn-left-up.svg";
-import FiBrArrowSmallLeft from "../assets/icons/svg/fi-br-arrow-small-left.svg";
-// simple JSON persistence (backend/storage/tasksStorage.ts)
-import { loadTasks, saveTasks } from "../backend/storage/tasksStorage";
-import { TouchableOpacity } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
 import {
-  PanGestureHandler,
-  State,
+  Alert,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Platform,
+} from "react-native";
+import FiBrburger from "../assets/icons/svg/fi-br-0.svg";
+import FiBrArrowSmallLeft from "../assets/icons/svg/fi-br-arrow-small-left.svg";
+import FiBrArrowTurnLeftUp from "../assets/icons/svg/fi-br-arrow-turn-left-up.svg";
+import FiBrcheck from "../assets/icons/svg/fi-br-list-check.svg";
+import FiBrplus from "../assets/icons/svg/fi-br-plus.svg";
+import FiBredit from "../assets/icons/svg/fi-br-text-box-edit.svg";
+import FiBrtrash from "../assets/icons/svg/fi-br-trash.svg";
+import { loadTasks, saveTasks } from "../backend/storage/tasksStorage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+// simple JSON persistence (backend/storage/tasksStorage.ts)
+import { TouchableOpacity } from "react-native";
+import {
+  FlatList,
   GestureHandlerGestureEvent,
+  PanGestureHandler,
   PanGestureHandlerEventPayload,
+  State,
   Swipeable,
 } from "react-native-gesture-handler";
+import { useTasks } from "../context/TasksContext";
+// Dummy user lists for demonstration
+const myLists = [];
+
+// Task group buttons (green)
+const taskGroups = [
+  { label: "Today" },
+  { label: "Scheduled" },
+  { label: "All" },
+  { label: "Flagged" },
+  { label: "Completed" },
+];
+// Additional styles for new UI elements
+const homeScreenStyles = StyleSheet.create({
+  divider: {
+    height: 1,
+    backgroundColor: "#444",
+    marginVertical: 10,
+    width: 300,
+    alignSelf: "center",
+  },
+  taskGroupRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: 2, // reduced the spacing further
+    width: "100%",
+  },
+  taskGroupButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 15,
+  },
+  taskListButton: {
+    backgroundColor: "#2563eb",
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 45,
+    width: 300,
+    alignSelf: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  inlineButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 50,
+    height: 45,
+    margin: 0,
+    borderRadius: 8,
+  },
+  taskListButtonText: {
+    color: "#93c5fd",
+    fontWeight: "500",
+    fontSize: 16,
+  },
+  recentlyDeletedButton: {
+    backgroundColor: "#4A4A4A",
+    borderRadius: 12,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    margin: 2,
+    width: "45%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  deleteButton: {
+    backgroundColor: "#D9534F",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 70,
+    height: "100%",
+  },
+  renameButton: {
+    backgroundColor: "#5BC0DE",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 70,
+    height: "100%",
+  },
+  recentlyDeletedText: {
+    color: "#fff",
+    fontWeight: "500",
+    fontSize: 15,
+  },
+  scrollRegion: {
+    backgroundColor: "#F4A261",
+    borderRadius: 16,
+    padding: 10,
+    marginHorizontal: 12,
+    marginTop: 18,
+    marginBottom: 10,
+    maxHeight: 350,
+    minHeight: 200,
+  },
+  taskGroupButton: {
+    backgroundColor: "#4A4A4A",
+    borderRadius: 12,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    margin: 2, // reduced from 5 to 2
+    width: "45%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  taskGroupsWrapper: {
+    marginHorizontal: 10,
+    marginBottom: 20,
+    alignItems: "flex-start",
+    marginLeft: 12,
+    width: "100%",
+  },
+});
 /*
   Dark theme palette (left UI) with original hex codes:
     dark_primary:    #101010
@@ -287,6 +415,24 @@ function TaskItem({
 }
 
 export default function HomeScreen() {
+  const { lists, setLists } = useTasks();
+
+  // Add-list modal state
+  const [addModalVisible, setAddModalVisible] = useState(false);
+  const [newListName, setNewListName] = useState("");
+  // Rename modal state
+  const [renameModalVisible, setRenameModalVisible] = useState(false);
+  const [renameName, setRenameName] = useState("");
+  const [renameError, setRenameError] = useState(false);
+  const [renameTarget, setRenameTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+
+  // e.g. to add a new list:
+  function addList(name: string) {
+    setLists((prev) => [...prev, { id: Date.now().toString(), name }]);
+  }
   // Home screen component
   const router = useRouter();
   const hasNavigated = useRef(false);
@@ -308,12 +454,8 @@ export default function HomeScreen() {
   const [editTaskId, setEditTaskId] = useState<string | null>(null);
 
   // State for toggling ongoing and completed lists
-  const [showOngoing, setShowOngoing] = useState(true);
-  const [showCompletedList, setShowCompletedList] = useState(true);
-
-  useEffect(() => {
-    Notifications.requestPermissionsAsync();
-  }, []);
+  //! const [showOngoing, setShowOngoing] = useState(true);
+  //! const [showCompletedList, setShowCompletedList] = useState(true);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -324,6 +466,7 @@ export default function HomeScreen() {
   // Manage tasks state
   const [tasks, setTasks] = useState<Task[]>([]);
   const [doneTasks, setDoneTasks] = useState<Task[]>([]);
+  const [recentlyDeleted, setRecentlyDeleted] = useState<any[]>([]);
 
   // ──────────────────────────────────────────────
   //  Load persisted tasks on first mount
@@ -331,15 +474,16 @@ export default function HomeScreen() {
   useEffect(() => {
     (async () => {
       const all = await loadTasks();
-      setTasks(all.filter((t) => !t.done));
-      setDoneTasks(all.filter((t) => t.done));
+      setTasks(all.filter((t) => !t.done && !t.recentlyDeleted));
+      setDoneTasks(all.filter((t) => t.done && !t.recentlyDeleted));
+      setRecentlyDeleted(all.filter((t) => t.recentlyDeleted));
     })();
   }, []);
 
-  // Persist whenever either list changes
+  // Persist whenever any list changes
   useEffect(() => {
-    saveTasks([...tasks, ...doneTasks]);
-  }, [tasks, doneTasks]);
+    saveTasks([...tasks, ...doneTasks, ...recentlyDeleted]);
+  }, [tasks, doneTasks, recentlyDeleted]);
 
   const onGestureEvent = (event: GestureHandlerGestureEvent) => {
     const translationX = (
@@ -351,11 +495,11 @@ export default function HomeScreen() {
       console.log("USER: HOME <= SETTINGS");
       router.push("/settings");
     }
-    if (translationX > 100 && !hasNavigated.current) {
+    /*  if (translationX > 100 && !hasNavigated.current) {
       hasNavigated.current = true;
       console.log("USER: HOME => LEADERBOARD");
       router.push("/leaderboard");
-    }
+    } */
 
     if (
       event.nativeEvent.state === State.END ||
@@ -419,265 +563,238 @@ export default function HomeScreen() {
     setEditModalVisible(false);
   };
 
+  // Add-list duplicate error state
+  const [duplicateError, setDuplicateError] = useState(false);
+
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent}>
       <View style={styles.screenbackground}>
-        {/* Screen title */}
-        <Pressable onPress={() => setShowOngoing((prev) => !prev)}>
-          <Text style={styles.subtitle}>Ongoing Chores</Text>
-        </Pressable>
-        {showOngoing && (
-          <FlatList
-            data={tasks}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <Swipeable
-                renderRightActions={() => (
-                  <View style={{ height: "100%" }}>
-                    {/* Delete (top‑half) */}
+        {/* Search Bar */}
+
+        {/* Task Groups (Green Buttons) */}
+        <View style={homeScreenStyles.taskGroupsWrapper}>
+          <View style={homeScreenStyles.taskGroupRow}>
+            <Pressable
+              style={homeScreenStyles.taskGroupButton}
+              onPress={() => router.push(`/myList/Today` as const)}
+            >
+              <Text style={homeScreenStyles.taskGroupButtonText}>Today</Text>
+            </Pressable>
+            <Pressable
+              style={homeScreenStyles.taskGroupButton}
+              onPress={() => router.push(`/myList/Scheduled` as const)}
+            >
+              <Text style={homeScreenStyles.taskGroupButtonText}>
+                Scheduled
+              </Text>
+            </Pressable>
+          </View>
+          <View style={homeScreenStyles.taskGroupRow}>
+            <Pressable
+              style={homeScreenStyles.taskGroupButton}
+              onPress={() => router.push(`/myList/All` as const)}
+            >
+              <Text style={homeScreenStyles.taskGroupButtonText}>All</Text>
+            </Pressable>
+            <Pressable
+              style={homeScreenStyles.taskGroupButton}
+              onPress={() => router.push(`/myList/Flagged` as const)}
+            >
+              <Text style={homeScreenStyles.taskGroupButtonText}>Flagged</Text>
+            </Pressable>
+          </View>
+          <View style={homeScreenStyles.taskGroupRow}>
+            <Pressable
+              style={homeScreenStyles.taskGroupButton}
+              onPress={() => router.push(`/myList/Completed` as const)}
+            >
+              <Text style={homeScreenStyles.taskGroupButtonText}>
+                Completed
+              </Text>
+            </Pressable>
+            <Pressable
+              style={homeScreenStyles.recentlyDeletedButton}
+              onPress={() => router.push(`/myList/Recently Deleted` as const)}
+            >
+              <Text style={homeScreenStyles.recentlyDeletedText}>
+                Recently Deleted
+              </Text>
+            </Pressable>
+          </View>
+          <View style={homeScreenStyles.divider} />
+        </View>
+        {/* User Lists (Blue Scrollable Region) */}
+        <View style={{ marginTop: 200 }}>
+          <View style={homeScreenStyles.divider} />
+          <ScrollView
+            style={{ flexGrow: 0, maxHeight: 220 }}
+            contentContainerStyle={{ paddingBottom: 10 }}
+            showsVerticalScrollIndicator={false}
+          >
+            <FlatList
+              data={lists}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <Swipeable
+                  renderRightActions={(progress, dragX) => (
                     <Pressable
-                      onPress={() => confirmDelete(item.id, false)}
-                      style={{
-                        flex: 1,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        backgroundColor: "red",
-                        width: 80,
-                        borderTopLeftRadius: 12,
-                        borderTopRightRadius: 12,
-                      }}
-                    >
-                      <FiBrtrash width={20} height={20} fill="#fff" />
-                    </Pressable>
-                    {/* Edit (bottom‑half) */}
-                    <Pressable
-                      onPress={() => openEdit(item)}
-                      style={{
-                        flex: 1,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        backgroundColor: "#2A9D8F", // blue from palette light_accents
-                        width: 80,
-                        borderBottomLeftRadius: 12,
-                        borderBottomRightRadius: 12,
-                      }}
-                    >
-                      <FiBredit
-                        width={20}
-                        height={20}
-                        fill={COLORS.dark_primary}
-                      />
-                    </Pressable>
-                  </View>
-                )}
-                renderLeftActions={() => (
-                  <View style={{ height: "100%" }}>
-                    {/* Un‑indent (only show if indent>0) */}
-                    {!!item.indent && item.indent > 0 && (
-                      <Pressable
-                        onPress={() => {
-                          setTasks((prev) =>
-                            prev.map((t) =>
-                              t.id === item.id
-                                ? { ...t, indent: (t.indent || 1) - 1 }
-                                : t
-                            )
-                          );
-                        }}
-                        style={{
-                          flex: 1,
-                          justifyContent: "center",
-                          alignItems: "center",
-                          backgroundColor: COLORS.light_accents,
-                          width: 80,
-                          borderTopLeftRadius: 12,
-                          borderTopRightRadius: 12,
-                        }}
-                      >
-                        <FiBrArrowSmallLeft
-                          width={20}
-                          height={20}
-                          fill={COLORS.dark_primary}
-                        />
-                      </Pressable>
-                    )}
-                    {/* Indent */}
-                    <Pressable
+                      style={[
+                        homeScreenStyles.inlineButton,
+                        { backgroundColor: "#7f1d1d" },
+                      ]}
                       onPress={() => {
-                        setTasks((prev) =>
-                          prev.map((t) =>
-                            t.id === item.id
-                              ? { ...t, indent: (t.indent || 0) + 1 }
-                              : t
-                          )
+                        Alert.alert(
+                          "Delete List",
+                          `Are you sure you want to delete ${item.name}?`,
+                          [
+                            { text: "Cancel", style: "cancel" },
+                            {
+                              text: "Delete",
+                              style: "destructive",
+                              onPress: () => {
+                                // remove list button
+                                setLists((prev) =>
+                                  prev.filter((l) => l.id !== item.id)
+                                );
+                                // move to recently deleted
+                                setRecentlyDeleted((prev) => [
+                                  ...prev,
+                                  { ...item, recentlyDeleted: true },
+                                ]);
+                              },
+                            },
+                          ]
                         );
                       }}
-                      style={{
-                        flex: 1,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        backgroundColor: COLORS.dark_accents,
-                        width: 80,
-                        borderBottomLeftRadius: 12,
-                        borderBottomRightRadius: 12,
+                    >
+                      <FiBrtrash width={20} height={20} fill="#fecaca" />
+                    </Pressable>
+                  )}
+                  renderLeftActions={(progress, dragX) => (
+                    <Pressable
+                      style={[
+                        homeScreenStyles.inlineButton,
+                        { backgroundColor: "#93c5fd" },
+                      ]}
+                      onPress={() => {
+                        setRenameTarget(item);
+                        setRenameName(item.name);
+                        setRenameError(true);
+                        setRenameModalVisible(true);
                       }}
                     >
-                      <FiBrArrowTurnLeftUp
-                        width={20}
-                        height={20}
-                        fill={COLORS.dark_primary}
-                      />
+                      <FiBredit width={20} height={20} fill="#2563eb" />
                     </Pressable>
-                  </View>
-                )}
-              >
-                <Pressable
-                  onPress={() => {
-                    // Move this task to done list
-                    setTasks((prev) => prev.filter((t) => t.id !== item.id));
-                    setDoneTasks((prev) => [...prev, { ...item, done: true }]);
-                  }}
+                  )}
                 >
-                  <TaskItem
-                    text={item.text}
-                    due={item.due}
-                    done={item.done}
-                    indent={item.indent || 0}
-                  />
-                </Pressable>
-              </Swipeable>
-            )}
-            ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-            contentContainerStyle={{
-              paddingVertical: 5,
-              paddingHorizontal: 16,
-            }}
-            style={{ flexGrow: 0 }}
-          />
-        )}
-        {/* 
-        <TouchableOpacity // HOME BUTTON
-        >
-          <FiBrhouse
-            width={50}
-            height={50}
-            fill={COLORS.dark_accents}
-            style={styles.homeButton}
-          />
-        </TouchableOpacity> */}
-        <Pressable onPress={() => setShowCompletedList((prev) => !prev)}>
-          <Text style={styles.subtitle}>Completed Chores</Text>
-        </Pressable>
-        {showCompletedList && (
-          <FlatList
-            data={doneTasks}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <Swipeable
-                renderLeftActions={() => (
                   <Pressable
-                    onPress={() => moveBackToOngoing(item.id)}
-                    style={[
-                      styles.leftAction,
-                      { backgroundColor: COLORS.light_accents },
-                    ]}
+                    style={homeScreenStyles.taskListButton}
+                    onPress={() => router.push(`/myList/${item.name}` as const)}
                   >
-                    <FiBrArrowTurnLeftUp
-                      width={20}
-                      height={20}
-                      fill={COLORS.dark_primary}
-                    />
+                    <Text style={homeScreenStyles.taskListButtonText}>
+                      {item.name}
+                    </Text>
                   </Pressable>
-                )}
-                renderRightActions={() => (
-                  <View style={{ height: "100%" }}>
-                    {/* Delete (top‑half) */}
-                    <Pressable
-                      onPress={() => confirmDelete(item.id, true)}
-                      style={{
-                        flex: 1,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        backgroundColor: "red",
-                        width: 80,
-                        borderTopLeftRadius: 12,
-                        borderTopRightRadius: 12,
-                      }}
-                    >
-                      <FiBrtrash width={20} height={20} fill="#fff" />
-                    </Pressable>
-                    {/* Edit (bottom‑half) */}
-                    <Pressable
-                      onPress={() => openEdit(item)}
-                      style={{
-                        flex: 1,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        backgroundColor: "#2A9D8F",
-                        width: 80,
-                        borderBottomLeftRadius: 12,
-                        borderBottomRightRadius: 12,
-                      }}
-                    >
-                      <FiBredit
-                        width={20}
-                        height={20}
-                        fill={COLORS.dark_primary}
-                      />
-                    </Pressable>
-                  </View>
-                )}
-              >
-                <Pressable>
-                  <TaskItem
-                    text={item.text}
-                    due={item.due}
-                    done={item.done}
-                    indent={item.indent || 0}
-                  />
-                </Pressable>
-              </Swipeable>
-            )}
-            ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-            contentContainerStyle={{
-              paddingVertical: 5,
-              paddingHorizontal: 16,
-            }}
-            style={{ flexGrow: 0 }}
-          />
-        )}
+                </Swipeable>
+              )}
+              ItemSeparatorComponent={() => <View style={{ height: 2 }} />}
+              scrollEnabled={false}
+            />
+          </ScrollView>
+        </View>
+        {/* --- The rest of the original task/chores UI could be rendered below this, if needed --- */}
         {/* Add‑task button */}
         <TouchableOpacity
           style={styles.addTaskButton}
           onPress={() => {
-            // Add a new task
-            console.log("Add Task");
-
-            const formatted = new Date().toLocaleDateString();
-
-            setShowTaskActions(true);
-            setTasks((prev) =>
-              prev.concat({
-                id: Date.now().toString(),
-                text: "New Task",
-                due: formatted,
-                done: false,
-                indent: 0,
-              })
-            );
+            setAddModalVisible(true);
           }}
         >
           <FiBrplus width={25} height={25} fill={COLORS.dark_accents} />
         </TouchableOpacity>
-        {/* Show‑lists button */}
-        <TouchableOpacity
-          style={styles.showListsButtons}
-          onPress={() => {
-            showModal ? setShowModal(false) : setShowModal(true);
-          }}
-        >
-          <FiBrburger width={25} height={25} fill={COLORS.dark_accents} />
-        </TouchableOpacity>
+        {/* Add List Modal */}
+        {/* Add List Modal */}
+        <Modal visible={addModalVisible} transparent animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>New List</Text>
+              <TextInput
+                value={newListName}
+                onChangeText={setNewListName}
+                placeholder="List name"
+                placeholderTextColor={COLORS.dark_subaccents}
+                style={{
+                  borderWidth: 1,
+                  borderColor: duplicateError
+                    ? "#450a0a"
+                    : COLORS.dark_tertiary,
+                  color: COLORS.dark_subaccents,
+                  padding: 8,
+                  borderRadius: 8,
+                  marginBottom: 10,
+                }}
+              />
+              {duplicateError && (
+                <Text
+                  style={{ color: "#ef4444", marginBottom: 8, fontSize: 12 }}
+                >
+                  List name already exists
+                </Text>
+              )}
+              <Pressable
+                onPress={() => {
+                  setAddModalVisible(false);
+                  setNewListName("");
+                  setDuplicateError(false);
+                }}
+                style={[
+                  styles.button,
+                  { backgroundColor: "#2563eb", marginBottom: 8 },
+                ]}
+              >
+                <Text
+                  style={[styles.buttonText, { color: COLORS.dark_primary }]}
+                >
+                  Cancel
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => {
+                  const trimmedName = newListName.trim();
+
+                  // Check for duplicates (case-insensitive)
+                  const isDuplicate = lists.some(
+                    (list) =>
+                      list.name.toLowerCase() === trimmedName.toLowerCase()
+                  );
+
+                  if (isDuplicate) {
+                    setDuplicateError(true);
+                    return;
+                  }
+
+                  if (trimmedName) {
+                    setLists((prev) => [
+                      ...prev,
+                      { id: Date.now().toString(), name: trimmedName },
+                    ]);
+                    setNewListName("");
+                    setDuplicateError(false);
+                    setAddModalVisible(false);
+                  }
+                }}
+                style={[styles.button, { backgroundColor: "#2563eb" }]}
+              >
+                <Text
+                  style={[styles.buttonText, { color: COLORS.dark_primary }]}
+                >
+                  Add
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+
         <Modal visible={editModalVisible} transparent animationType="fade">
           <View style={styles.modalOverlay}>
             {/* Dark translucent backdrop that dims the underlying screen */}
@@ -756,6 +873,73 @@ export default function HomeScreen() {
                   </Text>
                 </Pressable>
               </View>
+            </View>
+          </View>
+        </Modal>
+        {/* Rename List Modal */}
+        <Modal visible={renameModalVisible} transparent animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Rename List</Text>
+              <TextInput
+                value={renameName}
+                onChangeText={(text) => {
+                  setRenameName(text);
+                  setRenameError(false);
+                }}
+                placeholder="New name"
+                placeholderTextColor={COLORS.dark_subaccents}
+                style={{
+                  borderWidth: 1,
+                  borderColor: renameError ? "#450a0a" : COLORS.dark_tertiary,
+                  borderRadius: 8,
+                  padding: 8,
+                  color: COLORS.dark_subaccents,
+                  marginBottom: 10,
+                }}
+              />
+              <Pressable
+                style={styles.button}
+                onPress={async () => {
+                  if (!renameTarget) return;
+                  const trimmedName = renameName.trim();
+                  // Prevent duplicates (excluding the list being renamed), case‐insensitive
+                  if (renameTarget) {
+                    const normalized = trimmedName.toLowerCase();
+                    const duplicate = lists
+                      .filter((l) => l.id !== renameTarget.id)
+                      .some((l) => l.name.trim().toLowerCase() === normalized);
+                    if (duplicate) {
+                      setRenameError(true);
+                      return;
+                    }
+                  }
+                  const oldKey = `TASKS_${renameTarget.id}`;
+                  const newKey = `TASKS_${trimmedName}`;
+                  const raw = await AsyncStorage.getItem(oldKey);
+                  if (raw !== null) {
+                    await AsyncStorage.setItem(newKey, raw);
+                    await AsyncStorage.removeItem(oldKey);
+                  }
+                  setLists((prev) =>
+                    prev.map((l) =>
+                      l.id === renameTarget.id
+                        ? { ...l, id: trimmedName, name: trimmedName }
+                        : l
+                    )
+                  );
+                  router.replace(`/myList/${trimmedName}`);
+                  setRenameModalVisible(false);
+                }}
+              >
+                <Text style={styles.buttonText}>OK</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.button, { marginTop: 8 }]}
+                onPress={() => setRenameModalVisible(false)}
+              >
+                <Text style={styles.buttonText}>Cancel</Text>
+              </Pressable>
             </View>
           </View>
         </Modal>

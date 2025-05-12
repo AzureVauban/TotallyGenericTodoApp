@@ -1,12 +1,13 @@
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  View,
+  SafeAreaView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
+  View,
 } from "react-native";
-import { useRouter } from "expo-router";
+
 
 export default function VerifyPhone() {
   const [code, setCode] = useState("");

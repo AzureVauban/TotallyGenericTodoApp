@@ -53,11 +53,11 @@ export default function SettingsScreen() {
       } else {
         setBgColor("rgb(255,165,0)");
       }
-      if (translationX < -100 && !hasNavigated.current) {
+      /* if (translationX < -100 && !hasNavigated.current) {
         hasNavigated.current = true;
         console.log("USER: SETTINGS <= LEADERBOARD");
         router.push("/leaderboard");
-      }
+      } */
     } else if (translationX > 0) {
       // Right swipe: interpolate from white to blue
       if (translationX < 150) {

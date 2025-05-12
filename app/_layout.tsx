@@ -1,6 +1,10 @@
+import { useEffect } from "react";
+import * as NavigationBar from "expo-navigation-bar";
 import { Stack } from "expo-router";
 import * as React from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Platform } from "react-native";
+import { TasksProvider } from "../context/TasksContext";
 
 /**
  * Root layout component for Expo Router navigation.
@@ -16,16 +20,27 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
  */
 
 export default function RootLayout() {
+  useEffect(() => {
+    if (Platform.OS === "android") {
+      NavigationBar.setVisibilityAsync("hidden");
+      console.log("DETECTED PLATFORM IS ANDROID");
+      // Or to make it transparent:
+      // NavigationBar.setBackgroundColorAsync("transparent");
+      // NavigationBar.setButtonStyleAsync("light");
+    }
+  }, []);
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <Stack
-        screenOptions={{
-          gestureEnabled: true, // enables swipe gestures
-          gestureDirection: "horizontal", // swipe right/left
-          headerShown: false, // hides the header
-          contentStyle: { backgroundColor: "#eef2ff" }, // background color for the content
-        }}
-      />
-    </GestureHandlerRootView>
+    <TasksProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <Stack
+          screenOptions={{
+            gestureEnabled: true, // enables swipe gestures
+            gestureDirection: "horizontal", // swipe right/left
+            headerShown: false, // hides the header
+            contentStyle: { backgroundColor: "#eef2ff" }, // background color for the content
+          }}
+        />
+      </GestureHandlerRootView>
+    </TasksProvider>
   );
 }
