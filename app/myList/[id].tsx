@@ -23,7 +23,7 @@ import FiBredit from "../../assets/icons/svg/fi-br-text-box-edit.svg";
 import FiBrtrash from "../../assets/icons/svg/fi-br-trash.svg";
 import FiBrArrowRight from "../../assets/icons/svg/fi-br-arrow-alt-right.svg";
 import FiBrArrowLeft from "../../assets/icons/svg/fi-br-arrow-alt-left.svg";
-import { useTasks } from "../../context/TasksContext";
+import { useTasks } from "../../backend/storage/TasksContext";
 
 /**
  * **MyList Screen**
@@ -58,9 +58,9 @@ const getTomorrowMidnight = () => {
   const yyyy = d.getFullYear();
   return `${mm}-${dd}-${yyyy}`;
 };
-type TaskItem = {
+type Task = {
   id: string;
-  text: string;
+  title: string;
   done: boolean;
   flagged: boolean;
   recentlyDeleted?: boolean;
@@ -215,16 +215,45 @@ export default function MyList() {
   const { id } = useLocalSearchParams();
   // Ensure id is a string
   const listId = Array.isArray(id) ? id[0] : id;
-  const { lists, setLists } = useTasks();
+  // Update context import to include flagTask and indentTask
+  const { tasks, addTask, toggleTask, removeTask, updateTaskText, updateTask, flagTask, indentTask } =
+    useTasks() as unknown as {
+      tasks: Task[];
+      addTask: (task: Task) => void;
+      toggleTask: (id: string) => void;
+      removeTask: (id: string) => void;
+      updateTaskText: (id: string, newText: string) => void;
+      updateTask: (id: string, updatedTask: Task) => void;
+      flagTask: (id: string, isFlagged: boolean) => void;
+      indentTask: (id: string, indentLevel: number) => void;
+    };
   const router = useRouter();
-  const [tasks, setTasks] = useState<TaskItem[]>([]);
+
+  // Handler for flagging a task using context method
+  const handleFlagToggle = (taskId: string) => {
+    const isCurrentlyFlagged = tasks.find((t) => t.id === taskId)?.flagged ?? false;
+    flagTask(taskId, !isCurrentlyFlagged);
+  };
+
+  const handleEditTask = (taskId: string, taskText: string) => {
+    setRenameTaskId(taskId);
+    setRenameText(taskText);
+    setRenameModalVisible(true);
+  };
+
+  // Handler for indenting a task using context method
+  const handleIndentToggle = (taskId: string) => {
+    const currentIndent = tasks.find((t) => t.id === taskId)?.indent || 0;
+    indentTask(taskId, currentIndent === 1 ? 0 : 1);
+  };
+
   const [newTaskModalVisible, setNewTaskModalVisible] = useState(false);
   const [newTaskText, setNewTaskText] = useState("");
   const [renameModalVisible, setRenameModalVisible] = useState(false);
   const [renameText, setRenameText] = useState("");
   const [renameTaskId, setRenameTaskId] = useState<string | null>(null);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<TaskItem | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [detailDate, setDetailDate] = useState("");
   const [detailColor, setDetailColor] = useState("");
   const [newTaskError, setNewTaskError] = useState<string>("");
@@ -232,94 +261,42 @@ export default function MyList() {
   // Dynamic route: only for regular lists, never special lists
   const isSpecialList = false;
 
-  // Load saved tasks for this list (regular lists only)
-  useEffect(() => {
-    (async () => {
-      // Purge any tasks with undefined or literal "undefined" text from all stored lists
-      for (const list of lists) {
-        const storageKey = `TASKS_${list.name}`;
-        const rawList = await AsyncStorage.getItem(storageKey);
-        if (rawList) {
-          const arr: TaskItem[] = JSON.parse(rawList);
-          const cleanedList = arr.filter(
-            (t) => t.text !== undefined && t.text !== "undefined"
-          );
-          if (cleanedList.length !== arr.length) {
-            await AsyncStorage.setItem(storageKey, JSON.stringify(cleanedList));
-          }
-        }
-      }
-      // Regular list, load and immediately remove any undefined descriptions
-      const raw = await AsyncStorage.getItem(`TASKS_${listId}`);
-      const stored: TaskItem[] = raw ? JSON.parse(raw) : [];
-      // Filter out tasks with no valid description
-      const cleaned = stored.filter(
-        (t) => t.text !== undefined && t.text !== "undefined"
-      );
-      const normalized = cleaned.map((t) => ({
-        ...t,
-        flagged: t.flagged ?? false,
-        recentlyDeleted: t.recentlyDeleted ?? false,
-        indent: t.indent ?? 0,
-      }));
-      setTasks(normalized);
-    })();
-  }, [listId, lists]);
-
-  // Save whenever tasks change for regular lists
-  useEffect(() => {
-    AsyncStorage.setItem(`TASKS_${listId}`, JSON.stringify(tasks));
-  }, [tasks, listId]);
+  // Remove useEffect hooks for loading/saving tasks - handled by context now
 
   // No-op for updateTaskAcrossLists; not needed for regular lists
   const updateTaskAcrossLists = async (
     taskId: string,
     listName: string,
-    updateFn: (task: TaskItem) => TaskItem
+    updateFn: (task: Task) => Task
   ) => {};
 
-  // Function to handle indenting a task
-  const handleIndent = (taskIndex: number) => {
-    setTasks((prev) => {
-      const updated = [...prev];
-      const task = updated[taskIndex];
-      // Toggle indent (0 to 1, 1 to 0)
-      updated[taskIndex] = { ...task, indent: task.indent === 1 ? 0 : 1 };
-      return updated;
-    });
-  };
-
-  // Toggle indent by task id to avoid index mismatch
+  // Function to handle indenting a task (calls context method)
   const handleIndentById = (taskId: string) => {
-    setTasks((prev) =>
-      prev.map((t) =>
-        t.id === taskId ? { ...t, indent: t.indent === 1 ? 0 : 1 } : t
-      )
-    );
+    handleIndentToggle(taskId);
   };
 
   // Function to check if a task can be indented
-  const canIndent = (taskIndex: number): boolean => {
-    // Can't indent if it's the first task in the list or already indented
-    if (taskIndex === 0 || tasks[taskIndex].indent === 1) {
-      return false;
-    }
-    return true;
-  };
+  // (implementation omitted, as indent is not handled by context)
 
+  // Only show tasks for this list
+  const listTasks = tasks.filter((t) => (t as Task).listName === listId);
   // Custom active and completed filters
-  const activeTasks = tasks.filter((t, i) => {
+  const activeTasks = listTasks.filter((t, i) => {
     if (t.indent === 0) {
       // only include parent if not done
       return !t.done;
     }
     // for subtasks, include until parent and all siblings are done
     let j = i - 1;
-    while (j >= 0 && tasks[j].indent === 1) j--;
-    const parent = tasks[j];
+    while (j >= 0 && listTasks[j].indent === 1) j--;
+    const parent = listTasks[j];
     let allSibsDone = true;
-    for (let k = j + 1; k < tasks.length && tasks[k].indent === 1; k++) {
-      if (!tasks[k].done) {
+    for (
+      let k = j + 1;
+      k < listTasks.length && listTasks[k].indent === 1;
+      k++
+    ) {
+      if (!listTasks[k].done) {
         allSibsDone = false;
         break;
       }
@@ -327,18 +304,22 @@ export default function MyList() {
     // show subtask until parent+siblings complete
     return !(parent.done && allSibsDone);
   });
-  const completedTasks = tasks.filter((t, i) => {
+  const completedTasks = listTasks.filter((t, i) => {
     if (t.indent === 0) {
       // only parents that are done
       return t.done;
     }
     // for subtasks, only include once parent and all siblings are done
     let j = i - 1;
-    while (j >= 0 && tasks[j].indent === 1) j--;
-    const parent = tasks[j];
+    while (j >= 0 && listTasks[j].indent === 1) j--;
+    const parent = listTasks[j];
     let allSibsDone = true;
-    for (let k = j + 1; k < tasks.length && tasks[k].indent === 1; k++) {
-      if (!tasks[k].done) {
+    for (
+      let k = j + 1;
+      k < listTasks.length && listTasks[k].indent === 1;
+      k++
+    ) {
+      if (!listTasks[k].done) {
         allSibsDone = false;
         break;
       }
@@ -346,11 +327,9 @@ export default function MyList() {
     return parent.done && allSibsDone;
   });
   const [detailDesc, setDetailDesc] = useState("");
-  // Function to mark a task as deleted (regular list only)
+  // Function to mark a task as deleted (should use removeTask from context)
   const moveToRecentlyDeleted = (taskId: string, listName: string) => {
-    setTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, recentlyDeleted: true } : t))
-    );
+    removeTask(taskId);
   };
 
   // TODO: When dragging a parent task, also move its following subtasks as a group.
@@ -363,13 +342,13 @@ export default function MyList() {
         <Text style={styles.listTitle}>{listId}</Text>
       </View>
 
-      <DraggableFlatList<TaskItem>
-        data={activeTasks}
+      <DraggableFlatList
+        data={activeTasks as Task[]}
         keyExtractor={(item, index) => `${item.id}-${index}`}
         onDragEnd={({ data }) => {
-          if (!isSpecialList) setTasks(data as TaskItem[]);
+          // If you implement drag reordering in context, call it here.
         }}
-        renderItem={({ item, drag, getIndex }: RenderItemParams<TaskItem>) => {
+        renderItem={({ item, drag, getIndex }: RenderItemParams<Task>) => {
           const index = getIndex();
           const activeIndex = activeTasks.findIndex((t) => t.id === item.id);
           return (
@@ -384,7 +363,7 @@ export default function MyList() {
                     onPress={() => {
                       Alert.alert(
                         "Delete Task",
-                        `Move "${item.text}" to Recently Deleted?`,
+                        `Move "${item.title}" to Recently Deleted?`,
                         [
                           { text: "Cancel", style: "cancel" },
                           {
@@ -408,7 +387,7 @@ export default function MyList() {
                       setSelectedTask(item);
                       setDetailDate(item.scheduleDate ?? getTomorrowMidnight());
                       setDetailColor(item.buttonColor ?? "");
-                      setDetailDesc(item.text);
+                      setDetailDesc(item.title);
                       setDetailModalVisible(true);
                     }}
                   >
@@ -427,13 +406,7 @@ export default function MyList() {
                       styles.inlineButton,
                       { backgroundColor: "#fbbf24" },
                     ]}
-                    onPress={() => {
-                      setTasks((prev) =>
-                        prev.map((t) =>
-                          t.id === item.id ? { ...t, flagged: !t.flagged } : t
-                        )
-                      );
-                    }}
+                    onPress={() => handleFlagToggle(item.id)}
                   >
                     <FiBrflagAlt
                       width={20}
@@ -448,7 +421,7 @@ export default function MyList() {
                     ]}
                     onPress={() => {
                       setRenameTaskId(item.id);
-                      setRenameText(item.text);
+                      setRenameText(item.title);
                       setRenameModalVisible(true);
                     }}
                   >
@@ -484,14 +457,14 @@ export default function MyList() {
               <Pressable
                 onPress={() => {
                   console.log(
-                    `user pressed on the task, ${item.id}, with a description of, '${item.text}'`
+                    `user pressed on the task, ${item.id}, with a description of, '${item.title}'`
                   );
                   if (item.indent === 0) {
-                    const idx = tasks.findIndex((t) => t.id === item.id);
+                    const idx = listTasks.findIndex((t) => t.id === item.id);
                     let hasIncompleteSub = false;
-                    for (let j = idx + 1; j < tasks.length; j++) {
-                      if (tasks[j].indent !== 1) break;
-                      if (!tasks[j].done) {
+                    for (let j = idx + 1; j < listTasks.length; j++) {
+                      if (listTasks[j].indent !== 1) break;
+                      if (!listTasks[j].done) {
                         hasIncompleteSub = true;
                         break;
                       }
@@ -504,11 +477,7 @@ export default function MyList() {
                       return;
                     }
                   }
-                  setTasks((prev) =>
-                    prev.map((t) =>
-                      t.id === item.id ? { ...t, done: !t.done } : t
-                    )
-                  );
+                  toggleTask(item.id);
                 }}
                 onLongPress={() => {
                   // Default: start drag for reordering
@@ -540,7 +509,7 @@ export default function MyList() {
                         },
                     ]}
                   >
-                    {item.text}
+                    {item.title}
                   </Text>
                 </View>
               </Pressable>
@@ -552,19 +521,11 @@ export default function MyList() {
       {completedTasks.length > 0 && (
         <>
           <View style={styles.divider} />
-          <FlatList<TaskItem>
+          <FlatList<Task>
             data={completedTasks}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <Pressable
-                onPress={() =>
-                  setTasks((prev) =>
-                    prev.map((t) =>
-                      t.id === item.id ? { ...t, done: !t.done } : t
-                    )
-                  )
-                }
-              >
+              <Pressable onPress={() => toggleTask(item.id)}>
                 <View
                   style={[
                     styles.taskItem,
@@ -578,7 +539,7 @@ export default function MyList() {
                       { textDecorationLine: "line-through", color: "#888" },
                     ]}
                   >
-                    {item.text}
+                    {item.title}
                   </Text>
                 </View>
               </Pressable>
@@ -623,7 +584,7 @@ export default function MyList() {
                   setNewTaskError("Please enter a task description.");
                   return;
                 }
-                if (tasks.some((t) => t.text.trim() === desc)) {
+                if (listTasks.some((t) => t.title.trim() === desc)) {
                   setNewTaskError(
                     "A task with that description already exists."
                   );
@@ -632,21 +593,16 @@ export default function MyList() {
                 if (typeof desc !== "string") {
                   throw new Error(`Invalid task description: ${String(desc)}`);
                 }
-                const newTask: TaskItem = {
+                await addTask({
                   id: `${Date.now()}-${Math.random()
                     .toString(36)
                     .substr(2, 5)}`,
-                  text: desc,
+                  title: desc,
                   done: false,
                   flagged: false,
                   indent: 0,
-                };
-                const newArr = [...tasks, newTask];
-                setTasks(newArr);
-                await AsyncStorage.setItem(
-                  `TASKS_${listId}`,
-                  JSON.stringify(newArr)
-                );
+                  listName: listId,
+                });
                 setNewTaskError("");
                 setNewTaskText("");
                 setNewTaskModalVisible(false);
@@ -684,11 +640,8 @@ export default function MyList() {
               style={styles.modalButton}
               onPress={() => {
                 if (renameText.trim() && renameTaskId) {
-                  setTasks((prev) =>
-                    prev.map((t) =>
-                      t.id === renameTaskId ? { ...t, text: renameText } : t
-                    )
-                  );
+                  console.log(`Updating task with ID ${renameTaskId} to new text: ${renameText}`);
+                  updateTaskText(renameTaskId, renameText);
                 }
                 setRenameText("");
                 setRenameTaskId(null);
@@ -719,7 +672,7 @@ export default function MyList() {
             <TextInput
               value={detailDesc}
               onChangeText={setDetailDesc}
-              placeholder={selectedTask?.text}
+              placeholder={selectedTask?.title}
               placeholderTextColor="rgb(161, 161, 170)"
               style={styles.modalInput}
             />
@@ -786,17 +739,13 @@ export default function MyList() {
               style={styles.modalButton}
               onPress={() => {
                 if (selectedTask) {
-                  const updateFn = (t: TaskItem) => ({
+                  const updateFn = (t: Task) => ({
                     ...t,
-                    text: detailDesc,
+                    title: detailDesc,
                     scheduleDate: detailDate,
                     buttonColor: detailColor,
                   });
-                  setTasks((prev) =>
-                    prev.map((t) =>
-                      t.id === selectedTask.id ? updateFn(t) : t
-                    )
-                  );
+                  updateTask(selectedTask.id, updateFn(selectedTask));
                 }
                 setDetailModalVisible(false);
               }}

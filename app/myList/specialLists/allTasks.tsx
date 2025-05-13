@@ -6,8 +6,15 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useTasks } from "../../../context/TasksContext";
+import { useTasks } from "../../../backend/storage/TasksContext";
 
+// Local TaskItem shape
+interface TaskItem {
+  id: string;
+  text: string;
+  recentlyDeleted?: boolean;
+  listName: string;
+}
 
 export default function AllTasks() {
   const { lists } = useTasks();

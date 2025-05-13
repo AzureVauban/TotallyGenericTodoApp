@@ -14,8 +14,14 @@ import {
   Pressable,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useTasks } from "../../../context/TasksContext";
-import type { TaskItem } from "../_types";
+import { useTasks } from "../../../backend/storage/TasksContext";
+// Local TaskItem shape
+interface TaskItem {
+  id: string;
+  text: string;
+  recentlyDeleted?: boolean;
+  listName: string;
+}
 
 export default function RecentlyDeleted() {
   const { lists } = useTasks();

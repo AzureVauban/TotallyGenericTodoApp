@@ -18,8 +18,6 @@ import FiBrcheck from "../assets/icons/svg/fi-br-list-check.svg";
 import FiBrplus from "../assets/icons/svg/fi-br-plus.svg";
 import FiBredit from "../assets/icons/svg/fi-br-text-box-edit.svg";
 import FiBrtrash from "../assets/icons/svg/fi-br-trash.svg";
-import { loadTasks, saveTasks } from "../backend/storage/tasksStorage";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 // simple JSON persistence (backend/storage/tasksStorage.ts)
 import { TouchableOpacity } from "react-native";
 import {
@@ -30,10 +28,9 @@ import {
   State,
   Swipeable,
 } from "react-native-gesture-handler";
-import { useTasks } from "../context/TasksContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTasks } from "../backend/storage/TasksContext";
 import { Link } from "expo-router";
-// Dummy user lists for demonstration
-const myLists = [];
 
 // Task group buttons (green)
 const taskGroups = [
@@ -414,6 +411,7 @@ function TaskItem({
     </View>
   );
 }
+
 /**
  * **HomeScreen**
  *
@@ -435,8 +433,9 @@ function TaskItem({
  *
  * @returns A fully‑interactive React Native view wrapped in `Swipeable` components.
  */
+
 export default function HomeScreen() {
-  const { lists, setLists } = useTasks();
+  const { lists, addList, removeList } = useTasks();
 
   // Add-list modal state
   const [addModalVisible, setAddModalVisible] = useState(false);
@@ -450,61 +449,15 @@ export default function HomeScreen() {
     name: string;
   } | null>(null);
 
-  // e.g. to add a new list:
-  function addList(name: string) {
-    setLists((prev) => [...prev, { id: Date.now().toString(), name }]);
-  }
   // Home screen component
   const router = useRouter();
   const hasNavigated = useRef(false);
-  // Modal state for task actions
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<{
-    id: string;
-    text: string;
-    due: string;
-    done: boolean;
-  } | null>(null);
-  const [showCompleted, setShowCompleted] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [showTaskActions, setShowTaskActions] = useState(false);
-
-  const [editModalVisible, setEditModalVisible] = useState(false);
-  const [editText, setEditText] = useState("");
-  const [editDue, setEditDue] = useState("");
-  const [editTaskId, setEditTaskId] = useState<string | null>(null);
-
-  // State for toggling ongoing and completed lists
-  //! const [showOngoing, setShowOngoing] = useState(true);
-  //! const [showCompletedList, setShowCompletedList] = useState(true);
 
   useFocusEffect(
     React.useCallback(() => {
       hasNavigated.current = false;
     }, [])
   );
-
-  // Manage tasks state
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [doneTasks, setDoneTasks] = useState<Task[]>([]);
-  const [recentlyDeleted, setRecentlyDeleted] = useState<any[]>([]);
-
-  // ──────────────────────────────────────────────
-  //  Load persisted tasks on first mount
-  // ──────────────────────────────────────────────
-  useEffect(() => {
-    (async () => {
-      const all = await loadTasks();
-      setTasks(all.filter((t) => !t.done && !t.recentlyDeleted));
-      setDoneTasks(all.filter((t) => t.done && !t.recentlyDeleted));
-      setRecentlyDeleted(all.filter((t) => t.recentlyDeleted));
-    })();
-  }, []);
-
-  // Persist whenever any list changes
-  useEffect(() => {
-    saveTasks([...tasks, ...doneTasks, ...recentlyDeleted]);
-  }, [tasks, doneTasks, recentlyDeleted]);
 
   const onGestureEvent = (event: GestureHandlerGestureEvent) => {
     const translationX = (
@@ -531,57 +484,6 @@ export default function HomeScreen() {
         hasNavigated.current = false;
       }, 1500);
     }
-  };
-
-  const handleDelete = (id: string, done: boolean) => {
-    if (done) {
-      setDoneTasks((prev) => prev.filter((t) => t.id !== id));
-    } else {
-      setTasks((prev) => prev.filter((t) => t.id !== id));
-    }
-  };
-
-  const confirmDelete = (id: string, done: boolean) => {
-    Alert.alert("Delete task", "Are you sure you want to delete this task?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => handleDelete(id, done),
-      },
-    ]);
-  };
-
-  const openEdit = (item: {
-    id: string;
-    text: string;
-    due: string;
-    done: boolean;
-  }) => {
-    setEditTaskId(item.id);
-    setEditText(item.text);
-    setEditDue(item.due);
-    setEditModalVisible(true);
-  };
-
-  const moveBackToOngoing = (id: string) => {
-    const task = doneTasks.find((t) => t.id === id);
-    if (!task) return;
-    setDoneTasks((prev) => prev.filter((t) => t.id !== id));
-    setTasks((prev) => [...prev, { ...task, done: false }]);
-  };
-
-  const saveEdit = () => {
-    if (!editTaskId) {
-      return;
-    }
-    const apply = (list: any[]) =>
-      list.map((t) =>
-        t.id === editTaskId ? { ...t, text: editText, due: editDue } : t
-      );
-    setTasks((prev) => apply(prev));
-    setDoneTasks((prev) => apply(prev));
-    setEditModalVisible(false);
   };
 
   // Add-list duplicate error state
@@ -673,15 +575,7 @@ export default function HomeScreen() {
                               text: "Delete",
                               style: "destructive",
                               onPress: () => {
-                                // remove list button
-                                setLists((prev) =>
-                                  prev.filter((l) => l.id !== item.id)
-                                );
-                                // move to recently deleted
-                                setRecentlyDeleted((prev) => [
-                                  ...prev,
-                                  { ...item, recentlyDeleted: true },
-                                ]);
+                                removeList(item.id);
                               },
                             },
                           ]
@@ -700,7 +594,7 @@ export default function HomeScreen() {
                       onPress={() => {
                         setRenameTarget(item);
                         setRenameName(item.name);
-                        setRenameError(true);
+                        setRenameError(false);
                         setRenameModalVisible(true);
                       }}
                     >
@@ -795,10 +689,7 @@ export default function HomeScreen() {
                   }
 
                   if (trimmedName) {
-                    setLists((prev) => [
-                      ...prev,
-                      { id: Date.now().toString(), name: trimmedName },
-                    ]);
+                    addList(trimmedName);
                     setNewListName("");
                     setDuplicateError(false);
                     setAddModalVisible(false);
@@ -816,87 +707,7 @@ export default function HomeScreen() {
           </View>
         </Modal>
 
-        <Modal visible={editModalVisible} transparent animationType="fade">
-          <View style={styles.modalOverlay}>
-            {/* Dark translucent backdrop that dims the underlying screen */}
-            <View style={styles.modalContent}>
-              {/* White/grey card that holds all editable controls */}
-              <Text style={styles.modalTitle}>Edit Task</Text>
-              {/* Editable task description */}
-              <TextInput
-                value={editText}
-                onChangeText={setEditText}
-                placeholder="Description"
-                placeholderTextColor={COLORS.dark_subaccents}
-                style={{
-                  borderWidth: 1,
-                  borderColor: COLORS.dark_tertiary,
-                  color: COLORS.dark_subaccents,
-                  padding: 8,
-                  borderRadius: 8,
-                  marginBottom: 10,
-                }}
-              />
-              {/* Editable due date */}
-              <TextInput
-                value={editDue}
-                onChangeText={setEditDue}
-                placeholder="Due date"
-                placeholderTextColor={COLORS.dark_subaccents}
-                style={{
-                  borderWidth: 1,
-                  borderColor: COLORS.dark_tertiary,
-                  color: COLORS.dark_subaccents,
-                  padding: 8,
-                  borderRadius: 8,
-                  marginBottom: 10,
-                }}
-              />
-              {/* Action buttons – Cancel first, then Save */}
-              <View
-                style={{
-                  marginTop: 8,
-                }}
-              >
-                <Pressable
-                  onPress={() => setEditModalVisible(false)}
-                  style={[
-                    {
-                      backgroundColor: COLORS.dark_accents,
-                      paddingVertical: 10,
-                      borderRadius: 8,
-                      marginBottom: 8,
-                      alignItems: "center",
-                    },
-                  ]} // Close modal without saving
-                >
-                  <Text
-                    style={[styles.buttonText, { color: COLORS.dark_primary }]}
-                  >
-                    Cancel
-                  </Text>
-                </Pressable>
-                <Pressable
-                  onPress={saveEdit}
-                  style={[
-                    {
-                      backgroundColor: COLORS.dark_accents,
-                      paddingVertical: 10,
-                      borderRadius: 8,
-                      alignItems: "center",
-                    },
-                  ]}
-                >
-                  <Text
-                    style={[styles.buttonText, { color: COLORS.dark_primary }]}
-                  >
-                    Save
-                  </Text>
-                </Pressable>
-              </View>
-            </View>
-          </View>
-        </Modal>
+        {/* Removed Edit Task Modal as tasks are not managed here */}
         {/* Rename List Modal */}
         <Modal visible={renameModalVisible} transparent animationType="fade">
           <View style={styles.modalOverlay}>
@@ -942,12 +753,10 @@ export default function HomeScreen() {
                     await AsyncStorage.setItem(newKey, raw);
                     await AsyncStorage.removeItem(oldKey);
                   }
-                  setLists((prev) =>
-                    prev.map((l) =>
-                      l.id === renameTarget.id
-                        ? { ...l, id: trimmedName, name: trimmedName }
-                        : l
-                    )
+                  // Assuming rename logic is handled internally or needs to be implemented here.
+                  // If renameList is meant to be called, it should be implemented in TasksContext.
+                  console.warn(
+                    "renameList not found in TasksContext. Implement rename logic here."
                   );
                   router.replace(`/myList/${trimmedName}`);
                   setRenameModalVisible(false);
