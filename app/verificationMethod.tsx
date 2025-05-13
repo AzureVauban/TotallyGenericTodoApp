@@ -9,6 +9,33 @@ import {
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
+/**
+ * **VerificationMethod Screen**
+ *
+ * Lets the user choose how they want to receive their one‑time code—by **email**
+ * or **phone**—before proceeding to the corresponding verification screen.
+ *
+ * ### Interaction
+ * * Tapping an option toggles its selection (email ↔ phone).
+ * * Pressing **Next**:
+ *   - If _no_ option is selected, sets an error message (“Please select a
+ *     verification method.”) displayed in red beneath the button.
+ *   - If **Email** is selected, navigates to `/verifyEmail`.
+ *   - If **Phone** is selected, navigates to `/verifyPhone`.
+ *
+ * ### Visuals
+ * * Two rounded boxes show the available methods with icons and sample
+ *   destination text.  The selected box gets an orange border (`#F26C4F`).
+ * * A single orange “Next” button lives in a footer container.
+ *
+ * ### Hooks & State
+ * * `selectedMethod` – `"email" | "phone" | null`.
+ * * `errorMessage` – string shown when the user taps **Next** without a choice.
+ * * `useRouter` from **expo-router** handles navigation.
+ *
+ * @returns A `SafeAreaView` containing the selection UI and Next button.
+ */
+
 export default function VerificationMethod() {
   const router = useRouter();
   const [selectedMethod, setSelectedMethod] = useState<

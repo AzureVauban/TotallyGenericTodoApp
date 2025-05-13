@@ -13,25 +13,6 @@ import { StyleSheet } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 
-/*
-  Dark theme palette (left UI) with original hex codes:
-    dark_primary:    #101010
-    dark_secondary:  #1A1A1A
-    dark_tertiary:   #373737
-    dark_accents:    #F26C4F
-    dark_subaccents: #C5C5C5
-    dark_senary:     #808080
-    dark_icon_text:  #F26C4F
-
-  Light theme palette (right UI) with original hex codes:
-    light_primary:   #F26C4F
-    light_secondary: #FFFFFF
-    light_tertiary:  #CCCCCC
-    light_accents:   #101010
-    light_subaccents:#373737
-    light_senary:    #E8A87C
-    light_icon_text: #101010
-*/
 const COLORS = {
   //  Dark theme palette (left UI) with original hex codes:
   dark_primary: "#101010", // #101010
@@ -110,6 +91,30 @@ const styles = StyleSheet.create({
     backgroundColor: " #D59D80",
   },
 });
+
+/**
+ * **SignUpScreen**
+ *
+ * Presents the four‑field sign‑up form (username, password, email, phone) and a
+ * single **“Signup & Login”** button.  Field‑level validation colours the
+ * background `#450a0a` when invalid.
+ *
+ * ### Interaction
+ * * **Swipe → Back** – A right‑swipe (> 50 px) handled by
+ *   `PanGestureHandler` navigates to the previous screen.
+ * * **Signup & Login** – When all four inputs are non‑empty and *email* / *phone*
+ *   match their regex patterns, calls `router.replace("/verificationMethod")`.
+ *
+ * ### State
+ * * `username`, `password`, `email`, `phone` – controlled text inputs.
+ * * `*_Valid` booleans – toggle per‑field background colour.
+ *
+ * ### Visuals
+ * * A centred logo (`../assets/images/test5.png`) sits above the form.
+ * * Shared button styles (`sharedButtonStyle`) ensure uniform width.
+ *
+ * @returns A `PanGestureHandler`‑wrapped `View` containing the sign‑up form.
+ */
 
 export default function SignUpScreen() {
   const router = useRouter();

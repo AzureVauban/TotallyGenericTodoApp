@@ -51,8 +51,9 @@ app-example
 assets/uicons-bold-rounded-2.6.0.zip
 *.log
 
-# npm
+# npm and yarn
 package-lock.json
 npm-shrinkwrap.json
 assets/uicons-bold-rounded-2.6.0
 assets/icons/svg/
+assets/soundeffects/

@@ -68,6 +68,25 @@ const styles = StyleSheet.create({
   },
 });
 
+/**
+ * **VerifyEmail Screen**
+ *
+ * Shows the 4-digit OTP interface for email verification. Four boxes fill as
+ * the user taps digits on a custom keypad rendered below.
+ *
+ * #### Interaction
+ * • **Digit tap** – appends the digit to `code` (max 4).
+ * • **⌫ Backspace** – removes the last digit.
+ * • **← Back** – navigates back to `/verificationMethod`.
+ * • **Verify →** – enabled only when `code.length === 4`; routes to `/home`.
+ *
+ * #### State / Hooks
+ * • `code` – string holding the current 4-digit OTP.
+ * • `useRouter` – Expo Router instance for navigation.
+ *
+ * @returns A `SafeAreaView` containing the code boxes and numeric keypad.
+ */
+
 export default function verifyPhone() {
   const router = useRouter();
 

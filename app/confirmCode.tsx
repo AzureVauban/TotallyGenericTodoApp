@@ -7,8 +7,26 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-
+/**
+ * **VerifyPhone Screen**
+ *
+ * Renders a 4‑digit SMS/OTP verification UI for the phone‑number sign‑in flow.
+ *
+ * ### Behaviour
+ * 1. Displays four empty boxes that fill as the user taps digits on the custom keypad.
+ * 2. The *Verify and continue* button is only active when all four digits are entered;
+ *    pressing it navigates to `/home`.
+ * 3. The keypad includes:
+ *    * Digits 0‑9 – appends a digit (max length 4).
+ *    * `←` – navigates back to `/verificationMethod`.
+ *    * `⌫` – deletes the last digit.
+ *
+ * ### Hooks & Navigation
+ * * **`useState`** – tracks the current 4‑digit `code`.
+ * * **`useRouter`** – handles in‑app navigation with Expo Router.
+ *
+ * @returns A React‑Native `SafeAreaView` containing the verification UI.
+ */
 export default function VerifyPhone() {
   const [code, setCode] = useState("");
   const router = useRouter();

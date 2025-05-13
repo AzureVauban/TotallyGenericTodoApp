@@ -68,6 +68,26 @@ const styles = StyleSheet.create({
   },
 });
 
+/**
+ * **VerifyPhone Screen**
+ *
+ * Mirrors **VerifyEmail** but for SMS verification. Displays four code boxes
+ * and a numeric keypad; once the user enters all four digits, the **Verify →**
+ * button becomes active.
+ *
+ * #### Interaction
+ * • **Digit tap** – appends a digit (cap 4).
+ * • **⌫ Backspace** – deletes the most recent digit.
+ * • **← Back** – returns to `/verificationMethod`.
+ * • **Verify →** – active when `code` is full; navigates to `/home`.
+ *
+ * #### State / Hooks
+ * • `code` – 4-digit SMS code.
+ * • `useRouter` – Expo Router navigation.
+ *
+ * @returns A `SafeAreaView` wrapping the verification UI.
+ */
+
 export default function verifyPhone() {
   const router = useRouter();
 

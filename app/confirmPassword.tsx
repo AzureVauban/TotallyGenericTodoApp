@@ -37,7 +37,27 @@ const homeScreenStyles = StyleSheet.create({
     borderRadius: 8,
   },
 });
-
+/**
+ * **HomeScreen**
+ *
+ * Displays the list‑of‑lists “home” view where the user can:
+ *  • Swipe **right‑to‑left** on a list button to reveal a red **Delete** action.
+ *    Confirming the alert removes the list, pushes it to the *recentlyDeleted* state array,
+ *    and persists the change via `saveTasks`.
+ *  • Tap a list button to navigate to `/myList/<id>` using Expo Router.
+ *  • Tap the big green “+” button to create a new list. An `Alert.prompt` collects the
+ *    name, validates it, persists the new list, and immediately routes to its detail screen.
+ *
+ * **State**
+ *  * `tasks` – active task‑lists shown on screen.
+ *  * `doneTasks` / `recentlyDeleted` – supporting arrays used by other views.
+ *
+ * **Side‑effects**
+ *  Persists all list mutations through the local `saveTasks` helper (implementation
+ *  provided elsewhere in the project).
+ *
+ * @returns A fully‑interactive React Native view wrapped in `Swipeable` components.
+ */
 export default function HomeScreen() {
   const [tasks, setTasks] = useState([]);
   const [doneTasks, setDoneTasks] = useState([]);

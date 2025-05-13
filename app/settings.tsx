@@ -8,6 +8,31 @@ import {
   GestureHandlerGestureEvent,
 } from "react-native-gesture-handler";
 
+/**
+ * **SettingsScreen**
+ *
+ * Displays the Settings page with a swipe‑gesture background‑color transition and
+ * a “Log Out” button.  The component supports two key gestures:
+ *
+ * 1. **Swipe → Home** – A right‑swipe > 100 px navigates back to `/home`.  As the user
+ *    drags, the background gradually shifts from the default lavender `#eef2ff` to
+ *    full blue (`rgb(0,0,255)`).
+ * 2. **Swipe ← (placeholder leaderboard)** – A left‑swipe dynamically fades the
+ *    background to orange.  The actual navigation to `/leaderboard` is commented
+ *    out but can be re‑enabled.
+ *
+ * ### Hooks & State
+ * * `bgColor` – current background colour (updated every `onGestureEvent` frame).
+ * * `hasNavigated` (ref) – debounce so gesture navigation triggers only once.
+ * * `useFocusEffect` – resets colour & debounce whenever the screen regains focus.
+ *
+ * ### Components
+ * * **PanGestureHandler** from *react‑native‑gesture‑handler* wraps the entire screen.
+ * * **Image** – centred app logo.
+ * * **TouchableOpacity** – red “Log Out” button that routes to `/login`.
+ *
+ * @returns A full‑screen `View` wrapped in a `PanGestureHandler`.
+ */
 export function RedirectToLogin() {
   const router = useRouter();
   const isUserLoggedIn: boolean = false; // Replace with your actual login check
@@ -24,7 +49,7 @@ export function RedirectToLogin() {
     return () => clearTimeout(timeout);
   }, [isUserLoggedIn, router]);
 }
-
+//TODO: ADD DOCSTRING
 export default function SettingsScreen() {
   const router = useRouter();
   const hasNavigated = useRef(false);

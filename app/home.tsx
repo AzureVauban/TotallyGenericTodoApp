@@ -31,6 +31,7 @@ import {
   Swipeable,
 } from "react-native-gesture-handler";
 import { useTasks } from "../context/TasksContext";
+import { Link } from "expo-router";
 // Dummy user lists for demonstration
 const myLists = [];
 
@@ -365,7 +366,7 @@ type Task = {
   done: boolean;
   indent?: number; // optional, default 0
 };
-
+//TODO: ADD DOCSTRING
 function TaskItem({
   text,
   due,
@@ -413,7 +414,27 @@ function TaskItem({
     </View>
   );
 }
-
+/**
+ * **HomeScreen**
+ *
+ * Displays the list‑of‑lists “home” view where the user can:
+ *  • Swipe **right‑to‑left** on a list button to reveal a red **Delete** action.
+ *    Confirming the alert removes the list, pushes it to the *recentlyDeleted* state array,
+ *    and persists the change via `saveTasks`.
+ *  • Tap a list button to navigate to `/myList/<id>` using Expo Router.
+ *  • Tap the big green “+” button to create a new list. An `Alert.prompt` collects the
+ *    name, validates it, persists the new list, and immediately routes to its detail screen.
+ *
+ * **State**
+ *  * `tasks` – active task‑lists shown on screen.
+ *  * `doneTasks` / `recentlyDeleted` – supporting arrays used by other views.
+ *
+ * **Side‑effects**
+ *  Persists all list mutations through the local `saveTasks` helper (implementation
+ *  provided elsewhere in the project).
+ *
+ * @returns A fully‑interactive React Native view wrapped in `Swipeable` components.
+ */
 export default function HomeScreen() {
   const { lists, setLists } = useTasks();
 
@@ -574,52 +595,52 @@ export default function HomeScreen() {
         {/* Task Groups (Green Buttons) */}
         <View style={homeScreenStyles.taskGroupsWrapper}>
           <View style={homeScreenStyles.taskGroupRow}>
-            <Pressable
+            <Link
+              href="/myList/specialLists/today"
               style={homeScreenStyles.taskGroupButton}
-              onPress={() => router.push(`/myList/Today` as const)}
             >
               <Text style={homeScreenStyles.taskGroupButtonText}>Today</Text>
-            </Pressable>
-            <Pressable
+            </Link>
+            <Link
+              href="/myList/specialLists/scheduledTasks"
               style={homeScreenStyles.taskGroupButton}
-              onPress={() => router.push(`/myList/Scheduled` as const)}
             >
               <Text style={homeScreenStyles.taskGroupButtonText}>
                 Scheduled
               </Text>
-            </Pressable>
+            </Link>
           </View>
           <View style={homeScreenStyles.taskGroupRow}>
-            <Pressable
+            <Link
+              href="/myList/specialLists/allTasks"
               style={homeScreenStyles.taskGroupButton}
-              onPress={() => router.push(`/myList/All` as const)}
             >
               <Text style={homeScreenStyles.taskGroupButtonText}>All</Text>
-            </Pressable>
-            <Pressable
+            </Link>
+            <Link
+              href="/myList/specialLists/flaggedTasks"
               style={homeScreenStyles.taskGroupButton}
-              onPress={() => router.push(`/myList/Flagged` as const)}
             >
               <Text style={homeScreenStyles.taskGroupButtonText}>Flagged</Text>
-            </Pressable>
+            </Link>
           </View>
           <View style={homeScreenStyles.taskGroupRow}>
-            <Pressable
+            <Link
+              href="/myList/specialLists/completedTasks"
               style={homeScreenStyles.taskGroupButton}
-              onPress={() => router.push(`/myList/Completed` as const)}
             >
               <Text style={homeScreenStyles.taskGroupButtonText}>
                 Completed
               </Text>
-            </Pressable>
-            <Pressable
+            </Link>
+            <Link
+              href="/myList/specialLists/recentlyDeleted"
               style={homeScreenStyles.recentlyDeletedButton}
-              onPress={() => router.push(`/myList/Recently Deleted` as const)}
             >
               <Text style={homeScreenStyles.recentlyDeletedText}>
                 Recently Deleted
               </Text>
-            </Pressable>
+            </Link>
           </View>
           <View style={homeScreenStyles.divider} />
         </View>

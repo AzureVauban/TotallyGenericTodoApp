@@ -30,8 +30,30 @@ const COLORS = {
   light_icon_text: "#101010",
 };
 
-/* ---------------------------------------------------- */
-
+/**
+ * **ResetPassword Screen**
+ *
+ * A three‑field form that lets the user reset their password. The screen workflow:
+ *
+ * 1. **User Input**
+ *    * **Username / Email** – plain text field (not currently validated).
+ *    * **Password** – secure entry, stored in local `pwd` state.
+ *    * **Confirm password** – secure entry, must match `pwd`.
+ * 2. **Validation**
+ *    * Any empty field sets an error flag that highlights the input with `#450a0a`.
+ *    * Mismatched passwords also flag an error on the confirm box.
+ * 3. **Next →**  
+ *    * If validation passes, navigates to `/verificationMethod` via Expo Router.
+ * 4. **Swipe‑to‑go‑back**  
+ *    * A rightward PanGesture (> 50 px) sends the user to `/login`.
+ *
+ * ### State
+ * * `username`, `pwd`, `confirm` – user‑entered strings.
+ * * `*_Error` booleans – input‑level validation flags.
+ * * `isNavigating` – debounce so the swipe handler doesn’t fire twice.
+ *
+ * @returns A scrollable React‑Native form wrapped in `PanGestureHandler`.
+ */
 export default function ResetPassword() {
   const router = useRouter();
   const [username, setUsername] = useState("");

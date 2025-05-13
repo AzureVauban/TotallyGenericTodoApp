@@ -143,5 +143,4 @@ const styles = StyleSheet.create({
     elevation: 0,
   },
 });
-
 export default InputCodeScreen;
