@@ -146,22 +146,24 @@ const homeScreenStyles = StyleSheet.create({
     marginLeft: 12,
     width: "100%",
   },
-});
-/*
-  Dark theme palette (left UI) with original hex codes:
-    dark_primary:    #101010
-    dark_secondary:  #1A1A1A
-    dark_tertiary:   #373737
-    dark_accents:    #F26C4F
-    dark_subaccents: #C5C5C5
 
-  Light theme palette (right UI) with original hex codes:
-    light_primary:   #F26C4F
-    light_secondary: #FFFFFF
-    light_tertiary:  #CCCCCC
-    light_accents:   #101010
-    light_subaccents:#373737
-*/
+  addTaskListButton: {
+    backgroundColor: "#0284c7",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    // marginVertical: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "78.0%",
+  },
+  addTaskListButtonText: {
+    color: "#bae6fd",
+    fontSize: 16,
+    fontWeight: "500",
+  },
+});
+
 const COLORS = {
   //  Dark theme palette (left UI) with original hex codes:
   dark_primary: "#101010", // #101010
@@ -228,7 +230,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   buttonText: {
-    color: "#C6C6D0",
+    color: "#93c5fd",
     fontWeight: "bold",
   },
   buttonSecondary: {
@@ -246,18 +248,19 @@ const styles = StyleSheet.create({
     //color: " #D59D80",
     //fill: COLORS.dark_secondary,
   },
-  addTaskButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 15,
-    backgroundColor: COLORS.dark_primary,
-    justifyContent: "center",
+  addTaskListButton: {
+    backgroundColor: "#0284c7",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    marginVertical: 16,
     alignItems: "center",
-    position: "absolute",
-    bottom: 24,
-    right: 24,
-    borderColor: COLORS.dark_accents,
-    borderWidth: 1.5,
+    justifyContent: "center",
+  },
+  addTaskListButtonText: {
+    color: "#bae6fd",
+    fontSize: 16,
+    fontWeight: "500",
   },
   homeButton: {
     width: 56,
@@ -333,6 +336,18 @@ const styles = StyleSheet.create({
     color: COLORS.dark_subaccents,
     marginBottom: 12,
   },
+  modalButton: {
+    backgroundColor: "#2563eb",
+    padding: 12,
+    borderRadius: 6,
+    marginBottom: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalButtonText: {
+    color: "#fff",
+    fontSize: 16,
+  },
   modalOption: {
     paddingVertical: 10,
     borderTopWidth: 1,
@@ -354,63 +369,7 @@ const styles = StyleSheet.create({
   },
 });
 
-// dummy tasks data
-
-type Task = {
-  id: string;
-  text: string;
-  due: string;
-  done: boolean;
-  indent?: number; // optional, default 0
-};
 //TODO: ADD DOCSTRING
-function TaskItem({
-  text,
-  due,
-  done,
-  indent,
-}: {
-  text: string;
-  due: string;
-  done: boolean;
-  indent: number;
-}) {
-  // How much we visually shift the **contents** (not the row container) to the right
-  const leftOffset = indent * 10; // 10 px per indent level
-
-  // scale the little status circle but keep a sensible minimum
-  const iconSize = Math.max(8, 20 - indent * 4);
-
-  return (
-    <View style={styles.taskRow}>
-      {/* Give the whole row the normal width, but shift inner content */}
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          flex: 1,
-          marginLeft: leftOffset,
-        }}
-      >
-        <View
-          style={[
-            styles.square,
-            done && styles.squareDone,
-            {
-              width: iconSize,
-              height: iconSize,
-              borderRadius: iconSize / 2,
-            },
-          ]}
-        />
-        <Text style={[styles.taskText, done && styles.taskTextDone]}>
-          {text}
-        </Text>
-      </View>
-      {!!due && <Text style={styles.taskDue}>{due}</Text>}
-    </View>
-  );
-}
 
 /**
  * **HomeScreen**
@@ -435,7 +394,7 @@ function TaskItem({
  */
 
 export default function HomeScreen() {
-  const { lists, addList, removeList } = useTasks();
+  const { lists, addList, removeList, renameList } = useTasks();
 
   // Add-list modal state
   const [addModalVisible, setAddModalVisible] = useState(false);
@@ -493,7 +452,6 @@ export default function HomeScreen() {
     <PanGestureHandler onGestureEvent={onGestureEvent}>
       <View style={styles.screenbackground}>
         {/* Search Bar */}
-
         {/* Task Groups (Green Buttons) */}
         <View style={homeScreenStyles.taskGroupsWrapper}>
           <View style={homeScreenStyles.taskGroupRow}>
@@ -547,7 +505,7 @@ export default function HomeScreen() {
           <View style={homeScreenStyles.divider} />
         </View>
         {/* User Lists (Blue Scrollable Region) */}
-        <View style={{ marginTop: 200 }}>
+        <View style={{ marginTop: 100 }}>
           <View style={homeScreenStyles.divider} />
           <ScrollView
             style={{ flexGrow: 0, maxHeight: 220 }}
@@ -618,16 +576,35 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
         {/* --- The rest of the original task/chores UI could be rendered below this, if needed --- */}
-        {/* Add‑task button */}
-        <TouchableOpacity
-          style={styles.addTaskButton}
-          onPress={() => {
-            setAddModalVisible(true);
+        <View
+          style={{
+            position: "absolute",
+            bottom: 48, // moved it higher
+            left: 0,
+            right: 0,
+            alignItems: "center",
           }}
         >
-          <FiBrplus width={25} height={25} fill={COLORS.dark_accents} />
-        </TouchableOpacity>
-        {/* Add List Modal */}
+          {/* Divider just above button */}
+          <View
+            style={[
+              homeScreenStyles.divider,
+              { width: "90%", marginBottom: 8 },
+            ]}
+          />
+          {/* Centered Add-Task-List button */}
+          <TouchableOpacity
+            style={[
+              homeScreenStyles.addTaskListButton,
+              { width: 300 }, // uniform width with the other list buttons
+            ]}
+            onPress={() => setAddModalVisible(true)}
+          >
+            <Text style={homeScreenStyles.addTaskListButtonText}>
+              + Add Task List
+            </Text>
+          </TouchableOpacity>
+        </View>
         {/* Add List Modal */}
         <Modal visible={addModalVisible} transparent animationType="fade">
           <View style={styles.modalOverlay}>
@@ -657,37 +634,28 @@ export default function HomeScreen() {
                 </Text>
               )}
               <Pressable
+                style={[styles.modalButton, { backgroundColor: "#888" }]}
                 onPress={() => {
                   setAddModalVisible(false);
                   setNewListName("");
                   setDuplicateError(false);
                 }}
-                style={[
-                  styles.button,
-                  { backgroundColor: "#2563eb", marginBottom: 8 },
-                ]}
               >
-                <Text
-                  style={[styles.buttonText, { color: COLORS.dark_primary }]}
-                >
-                  Cancel
-                </Text>
+                <Text style={styles.modalButtonText}>Cancel</Text>
               </Pressable>
               <Pressable
+                style={styles.modalButton}
                 onPress={() => {
                   const trimmedName = newListName.trim();
-
                   // Check for duplicates (case-insensitive)
                   const isDuplicate = lists.some(
                     (list) =>
                       list.name.toLowerCase() === trimmedName.toLowerCase()
                   );
-
                   if (isDuplicate) {
                     setDuplicateError(true);
                     return;
                   }
-
                   if (trimmedName) {
                     addList(trimmedName);
                     setNewListName("");
@@ -695,20 +663,15 @@ export default function HomeScreen() {
                     setAddModalVisible(false);
                   }
                 }}
-                style={[styles.button, { backgroundColor: "#2563eb" }]}
               >
-                <Text
-                  style={[styles.buttonText, { color: COLORS.dark_primary }]}
-                >
-                  Add
-                </Text>
+                <Text style={styles.modalButtonText}>Add</Text>
               </Pressable>
             </View>
           </View>
         </Modal>
-
         {/* Removed Edit Task Modal as tasks are not managed here */}
         {/* Rename List Modal */}
+
         <Modal visible={renameModalVisible} transparent animationType="fade">
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
@@ -730,45 +693,36 @@ export default function HomeScreen() {
                   marginBottom: 10,
                 }}
               />
+
               <Pressable
-                style={styles.button}
-                onPress={async () => {
+                style={styles.modalButton}
+                onPress={() => {
                   if (!renameTarget) return;
                   const trimmedName = renameName.trim();
                   // Prevent duplicates (excluding the list being renamed), case‐insensitive
-                  if (renameTarget) {
-                    const normalized = trimmedName.toLowerCase();
-                    const duplicate = lists
-                      .filter((l) => l.id !== renameTarget.id)
-                      .some((l) => l.name.trim().toLowerCase() === normalized);
-                    if (duplicate) {
-                      setRenameError(true);
-                      return;
-                    }
+                  const normalized = trimmedName.toLowerCase();
+                  const duplicate = lists
+                    .filter((l) => l.id !== renameTarget.id)
+                    .some((l) => l.name.trim().toLowerCase() === normalized);
+                  if (duplicate || !trimmedName) {
+                    setRenameError(true);
+                    return;
                   }
-                  const oldKey = `TASKS_${renameTarget.id}`;
-                  const newKey = `TASKS_${trimmedName}`;
-                  const raw = await AsyncStorage.getItem(oldKey);
-                  if (raw !== null) {
-                    await AsyncStorage.setItem(newKey, raw);
-                    await AsyncStorage.removeItem(oldKey);
-                  }
-                  // Assuming rename logic is handled internally or needs to be implemented here.
-                  // If renameList is meant to be called, it should be implemented in TasksContext.
-                  console.warn(
-                    "renameList not found in TasksContext. Implement rename logic here."
-                  );
+                  // Call context renameList to update storage and state
+                  renameList(renameTarget.id, trimmedName);
+                  // Navigate to the renamed list screen
                   router.replace(`/myList/${trimmedName}`);
                   setRenameModalVisible(false);
                 }}
               >
-                <Text style={styles.buttonText}>OK</Text>
+                <Text style={styles.modalButtonText}>OK</Text>
               </Pressable>
+
               <Pressable
-                style={[styles.button, { marginTop: 8 }]}
+                style={[styles.modalButton, { backgroundColor: "#888" }]}
                 onPress={() => setRenameModalVisible(false)}
               >
-                <Text style={styles.buttonText}>Cancel</Text>
+                <Text style={styles.modalButtonText}>Cancel</Text>
               </Pressable>
             </View>
           </View>

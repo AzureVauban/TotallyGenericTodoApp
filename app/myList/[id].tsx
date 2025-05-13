@@ -1,7 +1,12 @@
 // Helper to get tomorrow's date at midnight in mm-dd-yyyy format
+import {
+  PanGestureHandler,
+  State,
+  GestureHandlerGestureEvent,
+} from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -24,6 +29,7 @@ import FiBrtrash from "../../assets/icons/svg/fi-br-trash.svg";
 import FiBrArrowRight from "../../assets/icons/svg/fi-br-arrow-alt-right.svg";
 import FiBrArrowLeft from "../../assets/icons/svg/fi-br-arrow-alt-left.svg";
 import { useTasks } from "../../backend/storage/TasksContext";
+import { Task as ContextTask } from "../../backend/storage/TasksContext";
 
 /**
  * **MyList Screen**
@@ -57,17 +63,6 @@ const getTomorrowMidnight = () => {
   const dd = String(d.getDate()).padStart(2, "0");
   const yyyy = d.getFullYear();
   return `${mm}-${dd}-${yyyy}`;
-};
-type Task = {
-  id: string;
-  title: string;
-  done: boolean;
-  flagged: boolean;
-  recentlyDeleted?: boolean;
-  indent?: number;
-  scheduleDate?: string;
-  buttonColor?: string;
-  listName?: string;
 };
 
 // Special list types (for reference, but not used for routing)
@@ -206,32 +201,35 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: 50,
     height: "100%",
+    alignSelf: "stretch",
     margin: 0,
     borderRadius: 8,
   },
 });
 
 export default function MyList() {
+  const router = useRouter();
+  const hasNavigated = useRef(false);
   const { id } = useLocalSearchParams();
   // Ensure id is a string
   const listId = Array.isArray(id) ? id[0] : id;
   // Update context import to include flagTask and indentTask
-  const { tasks, addTask, toggleTask, removeTask, updateTaskText, updateTask, flagTask, indentTask } =
-    useTasks() as unknown as {
-      tasks: Task[];
-      addTask: (task: Task) => void;
-      toggleTask: (id: string) => void;
-      removeTask: (id: string) => void;
-      updateTaskText: (id: string, newText: string) => void;
-      updateTask: (id: string, updatedTask: Task) => void;
-      flagTask: (id: string, isFlagged: boolean) => void;
-      indentTask: (id: string, indentLevel: number) => void;
-    };
-  const router = useRouter();
+  const {
+    tasks,
+    addTask,
+    toggleTask,
+    removeTask,
+    updateTaskText,
+    updateTask,
+    flagTask,
+    indentTask,
+    reorderTasks: reorderTask,
+  } = useTasks();
 
   // Handler for flagging a task using context method
   const handleFlagToggle = (taskId: string) => {
-    const isCurrentlyFlagged = tasks.find((t) => t.id === taskId)?.flagged ?? false;
+    const isCurrentlyFlagged =
+      tasks.find((t) => t.id === taskId)?.flagged ?? false;
     flagTask(taskId, !isCurrentlyFlagged);
   };
 
@@ -253,7 +251,7 @@ export default function MyList() {
   const [renameText, setRenameText] = useState("");
   const [renameTaskId, setRenameTaskId] = useState<string | null>(null);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [selectedTask, setSelectedTask] = useState<ContextTask | null>(null);
   const [detailDate, setDetailDate] = useState("");
   const [detailColor, setDetailColor] = useState("");
   const [newTaskError, setNewTaskError] = useState<string>("");
@@ -267,7 +265,7 @@ export default function MyList() {
   const updateTaskAcrossLists = async (
     taskId: string,
     listName: string,
-    updateFn: (task: Task) => Task
+    updateFn: (task: ContextTask) => ContextTask
   ) => {};
 
   // Function to handle indenting a task (calls context method)
@@ -279,488 +277,517 @@ export default function MyList() {
   // (implementation omitted, as indent is not handled by context)
 
   // Only show tasks for this list
-  const listTasks = tasks.filter((t) => (t as Task).listName === listId);
+  const listTasks = tasks.filter((t) => (t as ContextTask).listName === listId);
   // Custom active and completed filters
   const activeTasks = listTasks.filter((t, i) => {
     if (t.indent === 0) {
-      // only include parent if not done
-      return !t.done;
+      // only include parent if not completed
+      return !t.completed;
     }
-    // for subtasks, include until parent and all siblings are done
+    // for subtasks, include until parent and all siblings are completed
     let j = i - 1;
     while (j >= 0 && listTasks[j].indent === 1) j--;
     const parent = listTasks[j];
-    let allSibsDone = true;
+    let allSibsCompleted = true;
     for (
       let k = j + 1;
       k < listTasks.length && listTasks[k].indent === 1;
       k++
     ) {
-      if (!listTasks[k].done) {
-        allSibsDone = false;
+      if (!listTasks[k].completed) {
+        allSibsCompleted = false;
         break;
       }
     }
     // show subtask until parent+siblings complete
-    return !(parent.done && allSibsDone);
+    return !(parent.completed && allSibsCompleted);
   });
   const completedTasks = listTasks.filter((t, i) => {
     if (t.indent === 0) {
-      // only parents that are done
-      return t.done;
+      // only parents that are completed
+      return t.completed;
     }
-    // for subtasks, only include once parent and all siblings are done
+    // for subtasks, only include once parent and all siblings are completed
     let j = i - 1;
     while (j >= 0 && listTasks[j].indent === 1) j--;
     const parent = listTasks[j];
-    let allSibsDone = true;
+    let allSibsCompleted = true;
     for (
       let k = j + 1;
       k < listTasks.length && listTasks[k].indent === 1;
       k++
     ) {
-      if (!listTasks[k].done) {
-        allSibsDone = false;
+      if (!listTasks[k].completed) {
+        allSibsCompleted = false;
         break;
       }
     }
-    return parent.done && allSibsDone;
+    return parent.completed && allSibsCompleted;
   });
   const [detailDesc, setDetailDesc] = useState("");
   // Function to mark a task as deleted (should use removeTask from context)
   const moveToRecentlyDeleted = (taskId: string, listName: string) => {
     removeTask(taskId);
   };
+  const onGestureEvent = (event: GestureHandlerGestureEvent) => {
+    const translationX = event.nativeEvent.translationX as number;
 
+    // Left-swipe (>100px to the left) → Home
+    if (translationX > -100 && !hasNavigated.current) {
+      hasNavigated.current = true;
+      console.log(`USER: ${listId} <= HOME`);
+      router.push("/home");
+    }
+
+    // Reset navigation lock after gesture ends
+    if (
+      event.nativeEvent.state === State.END ||
+      event.nativeEvent.state === State.CANCELLED ||
+      event.nativeEvent.state === State.FAILED
+    ) {
+      setTimeout(() => {
+        hasNavigated.current = false;
+      }, 1500);
+    }
+  };
   // TODO: When dragging a parent task, also move its following subtasks as a group.
   //       Implement custom onDragBegin/onDragEnd to splice the subtasks array slice
   //       along with the parent to the new index position.
 
   return (
-    <View style={styles.container}>
-      <View style={styles.listTitleWrapper}>
-        <Text style={styles.listTitle}>{listId}</Text>
-      </View>
+    <PanGestureHandler onGestureEvent={onGestureEvent}>
+      <View style={styles.container}>
+        <View style={styles.listTitleWrapper}>
+          <Text style={styles.listTitle}>{listId}</Text>
+        </View>
 
-      <DraggableFlatList
-        data={activeTasks as Task[]}
-        keyExtractor={(item, index) => `${item.id}-${index}`}
-        onDragEnd={({ data }) => {
-          // If you implement drag reordering in context, call it here.
-        }}
-        renderItem={({ item, drag, getIndex }: RenderItemParams<Task>) => {
-          const index = getIndex();
-          const activeIndex = activeTasks.findIndex((t) => t.id === item.id);
-          return (
-            <Swipeable
-              renderRightActions={() => (
-                <View style={{ flexDirection: "row" }}>
-                  <Pressable
-                    style={[
-                      styles.inlineButton,
-                      { backgroundColor: "#7f1d1d" },
-                    ]}
-                    onPress={() => {
-                      Alert.alert(
-                        "Delete Task",
-                        `Move "${item.title}" to Recently Deleted?`,
-                        [
-                          { text: "Cancel", style: "cancel" },
-                          {
-                            text: "Delete",
-                            style: "destructive",
-                            onPress: () =>
-                              moveToRecentlyDeleted(item.id, listId),
-                          },
-                        ]
-                      );
-                    }}
-                  >
-                    <FiBrtrash width={20} height={20} fill="#fecaca" />
-                  </Pressable>
-                  <Pressable
-                    style={[
-                      styles.inlineButton,
-                      { backgroundColor: "rgb(67,56,202)" },
-                    ]}
-                    onPress={() => {
-                      setSelectedTask(item);
-                      setDetailDate(item.scheduleDate ?? getTomorrowMidnight());
-                      setDetailColor(item.buttonColor ?? "");
-                      setDetailDesc(item.title);
-                      setDetailModalVisible(true);
-                    }}
-                  >
-                    <FiBrsettings
-                      width={20}
-                      height={20}
-                      fill="rgb(165,180,252)"
-                    />
-                  </Pressable>
-                </View>
-              )}
-              renderLeftActions={() => (
-                <View style={{ flexDirection: "row" }}>
-                  <Pressable
-                    style={[
-                      styles.inlineButton,
-                      { backgroundColor: "#fbbf24" },
-                    ]}
-                    onPress={() => handleFlagToggle(item.id)}
-                  >
-                    <FiBrflagAlt
-                      width={20}
-                      height={20}
-                      fill={item.flagged ? "#b45309" : "#fde68a"}
-                    />
-                  </Pressable>
-                  <Pressable
-                    style={[
-                      styles.inlineButton,
-                      { backgroundColor: "#93c5fd" },
-                    ]}
-                    onPress={() => {
-                      setRenameTaskId(item.id);
-                      setRenameText(item.title);
-                      setRenameModalVisible(true);
-                    }}
-                  >
-                    <FiBredit width={20} height={20} fill="#2563eb" />
-                  </Pressable>
-                  {/* Indent/Outdent button for non-special lists */}
-                  {activeIndex >= 0 && (
+        <DraggableFlatList
+          data={activeTasks as ContextTask[]}
+          keyExtractor={(item, index) => `${item.id}-${index}`}
+          onDragEnd={({ data }) => reorderTask(listId, data)}
+          renderItem={({
+            item,
+            drag,
+            getIndex,
+          }: RenderItemParams<ContextTask>) => {
+            const index = getIndex();
+            const activeIndex = activeTasks.findIndex((t) => t.id === item.id);
+            return (
+              <Swipeable
+                renderRightActions={() => (
+                  <View style={{ flexDirection: "row", alignItems: "stretch", marginBottom: 5 }}>
                     <Pressable
                       style={[
                         styles.inlineButton,
-                        { backgroundColor: "rgb(16, 185, 129)" },
+                        { backgroundColor: "rgb(67,56,202)" },
                       ]}
-                      onPress={() => handleIndentById(item.id)}
+                      onPress={() => {
+                        setSelectedTask(item);
+                        setDetailDate(
+                          item.scheduleDate ?? getTomorrowMidnight()
+                        );
+                        setDetailColor(item.buttonColor ?? "");
+                        setDetailDesc(item.title);
+                        setDetailModalVisible(true);
+                      }}
                     >
-                      {item.indent === 1 ? (
-                        <FiBrArrowLeft
-                          width={20}
-                          height={20}
-                          fill="rgb(167, 243, 208)"
-                        />
-                      ) : (
-                        <FiBrArrowRight
-                          width={20}
-                          height={20}
-                          fill="rgb(167, 243, 208)"
-                        />
-                      )}
+                      <FiBrsettings
+                        width={20}
+                        height={20}
+                        fill="rgb(165,180,252)"
+                      />
                     </Pressable>
-                  )}
-                </View>
-              )}
-            >
-              <Pressable
-                onPress={() => {
-                  console.log(
-                    `user pressed on the task, ${item.id}, with a description of, '${item.title}'`
-                  );
-                  if (item.indent === 0) {
-                    const idx = listTasks.findIndex((t) => t.id === item.id);
-                    let hasIncompleteSub = false;
-                    for (let j = idx + 1; j < listTasks.length; j++) {
-                      if (listTasks[j].indent !== 1) break;
-                      if (!listTasks[j].done) {
-                        hasIncompleteSub = true;
-                        break;
+                    <Pressable
+                      style={[
+                        styles.inlineButton,
+                        { backgroundColor: "#7f1d1d" },
+                      ]}
+                      onPress={() => {
+                        Alert.alert(
+                          "Delete Task",
+                          `Move "${item.title}" to Recently Deleted?`,
+                          [
+                            { text: "Cancel", style: "cancel" },
+                            {
+                              text: "Delete",
+                              style: "destructive",
+                              onPress: () =>
+                                moveToRecentlyDeleted(item.id, listId),
+                            },
+                          ]
+                        );
+                      }}
+                    >
+                      <FiBrtrash width={20} height={20} fill="#fecaca" />
+                    </Pressable>
+                  </View>
+                )}
+                renderLeftActions={() => (
+                  <View style={{ flexDirection: "row", alignItems: "stretch", marginBottom: 5 }}>
+                    <Pressable
+                      style={[
+                        styles.inlineButton,
+                        { backgroundColor: "#fbbf24" },
+                      ]}
+                      onPress={() => handleFlagToggle(item.id)}
+                    >
+                      <FiBrflagAlt
+                        width={20}
+                        height={20}
+                        fill={item.flagged ? "#b45309" : "#fde68a"}
+                      />
+                    </Pressable>
+                    <Pressable
+                      style={[
+                        styles.inlineButton,
+                        { backgroundColor: "#93c5fd" },
+                      ]}
+                      onPress={() => {
+                        setRenameTaskId(item.id);
+                        setRenameText(item.title);
+                        setRenameModalVisible(true);
+                      }}
+                    >
+                      <FiBredit width={20} height={20} fill="#2563eb" />
+                    </Pressable>
+                    {/* Indent/Outdent button for non-special lists */}
+                    {activeIndex >= 0 && (
+                      <Pressable
+                        style={[
+                          styles.inlineButton,
+                          { backgroundColor: "rgb(16, 185, 129)" },
+                        ]}
+                        onPress={() => handleIndentById(item.id)}
+                      >
+                        {item.indent === 1 ? (
+                          <FiBrArrowLeft
+                            width={20}
+                            height={20}
+                            fill="rgb(167, 243, 208)"
+                          />
+                        ) : (
+                          <FiBrArrowRight
+                            width={20}
+                            height={20}
+                            fill="rgb(167, 243, 208)"
+                          />
+                        )}
+                      </Pressable>
+                    )}
+                  </View>
+                )}
+              >
+                <Pressable
+                  onPress={() => {
+                    console.log(
+                      `user pressed on the task, ${item.id}, with a description of, '${item.title}'`
+                    );
+                    if (item.indent === 0) {
+                      const idx = listTasks.findIndex((t) => t.id === item.id);
+                      let hasIncompleteSub = false;
+                      for (let j = idx + 1; j < listTasks.length; j++) {
+                        if (listTasks[j].indent !== 1) break;
+                        if (!listTasks[j].completed) {
+                          hasIncompleteSub = true;
+                          break;
+                        }
+                      }
+                      if (hasIncompleteSub) {
+                        Alert.alert(
+                          "Complete Subtasks",
+                          "You must complete all subtasks before completing this task."
+                        );
+                        return;
                       }
                     }
-                    if (hasIncompleteSub) {
-                      Alert.alert(
-                        "Complete Subtasks",
-                        "You must complete all subtasks before completing this task."
-                      );
-                      return;
-                    }
-                  }
-                  toggleTask(item.id);
-                }}
-                onLongPress={() => {
-                  // Default: start drag for reordering
-                  drag();
-                }}
-              >
-                <View
-                  style={[
-                    styles.taskItem,
-                    item.indent === 1 && styles.indentedTask,
-                    item.done
-                      ? { backgroundColor: "#2d2d2d" }
-                      : item.buttonColor
-                      ? { backgroundColor: item.buttonColor }
-                      : {},
-                  ]}
+                    toggleTask(item.id);
+                  }}
+                  onLongPress={() => {
+                    // Default: start drag for reordering
+                    drag();
+                  }}
                 >
-                  <Text
+                  <View
                     style={[
-                      styles.taskText,
-                      item.done && {
-                        textDecorationLine: "line-through",
-                        color: "#888",
-                      },
-                      item.indent === 1 &&
-                        item.done && {
+                      styles.taskItem,
+                      item.indent === 1 && styles.indentedTask,
+                      item.completed
+                        ? { backgroundColor: "#2d2d2d" }
+                        : item.buttonColor
+                        ? { backgroundColor: item.buttonColor }
+                        : {},
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.taskText,
+                        item.completed && {
                           textDecorationLine: "line-through",
                           color: "#888",
                         },
-                    ]}
-                  >
-                    {item.title}
-                  </Text>
-                </View>
-              </Pressable>
-            </Swipeable>
-          );
-        }}
-      />
+                        item.indent === 1 &&
+                          item.completed && {
+                            textDecorationLine: "line-through",
+                            color: "#888",
+                          },
+                      ]}
+                    >
+                      {item.title}
+                    </Text>
+                  </View>
+                </Pressable>
+              </Swipeable>
+            );
+          }}
+        />
 
-      {completedTasks.length > 0 && (
-        <>
-          <View style={styles.divider} />
-          <FlatList<Task>
-            data={completedTasks}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <Pressable onPress={() => toggleTask(item.id)}>
-                <View
-                  style={[
-                    styles.taskItem,
-                    item.indent === 1 && styles.indentedTask,
-                    { backgroundColor: "#2d2d2d" },
-                  ]}
-                >
-                  <Text
+        {completedTasks.length > 0 && (
+          <>
+            <View style={styles.divider} />
+            <FlatList<ContextTask>
+              data={completedTasks}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <Pressable onPress={() => toggleTask(item.id)}>
+                  <View
                     style={[
-                      styles.taskText,
-                      { textDecorationLine: "line-through", color: "#888" },
+                      styles.taskItem,
+                      item.indent === 1 && styles.indentedTask,
+                      { backgroundColor: "#2d2d2d" },
                     ]}
                   >
-                    {item.title}
-                  </Text>
-                </View>
-              </Pressable>
-            )}
-          />
-        </>
-      )}
-
-      {/* Only show add task button (always, since only regular lists) */}
-      <TouchableOpacity
-        style={styles.addTaskButton}
-        onPress={() => setNewTaskModalVisible(true)}
-      >
-        <Text style={styles.addTaskButtonText}>+ Add Task</Text>
-      </TouchableOpacity>
-
-      {/* New Task Modal */}
-      <Modal visible={newTaskModalVisible} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>New Task</Text>
-            <TextInput
-              value={newTaskText}
-              onChangeText={setNewTaskText}
-              placeholder="Task description"
-              placeholderTextColor="#ccc"
-              style={[
-                styles.modalInput,
-                newTaskError && { borderColor: "#450a0a" },
-              ]}
+                    <Text
+                      style={[
+                        styles.taskText,
+                        { textDecorationLine: "line-through", color: "#888" },
+                      ]}
+                    >
+                      {item.title}
+                    </Text>
+                  </View>
+                </Pressable>
+              )}
             />
-            {newTaskError ? (
-              <Text style={{ color: "#450a0a", marginBottom: 8 }}>
-                {newTaskError}
-              </Text>
-            ) : null}
-            <Pressable
-              style={styles.modalButton}
-              onPress={async () => {
-                const desc = newTaskText?.trim();
-                if (!desc) {
-                  setNewTaskError("Please enter a task description.");
-                  return;
-                }
-                if (listTasks.some((t) => t.title.trim() === desc)) {
-                  setNewTaskError(
-                    "A task with that description already exists."
-                  );
-                  return;
-                }
-                if (typeof desc !== "string") {
-                  throw new Error(`Invalid task description: ${String(desc)}`);
-                }
-                await addTask({
-                  id: `${Date.now()}-${Math.random()
-                    .toString(36)
-                    .substr(2, 5)}`,
-                  title: desc,
-                  done: false,
-                  flagged: false,
-                  indent: 0,
-                  listName: listId,
-                });
-                setNewTaskError("");
-                setNewTaskText("");
-                setNewTaskModalVisible(false);
-              }}
-            >
-              <Text style={styles.modalButtonText}>Add</Text>
-            </Pressable>
-            <Pressable
-              style={[styles.modalButton, { backgroundColor: "#888" }]}
-              onPress={() => {
-                setNewTaskText("");
-                setNewTaskError("");
-                setNewTaskModalVisible(false);
-              }}
-            >
-              <Text style={styles.modalButtonText}>Cancel</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
+          </>
+        )}
 
-      {/* Rename Task Modal */}
-      <Modal visible={renameModalVisible} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Rename Task</Text>
-            <TextInput
-              value={renameText}
-              onChangeText={setRenameText}
-              placeholder="Task description"
-              placeholderTextColor="#ccc"
-              style={styles.modalInput}
-            />
-            <Pressable
-              style={styles.modalButton}
-              onPress={() => {
-                if (renameText.trim() && renameTaskId) {
-                  console.log(`Updating task with ID ${renameTaskId} to new text: ${renameText}`);
-                  updateTaskText(renameTaskId, renameText);
-                }
-                setRenameText("");
-                setRenameTaskId(null);
-                setRenameModalVisible(false);
-              }}
-            >
-              <Text style={styles.modalButtonText}>Save</Text>
-            </Pressable>
-            <Pressable
-              style={[styles.modalButton, { backgroundColor: "#888" }]}
-              onPress={() => {
-                setRenameText("");
-                setRenameTaskId(null);
-                setRenameModalVisible(false);
-              }}
-            >
-              <Text style={styles.modalButtonText}>Cancel</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
+        {/* Only show add task button (always, since only regular lists) */}
+        <TouchableOpacity
+          style={styles.addTaskButton}
+          onPress={() => setNewTaskModalVisible(true)}
+        >
+          <Text style={styles.addTaskButtonText}>+ Add Task</Text>
+        </TouchableOpacity>
 
-      {/* Task Details Modal */}
-      <Modal visible={detailModalVisible} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Task Details</Text>
-            <TextInput
-              value={detailDesc}
-              onChangeText={setDetailDesc}
-              placeholder={selectedTask?.title}
-              placeholderTextColor="rgb(161, 161, 170)"
-              style={styles.modalInput}
-            />
-
-            <TextInput
-              value={detailDate}
-              onChangeText={setDetailDate}
-              placeholder="Scheduled Date"
-              placeholderTextColor="#ccc"
-              style={styles.modalInput}
-            />
-
-            {/* Color picker swatches */}
-            <View style={styles.colorPickerContainer}>
-              {[
-                // 800
-                "rgb(107, 33,168)",
-                "rgb(30,64, 175)",
-                "rgb(22, 101 ,52)",
-                "rgb(146,64 ,14)",
-                "rgb(157 ,23 ,77)",
-                // 600
-                "rgb(147 ,51 ,234)",
-                "rgb(37  ,99 ,235)",
-                "rgb(5   ,150, 105)",
-                "rgb(202 ,138, 4)",
-                "rgb(219 ,39 ,119)",
-                // 400
-                "rgb(192 ,132, 252)",
-                "rgb(96  ,165, 250)",
-                "rgb(74  ,222, 128)",
-                "rgb(250 ,204, 21)",
-                "rgb(244 ,114, 182)",
-                // 200
-                "rgb(233,213, 255)",
-                "rgb(191,219, 254)",
-                "rgb(187,247, 208)",
-                "rgb(254,240, 138)",
-                "rgb(251,207, 232)",
-              ].map((color) => (
-                <Pressable
-                  key={color}
-                  onPress={() => setDetailColor(color)}
-                  style={[
-                    styles.colorSwatch,
-                    {
-                      backgroundColor: color,
-                      borderWidth: detailColor === color ? 2 : 0,
-                      borderColor: "#fff",
-                    },
-                  ]}
-                />
-              ))}
-            </View>
-
-            <TextInput
-              value={detailColor}
-              onChangeText={setDetailColor}
-              placeholder="Button Color (hex)"
-              placeholderTextColor="#ccc"
-              style={styles.modalInput}
-            />
-            <Pressable
-              style={styles.modalButton}
-              onPress={() => {
-                if (selectedTask) {
-                  const updateFn = (t: Task) => ({
-                    ...t,
-                    title: detailDesc,
-                    scheduleDate: detailDate,
-                    buttonColor: detailColor,
+        {/* New Task Modal */}
+        <Modal visible={newTaskModalVisible} transparent animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>New Task</Text>
+              <TextInput
+                value={newTaskText}
+                onChangeText={setNewTaskText}
+                placeholder="Task description"
+                placeholderTextColor="#ccc"
+                style={[
+                  styles.modalInput,
+                  newTaskError && { borderColor: "#450a0a" },
+                ]}
+              />
+              {newTaskError ? (
+                <Text style={{ color: "#450a0a", marginBottom: 8 }}>
+                  {newTaskError}
+                </Text>
+              ) : null}
+              <Pressable
+                style={styles.modalButton}
+                onPress={async () => {
+                  const desc = newTaskText?.trim();
+                  if (!desc) {
+                    setNewTaskError("Please enter a task description.");
+                    return;
+                  }
+                  if (listTasks.some((t) => t.title.trim() === desc)) {
+                    setNewTaskError(
+                      "A task with that description already exists."
+                    );
+                    return;
+                  }
+                  if (typeof desc !== "string") {
+                    throw new Error(
+                      `Invalid task description: ${String(desc)}`
+                    );
+                  }
+                  await addTask({
+                    id: `${Date.now()}-${Math.random()
+                      .toString(36)
+                      .substr(2, 5)}`,
+                    title: desc,
+                    flagged: false,
+                    indent: 0,
+                    listName: listId,
                   });
-                  updateTask(selectedTask.id, updateFn(selectedTask));
-                }
-                setDetailModalVisible(false);
-              }}
-            >
-              <Text style={styles.modalButtonText}>Save</Text>
-            </Pressable>
-            <Pressable
-              style={[styles.modalButton, { backgroundColor: "#888" }]}
-              onPress={() => setDetailModalVisible(false)}
-            >
-              <Text style={styles.modalButtonText}>Cancel</Text>
-            </Pressable>
+                  setNewTaskError("");
+                  setNewTaskText("");
+                  setNewTaskModalVisible(false);
+                }}
+              >
+                <Text style={styles.modalButtonText}>Add</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.modalButton, { backgroundColor: "#888" }]}
+                onPress={() => {
+                  setNewTaskText("");
+                  setNewTaskError("");
+                  setNewTaskModalVisible(false);
+                }}
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
-      </Modal>
-    </View>
+        </Modal>
+
+        {/* Rename Task Modal */}
+        <Modal visible={renameModalVisible} transparent animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Rename Task</Text>
+              <TextInput
+                value={renameText}
+                onChangeText={setRenameText}
+                placeholder="Task description"
+                placeholderTextColor="#ccc"
+                style={styles.modalInput}
+              />
+              <Pressable
+                style={styles.modalButton}
+                onPress={() => {
+                  if (renameText.trim() && renameTaskId) {
+                    console.log(
+                      `Updating task with ID ${renameTaskId} to new text: ${renameText}`
+                    );
+                    updateTaskText(renameTaskId, renameText);
+                  }
+                  setRenameText("");
+                  setRenameTaskId(null);
+                  setRenameModalVisible(false);
+                }}
+              >
+                <Text style={styles.modalButtonText}>Save</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.modalButton, { backgroundColor: "#888" }]}
+                onPress={() => {
+                  setRenameText("");
+                  setRenameTaskId(null);
+                  setRenameModalVisible(false);
+                }}
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Task Details Modal */}
+        <Modal visible={detailModalVisible} transparent animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Task Details</Text>
+              <TextInput
+                value={detailDesc}
+                onChangeText={setDetailDesc}
+                placeholder={selectedTask?.title}
+                placeholderTextColor="rgb(161, 161, 170)"
+                style={styles.modalInput}
+              />
+
+              <TextInput
+                value={detailDate}
+                onChangeText={setDetailDate}
+                placeholder="Scheduled Date"
+                placeholderTextColor="#ccc"
+                style={styles.modalInput}
+              />
+
+              {/* Color picker swatches */}
+              <View style={styles.colorPickerContainer}>
+                {[
+                  // 800
+                  "rgb(107, 33,168)",
+                  "rgb(30,64, 175)",
+                  "rgb(22, 101 ,52)",
+                  "rgb(146,64 ,14)",
+                  "rgb(157 ,23 ,77)",
+                  // 600
+                  "rgb(147 ,51 ,234)",
+                  "rgb(37  ,99 ,235)",
+                  "rgb(5   ,150, 105)",
+                  "rgb(202 ,138, 4)",
+                  "rgb(219 ,39 ,119)",
+                  // 400
+                  "rgb(192 ,132, 252)",
+                  "rgb(96  ,165, 250)",
+                  "rgb(74  ,222, 128)",
+                  "rgb(250 ,204, 21)",
+                  "rgb(244 ,114, 182)",
+                  // 200
+                  "rgb(233,213, 255)",
+                  "rgb(191,219, 254)",
+                  "rgb(187,247, 208)",
+                  "rgb(254,240, 138)",
+                  "rgb(251,207, 232)",
+                ].map((color) => (
+                  <Pressable
+                    key={color}
+                    onPress={() => setDetailColor(color)}
+                    style={[
+                      styles.colorSwatch,
+                      {
+                        backgroundColor: color,
+                        borderWidth: detailColor === color ? 2 : 0,
+                        borderColor: "#fff",
+                      },
+                    ]}
+                  />
+                ))}
+              </View>
+
+              <TextInput
+                value={detailColor}
+                onChangeText={setDetailColor}
+                placeholder="Button Color (hex)"
+                placeholderTextColor="#ccc"
+                style={styles.modalInput}
+              />
+              <Pressable
+                style={styles.modalButton}
+                onPress={() => {
+                  if (selectedTask) {
+                    const updateFn = (t: ContextTask) => ({
+                      ...t,
+                      title: detailDesc,
+                      scheduleDate: detailDate,
+                      buttonColor: detailColor,
+                    });
+                    updateTask(selectedTask.id, updateFn(selectedTask));
+                  }
+                  setDetailModalVisible(false);
+                }}
+              >
+                <Text style={styles.modalButtonText}>Save</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.modalButton, { backgroundColor: "#888" }]}
+                onPress={() => setDetailModalVisible(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+      </View>
+    </PanGestureHandler>
   );
 }
