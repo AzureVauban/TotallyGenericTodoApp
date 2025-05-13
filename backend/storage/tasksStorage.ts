@@ -1,24 +1,28 @@
-import * as FileSystem from "expo-file-system";
-import { Task } from "./types";
+// backend/storage/tasksStorage.ts
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const FILE = FileSystem.documentDirectory + "tasks.json";
+const STORAGE_KEY = "MY_TASK_LISTS";
 
 /**
- * Read tasks.json (returns [] if the file doesn't exist)
+ * Load the saved task lists (returns [] if none).
  */
-export async function loadTasks(): Promise<Task[]> {
+export async function loadTasks(): Promise<any[]> {
   try {
-    const data = await FileSystem.readAsStringAsync(FILE);
-    return JSON.parse(data) as Task[];
-  } catch (e) {
-    // File might not exist on first launch – that's fine
+    const json = await AsyncStorage.getItem(STORAGE_KEY);
+    return json ? JSON.parse(json) : [];
+  } catch (err) {
+    console.error("loadTasks error:", err);
     return [];
   }
 }
 
 /**
- * Persist the entire task list
+ * Save the given task lists.
  */
-export async function saveTasks(tasks: Task[]): Promise<void> {
-  await FileSystem.writeAsStringAsync(FILE, JSON.stringify(tasks));
+export async function saveTasks(tasks: any[]): Promise<void> {
+  try {
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  } catch (err) {
+    console.error("saveTasks error:", err);
+  }
 }
