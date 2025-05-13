@@ -13,6 +13,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import DraggableFlatList, {
+  RenderItemParams,
+} from "react-native-draggable-flatlist";
+import FiBrsettings from "../../assets/icons/svg/fi-br-settings.svg";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import FiBrflagAlt from "../../assets/icons/svg/fi-br-flag-alt.svg";
 import FiBredit from "../../assets/icons/svg/fi-br-text-box-edit.svg";
@@ -20,6 +24,30 @@ import FiBrtrash from "../../assets/icons/svg/fi-br-trash.svg";
 import FiBrArrowRight from "../../assets/icons/svg/fi-br-arrow-alt-right.svg";
 import FiBrArrowLeft from "../../assets/icons/svg/fi-br-arrow-alt-left.svg";
 import { useTasks } from "../../context/TasksContext";
+
+/**
+ * **MyList Screen**
+ *
+ * Renders the task view for a single list route (e.g. `/myList/<list-name>`). The component handles
+ * both *regular* user lists (persisted under `TASKS_<list-name>` in `AsyncStorage`) **and** the six
+ * virtual “task-group” views (Today, Scheduled, All, Flagged, Completed, Recently Deleted). In
+ * virtual views it aggregates tasks from *all* lists and applies in-memory filters so no additional
+ * storage is written.
+ *
+ * **Responsibilities**
+ * 1. **Load Tasks** – On mount decides whether to fetch one list or aggregate all; normalises each
+ *    task (`flagged`, `indent`, etc.).
+ * 2. **Persist Tasks** – Saves changes back to `AsyncStorage` for regular lists only.
+ * 3. **Task Interactions**
+ *    • *Tap* toggles `done` (only inside a regular list).
+ *    • *Long-press* opens a **Task Details** modal (edit description, date, colour).
+ *    • *Swipe left* shows **flag** and **rename** actions.
+ *    • *Swipe right* shows the **delete** action (moves to Recently Deleted).
+ * 4. **Indentation** – Toggles a one-level sub-task view via an `indent` flag.
+ * 5. **Special-list helpers** – `updateTaskAcrossLists` keeps aggregated views in sync.
+ *
+ * @returns JSX element representing the list screen.
+ */
 
 const getTomorrowMidnight = () => {
   const d = new Date();
@@ -42,18 +70,15 @@ type TaskItem = {
   listName?: string;
 };
 
-type Divider = { isDivider: true };
-type ListItem = TaskItem | Divider;
-
-// Special list types
-const SPECIAL_LISTS = [
-  "Today",
-  "Scheduled",
-  "All",
-  "Flagged",
-  "Completed",
-  "Recently Deleted",
-];
+// Special list types (for reference, but not used for routing)
+// const SPECIAL_LISTS = [
+//   "Today",
+//   "Scheduled",
+//   "All",
+//   "Flagged",
+//   "Completed",
+//   "Recently Deleted",
+// ];
 
 const styles = StyleSheet.create({
   container: {
@@ -99,6 +124,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "#4A90E2",
+    marginTop: 25,
   },
   scrollContainer: {
     flex: 1,
@@ -179,7 +205,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: 50,
-    height: 45,
+    height: "100%",
     margin: 0,
     borderRadius: 8,
   },
@@ -201,97 +227,75 @@ export default function MyList() {
   const [selectedTask, setSelectedTask] = useState<TaskItem | null>(null);
   const [detailDate, setDetailDate] = useState("");
   const [detailColor, setDetailColor] = useState("");
+  const [newTaskError, setNewTaskError] = useState<string>("");
 
-  // Determine if this is a special list
-  const isSpecialList = SPECIAL_LISTS.includes(listId);
+  // Dynamic route: only for regular lists, never special lists
+  const isSpecialList = false;
 
-  // Load saved tasks for this list or filter based on special list types
+  // Load saved tasks for this list (regular lists only)
   useEffect(() => {
     (async () => {
-      // For special lists, we need to get all tasks
-      if (isSpecialList) {
-        // Get all tasks from all lists
-        const allTasks: TaskItem[] = [];
-        for (const list of lists) {
-          const raw = await AsyncStorage.getItem(`TASKS_${list.name}`);
-          const stored: TaskItem[] = raw ? JSON.parse(raw) : [];
-          allTasks.push(...stored.map((t) => ({ ...t, listName: list.name })));
+      // Purge any tasks with undefined or literal "undefined" text from all stored lists
+      for (const list of lists) {
+        const storageKey = `TASKS_${list.name}`;
+        const rawList = await AsyncStorage.getItem(storageKey);
+        if (rawList) {
+          const arr: TaskItem[] = JSON.parse(rawList);
+          const cleanedList = arr.filter(
+            (t) => t.text !== undefined && t.text !== "undefined"
+          );
+          if (cleanedList.length !== arr.length) {
+            await AsyncStorage.setItem(storageKey, JSON.stringify(cleanedList));
+          }
         }
-
-        // Filter based on the special list type
-        if (listId === "Flagged") {
-          setTasks(allTasks.filter((t) => t.flagged && !t.recentlyDeleted));
-        } else if (listId === "Completed") {
-          setTasks(allTasks.filter((t) => t.done && !t.recentlyDeleted));
-        } else if (listId === "Recently Deleted") {
-          setTasks(allTasks.filter((t) => t.recentlyDeleted));
-        } else {
-          // For "All", "Today", "Scheduled" (you'd need date logic for Today/Scheduled)
-          setTasks(allTasks.filter((t) => !t.recentlyDeleted));
-        }
-      } else {
-        // Regular list, just load its tasks
-        const raw = await AsyncStorage.getItem(`TASKS_${listId}`);
-        const stored: TaskItem[] = raw ? JSON.parse(raw) : [];
-        setTasks(
-          stored.map((t) => ({
-            ...t,
-            flagged: t.flagged ?? false,
-            recentlyDeleted: t.recentlyDeleted ?? false,
-            indent: t.indent ?? 0,
-          }))
-        );
       }
+      // Regular list, load and immediately remove any undefined descriptions
+      const raw = await AsyncStorage.getItem(`TASKS_${listId}`);
+      const stored: TaskItem[] = raw ? JSON.parse(raw) : [];
+      // Filter out tasks with no valid description
+      const cleaned = stored.filter(
+        (t) => t.text !== undefined && t.text !== "undefined"
+      );
+      const normalized = cleaned.map((t) => ({
+        ...t,
+        flagged: t.flagged ?? false,
+        recentlyDeleted: t.recentlyDeleted ?? false,
+        indent: t.indent ?? 0,
+      }));
+      setTasks(normalized);
     })();
   }, [listId, lists]);
 
   // Save whenever tasks change for regular lists
   useEffect(() => {
-    // Only save for non-special lists
-    if (!isSpecialList) {
-      AsyncStorage.setItem(`TASKS_${listId}`, JSON.stringify(tasks));
-    }
-  }, [tasks, listId, isSpecialList]);
+    AsyncStorage.setItem(`TASKS_${listId}`, JSON.stringify(tasks));
+  }, [tasks, listId]);
 
-  // Function to update a task across all lists (for special lists)
+  // No-op for updateTaskAcrossLists; not needed for regular lists
   const updateTaskAcrossLists = async (
     taskId: string,
     listName: string,
     updateFn: (task: TaskItem) => TaskItem
-  ) => {
-    const raw = await AsyncStorage.getItem(`TASKS_${listName}`);
-    if (raw) {
-      const listTasks: TaskItem[] = JSON.parse(raw);
-      const updatedTasks = listTasks.map((t) =>
-        t.id === taskId ? updateFn(t) : t
-      );
-      await AsyncStorage.setItem(
-        `TASKS_${listName}`,
-        JSON.stringify(updatedTasks)
-      );
-
-      // Refresh the current view
-      if (isSpecialList) {
-        const updatedList = [...tasks];
-        const taskIndex = updatedList.findIndex((t) => t.id === taskId);
-        if (taskIndex !== -1) {
-          updatedList[taskIndex] = updateFn(updatedList[taskIndex]);
-          setTasks(updatedList);
-        }
-      }
-    }
-  };
+  ) => {};
 
   // Function to handle indenting a task
   const handleIndent = (taskIndex: number) => {
     setTasks((prev) => {
       const updated = [...prev];
       const task = updated[taskIndex];
-
       // Toggle indent (0 to 1, 1 to 0)
       updated[taskIndex] = { ...task, indent: task.indent === 1 ? 0 : 1 };
       return updated;
     });
+  };
+
+  // Toggle indent by task id to avoid index mismatch
+  const handleIndentById = (taskId: string) => {
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === taskId ? { ...t, indent: t.indent === 1 ? 0 : 1 } : t
+      )
+    );
   };
 
   // Function to check if a task can be indented
@@ -303,23 +307,55 @@ export default function MyList() {
     return true;
   };
 
-  // Filter active and completed tasks
-  const activeTasks = tasks.filter((t) => !t.done);
-  const completedTasks = tasks.filter((t) => t.done);
-  const [detailDesc, setDetailDesc] = useState("");
-  // Function to mark a task as deleted
-  const moveToRecentlyDeleted = (taskId: string, listName: string) => {
-    if (isSpecialList && listName) {
-      updateTaskAcrossLists(taskId, listName, (task) => ({
-        ...task,
-        recentlyDeleted: true,
-      }));
-    } else {
-      setTasks((prev) =>
-        prev.map((t) => (t.id === taskId ? { ...t, recentlyDeleted: true } : t))
-      );
+  // Custom active and completed filters
+  const activeTasks = tasks.filter((t, i) => {
+    if (t.indent === 0) {
+      // only include parent if not done
+      return !t.done;
     }
+    // for subtasks, include until parent and all siblings are done
+    let j = i - 1;
+    while (j >= 0 && tasks[j].indent === 1) j--;
+    const parent = tasks[j];
+    let allSibsDone = true;
+    for (let k = j + 1; k < tasks.length && tasks[k].indent === 1; k++) {
+      if (!tasks[k].done) {
+        allSibsDone = false;
+        break;
+      }
+    }
+    // show subtask until parent+siblings complete
+    return !(parent.done && allSibsDone);
+  });
+  const completedTasks = tasks.filter((t, i) => {
+    if (t.indent === 0) {
+      // only parents that are done
+      return t.done;
+    }
+    // for subtasks, only include once parent and all siblings are done
+    let j = i - 1;
+    while (j >= 0 && tasks[j].indent === 1) j--;
+    const parent = tasks[j];
+    let allSibsDone = true;
+    for (let k = j + 1; k < tasks.length && tasks[k].indent === 1; k++) {
+      if (!tasks[k].done) {
+        allSibsDone = false;
+        break;
+      }
+    }
+    return parent.done && allSibsDone;
+  });
+  const [detailDesc, setDetailDesc] = useState("");
+  // Function to mark a task as deleted (regular list only)
+  const moveToRecentlyDeleted = (taskId: string, listName: string) => {
+    setTasks((prev) =>
+      prev.map((t) => (t.id === taskId ? { ...t, recentlyDeleted: true } : t))
+    );
   };
+
+  // TODO: When dragging a parent task, also move its following subtasks as a group.
+  //       Implement custom onDragBegin/onDragEnd to splice the subtasks array slice
+  //       along with the parent to the new index position.
 
   return (
     <View style={styles.container}>
@@ -327,44 +363,25 @@ export default function MyList() {
         <Text style={styles.listTitle}>{listId}</Text>
       </View>
 
-      <FlatList<ListItem>
-        data={
-          [...activeTasks, { isDivider: true }, ...completedTasks] as ListItem[]
-        }
-        keyExtractor={(item, index) =>
-          "isDivider" in item ? `div-${index}` : item.id
-        }
-        renderItem={({ item, index }) => {
-          if ("isDivider" in item) {
-            return <View style={styles.divider} />;
-          }
-
-          // Calculate real index in the active tasks list
+      <DraggableFlatList<TaskItem>
+        data={activeTasks}
+        keyExtractor={(item, index) => `${item.id}-${index}`}
+        onDragEnd={({ data }) => {
+          if (!isSpecialList) setTasks(data as TaskItem[]);
+        }}
+        renderItem={({ item, drag, getIndex }: RenderItemParams<TaskItem>) => {
+          const index = getIndex();
           const activeIndex = activeTasks.findIndex((t) => t.id === item.id);
-
           return (
             <Swipeable
               renderRightActions={() => (
-                <Pressable
-                  style={[styles.inlineButton, { backgroundColor: "#7f1d1d" }]}
-                  onPress={() => {
-                    // For special lists, we need to mark it as recently deleted in its original list
-                    if (isSpecialList && "listName" in item) {
-                      Alert.alert(
-                        "Delete Task",
-                        `Move "${item.text}" to Recently Deleted?`,
-                        [
-                          { text: "Cancel", style: "cancel" },
-                          {
-                            text: "Delete",
-                            style: "destructive",
-                            // @ts-ignore - we know listName exists
-                            onPress: () =>
-                              moveToRecentlyDeleted(item.id, item.listName),
-                          },
-                        ]
-                      );
-                    } else {
+                <View style={{ flexDirection: "row" }}>
+                  <Pressable
+                    style={[
+                      styles.inlineButton,
+                      { backgroundColor: "#7f1d1d" },
+                    ]}
+                    onPress={() => {
                       Alert.alert(
                         "Delete Task",
                         `Move "${item.text}" to Recently Deleted?`,
@@ -378,11 +395,30 @@ export default function MyList() {
                           },
                         ]
                       );
-                    }
-                  }}
-                >
-                  <FiBrtrash width={20} height={20} fill="#fecaca" />
-                </Pressable>
+                    }}
+                  >
+                    <FiBrtrash width={20} height={20} fill="#fecaca" />
+                  </Pressable>
+                  <Pressable
+                    style={[
+                      styles.inlineButton,
+                      { backgroundColor: "rgb(67,56,202)" },
+                    ]}
+                    onPress={() => {
+                      setSelectedTask(item);
+                      setDetailDate(item.scheduleDate ?? getTomorrowMidnight());
+                      setDetailColor(item.buttonColor ?? "");
+                      setDetailDesc(item.text);
+                      setDetailModalVisible(true);
+                    }}
+                  >
+                    <FiBrsettings
+                      width={20}
+                      height={20}
+                      fill="rgb(165,180,252)"
+                    />
+                  </Pressable>
+                </View>
               )}
               renderLeftActions={() => (
                 <View style={{ flexDirection: "row" }}>
@@ -392,23 +428,11 @@ export default function MyList() {
                       { backgroundColor: "#fbbf24" },
                     ]}
                     onPress={() => {
-                      if (isSpecialList && "listName" in item) {
-                        // @ts-ignore - we know listName exists
-                        updateTaskAcrossLists(
-                          item.id,
-                          item.listName,
-                          (task) => ({
-                            ...task,
-                            flagged: !task.flagged,
-                          })
-                        );
-                      } else {
-                        setTasks((prev) =>
-                          prev.map((t) =>
-                            t.id === item.id ? { ...t, flagged: !t.flagged } : t
-                          )
-                        );
-                      }
+                      setTasks((prev) =>
+                        prev.map((t) =>
+                          t.id === item.id ? { ...t, flagged: !t.flagged } : t
+                        )
+                      );
                     }}
                   >
                     <FiBrflagAlt
@@ -430,17 +454,14 @@ export default function MyList() {
                   >
                     <FiBredit width={20} height={20} fill="#2563eb" />
                   </Pressable>
-
                   {/* Indent/Outdent button for non-special lists */}
-                  {!isSpecialList && activeIndex >= 0 && (
+                  {activeIndex >= 0 && (
                     <Pressable
                       style={[
                         styles.inlineButton,
                         { backgroundColor: "rgb(16, 185, 129)" },
                       ]}
-                      onPress={() => handleIndent(activeIndex)}
-                      // Disable the button if indenting isn't possible
-                      disabled={activeIndex === 0 && item.indent === 0}
+                      onPress={() => handleIndentById(item.id)}
                     >
                       {item.indent === 1 ? (
                         <FiBrArrowLeft
@@ -462,33 +483,65 @@ export default function MyList() {
             >
               <Pressable
                 onPress={() => {
-                  // Only toggle when in a regular list (not a task-group view)
-                  if (!isSpecialList) {
-                    setTasks((prev) =>
-                      prev.map((t) =>
-                        t.id === item.id ? { ...t, done: !t.done } : t
-                      )
-                    );
+                  console.log(
+                    `user pressed on the task, ${item.id}, with a description of, '${item.text}'`
+                  );
+                  if (item.indent === 0) {
+                    const idx = tasks.findIndex((t) => t.id === item.id);
+                    let hasIncompleteSub = false;
+                    for (let j = idx + 1; j < tasks.length; j++) {
+                      if (tasks[j].indent !== 1) break;
+                      if (!tasks[j].done) {
+                        hasIncompleteSub = true;
+                        break;
+                      }
+                    }
+                    if (hasIncompleteSub) {
+                      Alert.alert(
+                        "Complete Subtasks",
+                        "You must complete all subtasks before completing this task."
+                      );
+                      return;
+                    }
                   }
+                  setTasks((prev) =>
+                    prev.map((t) =>
+                      t.id === item.id ? { ...t, done: !t.done } : t
+                    )
+                  );
                 }}
                 onLongPress={() => {
-                  setSelectedTask(item);
-                  setDetailDate(item.scheduleDate ?? getTomorrowMidnight());
-                  setDetailColor(item.buttonColor ?? "");
-                  setDetailDesc(item.text);
-                  setDetailModalVisible(true);
+                  // Default: start drag for reordering
+                  drag();
                 }}
               >
                 <View
                   style={[
                     styles.taskItem,
                     item.indent === 1 && styles.indentedTask,
-                    item.buttonColor
+                    item.done
+                      ? { backgroundColor: "#2d2d2d" }
+                      : item.buttonColor
                       ? { backgroundColor: item.buttonColor }
                       : {},
                   ]}
                 >
-                  <Text style={styles.taskText}>{item.text}</Text>
+                  <Text
+                    style={[
+                      styles.taskText,
+                      item.done && {
+                        textDecorationLine: "line-through",
+                        color: "#888",
+                      },
+                      item.indent === 1 &&
+                        item.done && {
+                          textDecorationLine: "line-through",
+                          color: "#888",
+                        },
+                    ]}
+                  >
+                    {item.text}
+                  </Text>
                 </View>
               </Pressable>
             </Swipeable>
@@ -496,15 +549,51 @@ export default function MyList() {
         }}
       />
 
-      {/* Only show add task button if not in a special list */}
-      {!isSpecialList && (
-        <TouchableOpacity
-          style={styles.addTaskButton}
-          onPress={() => setNewTaskModalVisible(true)}
-        >
-          <Text style={styles.addTaskButtonText}>+ Add Task</Text>
-        </TouchableOpacity>
+      {completedTasks.length > 0 && (
+        <>
+          <View style={styles.divider} />
+          <FlatList<TaskItem>
+            data={completedTasks}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <Pressable
+                onPress={() =>
+                  setTasks(prev =>
+                    prev.map(t =>
+                      t.id === item.id ? { ...t, done: !t.done } : t
+                    )
+                  )
+                }
+              >
+                <View
+                  style={[
+                    styles.taskItem,
+                    item.indent === 1 && styles.indentedTask,
+                    { backgroundColor: "#2d2d2d" },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.taskText,
+                      { textDecorationLine: "line-through", color: "#888" },
+                    ]}
+                  >
+                    {item.text}
+                  </Text>
+                </View>
+              </Pressable>
+            )}
+          />
+        </>
       )}
+
+      {/* Only show add task button (always, since only regular lists) */}
+      <TouchableOpacity
+        style={styles.addTaskButton}
+        onPress={() => setNewTaskModalVisible(true)}
+      >
+        <Text style={styles.addTaskButtonText}>+ Add Task</Text>
+      </TouchableOpacity>
 
       {/* New Task Modal */}
       <Modal visible={newTaskModalVisible} transparent animationType="fade">
@@ -516,23 +605,48 @@ export default function MyList() {
               onChangeText={setNewTaskText}
               placeholder="Task description"
               placeholderTextColor="#ccc"
-              style={styles.modalInput}
+              style={[
+                styles.modalInput,
+                newTaskError && { borderColor: "#450a0a" },
+              ]}
             />
+            {newTaskError ? (
+              <Text style={{ color: "#450a0a", marginBottom: 8 }}>
+                {newTaskError}
+              </Text>
+            ) : null}
             <Pressable
               style={styles.modalButton}
               onPress={() => {
-                if (newTaskText.trim()) {
-                  setTasks((prev) => [
-                    ...prev,
-                    {
-                      id: Date.now().toString(),
-                      text: newTaskText,
-                      done: false,
-                      flagged: false,
-                      indent: 0,
-                    },
-                  ]);
+                const desc = newTaskText?.trim();
+                if (!desc) {
+                  setNewTaskError("Please enter a task description.");
+                  return;
                 }
+                if (tasks.some((t) => t.text.trim() === desc)) {
+                  setNewTaskError(
+                    "A task with that description already exists."
+                  );
+                  return;
+                }
+                // Crash on any invalid type
+                if (typeof desc !== "string") {
+                  throw new Error(`Invalid task description: ${String(desc)}`);
+                }
+                // All good – add the new task
+                setTasks((prev) => [
+                  ...prev,
+                  {
+                    id: `${Date.now()}-${Math.random()
+                      .toString(36)
+                      .substr(2, 5)}`,
+                    text: desc,
+                    done: false,
+                    flagged: false,
+                    indent: 0,
+                  },
+                ]);
+                setNewTaskError("");
                 setNewTaskText("");
                 setNewTaskModalVisible(false);
               }}
@@ -543,6 +657,7 @@ export default function MyList() {
               style={[styles.modalButton, { backgroundColor: "#888" }]}
               onPress={() => {
                 setNewTaskText("");
+                setNewTaskError("");
                 setNewTaskModalVisible(false);
               }}
             >
@@ -568,30 +683,11 @@ export default function MyList() {
               style={styles.modalButton}
               onPress={() => {
                 if (renameText.trim() && renameTaskId) {
-                  if (
-                    isSpecialList &&
-                    tasks.find((t) => t.id === renameTaskId && "listName" in t)
-                  ) {
-                    const task = tasks.find((t) => t.id === renameTaskId);
-                    // @ts-ignore - we know listName exists
-                    if (task && "listName" in task) {
-                      // @ts-ignore - we know listName exists
-                      updateTaskAcrossLists(
-                        renameTaskId,
-                        task.listName,
-                        (t) => ({
-                          ...t,
-                          text: renameText,
-                        })
-                      );
-                    }
-                  } else {
-                    setTasks((prev) =>
-                      prev.map((t) =>
-                        t.id === renameTaskId ? { ...t, text: renameText } : t
-                      )
-                    );
-                  }
+                  setTasks((prev) =>
+                    prev.map((t) =>
+                      t.id === renameTaskId ? { ...t, text: renameText } : t
+                    )
+                  );
                 }
                 setRenameText("");
                 setRenameTaskId(null);
@@ -691,23 +787,15 @@ export default function MyList() {
                 if (selectedTask) {
                   const updateFn = (t: TaskItem) => ({
                     ...t,
-                    text: detailDesc, // ← new line
+                    text: detailDesc,
                     scheduleDate: detailDate,
                     buttonColor: detailColor,
                   });
-                  if (isSpecialList && selectedTask.listName) {
-                    updateTaskAcrossLists(
-                      selectedTask.id,
-                      selectedTask.listName,
-                      updateFn
-                    );
-                  } else {
-                    setTasks((prev) =>
-                      prev.map((t) =>
-                        t.id === selectedTask.id ? updateFn(t) : t
-                      )
-                    );
-                  }
+                  setTasks((prev) =>
+                    prev.map((t) =>
+                      t.id === selectedTask.id ? updateFn(t) : t
+                    )
+                  );
                 }
                 setDetailModalVisible(false);
               }}
