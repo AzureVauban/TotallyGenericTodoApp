@@ -1,39 +1,61 @@
-// src/context/TasksContext.tsx
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { loadTasks, saveTasks } from "../backend/storage/tasksStorage";
+import React, { createContext, useState, useEffect, useContext } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-type TasksContextType = {
-  lists: any[];
-  setLists: React.Dispatch<React.SetStateAction<any[]>>;
-};
+export interface Task {
+  id: string;
+  title: string;
+  completed: boolean;
+}
 
-const TasksContext = createContext<TasksContextType | undefined>(undefined);
+export interface ListEntry {
+  name: string;
+}
+
+export interface TasksContextValue {
+  tasks: Task[];
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  lists: ListEntry[];
+  setLists: React.Dispatch<React.SetStateAction<ListEntry[]>>;
+  // …any other actions (addTask, toggleTask, removeTask)…
+}
+// Hook to consume TasksContext
+export function useTasks(): TasksContextValue {
+  return React.useContext(TasksContext);
+}
+export const TasksContext = createContext<TasksContextValue>({
+  tasks: [],
+  setTasks: () => {},
+  lists: [],
+  setLists: () => {},
+});
 
 export function TasksProvider({ children }: { children: React.ReactNode }) {
-  const [lists, setLists] = useState<any[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [lists, setLists] = useState<ListEntry[]>([]);
 
-  // load once
+  // Load persisted tasks on mount
   useEffect(() => {
-    (async () => {
-      const stored = await loadTasks();
-      setLists(stored);
-    })();
+    AsyncStorage.getItem("TASKS_STORAGE_KEY").then((json) => {
+      if (json) {
+        try {
+          setTasks(JSON.parse(json));
+        } catch {
+          console.warn("Failed to parse saved tasks JSON");
+        }
+      }
+    });
   }, []);
 
-  // save on every change
+  // Persist tasks on every change
   useEffect(() => {
-    saveTasks(lists);
-  }, [lists]);
+    AsyncStorage.setItem("TASKS_STORAGE_KEY", JSON.stringify(tasks));
+  }, [tasks]);
 
   return (
-    <TasksContext.Provider value={{ lists, setLists }}>
+    <TasksContext.Provider
+      value={{ tasks, setTasks, lists, setLists /* …other actions… */ }}
+    >
       {children}
     </TasksContext.Provider>
   );
-}
-
-export function useTasks() {
-  const ctx = useContext(TasksContext);
-  if (!ctx) throw new Error("useTasks must be inside TasksProvider");
-  return ctx;
 }

@@ -558,8 +558,8 @@ export default function MyList() {
             renderItem={({ item }) => (
               <Pressable
                 onPress={() =>
-                  setTasks(prev =>
-                    prev.map(t =>
+                  setTasks((prev) =>
+                    prev.map((t) =>
                       t.id === item.id ? { ...t, done: !t.done } : t
                     )
                   )
@@ -617,7 +617,7 @@ export default function MyList() {
             ) : null}
             <Pressable
               style={styles.modalButton}
-              onPress={() => {
+              onPress={async () => {
                 const desc = newTaskText?.trim();
                 if (!desc) {
                   setNewTaskError("Please enter a task description.");
@@ -629,23 +629,24 @@ export default function MyList() {
                   );
                   return;
                 }
-                // Crash on any invalid type
                 if (typeof desc !== "string") {
                   throw new Error(`Invalid task description: ${String(desc)}`);
                 }
-                // All good – add the new task
-                setTasks((prev) => [
-                  ...prev,
-                  {
-                    id: `${Date.now()}-${Math.random()
-                      .toString(36)
-                      .substr(2, 5)}`,
-                    text: desc,
-                    done: false,
-                    flagged: false,
-                    indent: 0,
-                  },
-                ]);
+                const newTask: TaskItem = {
+                  id: `${Date.now()}-${Math.random()
+                    .toString(36)
+                    .substr(2, 5)}`,
+                  text: desc,
+                  done: false,
+                  flagged: false,
+                  indent: 0,
+                };
+                const newArr = [...tasks, newTask];
+                setTasks(newArr);
+                await AsyncStorage.setItem(
+                  `TASKS_${listId}`,
+                  JSON.stringify(newArr)
+                );
                 setNewTaskError("");
                 setNewTaskText("");
                 setNewTaskModalVisible(false);
