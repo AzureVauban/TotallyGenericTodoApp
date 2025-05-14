@@ -12,6 +12,7 @@ import { useRouter } from "expo-router";
 import { StyleSheet } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
+import { playInvalidSound } from "../utils/playInvalidSound";
 
 const COLORS = {
   //  Dark theme palette (left UI) with original hex codes:
@@ -266,6 +267,8 @@ export default function SignUpScreen() {
             ) {
               console.log("Navigating to verificationMethod");
               router.replace("/verificationMethod");
+            } else {
+              playInvalidSound();
             }
           }}
         >

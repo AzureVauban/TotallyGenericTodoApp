@@ -1,10 +1,16 @@
+import { playRemoveSound } from "../../utils/playRemoveSound";
+import { playIndentTasksound } from "../../utils/playIndentTaskSound";
+import { playRenameTaskSound } from "../../utils/playRenameSound";
+import { playFlaggedSound } from "../../utils/playFlaggedSound";
+import { playUnflaggedSound } from "../../utils/playUnflaggedSound";
 // Helper to get tomorrow's date at midnight in mm-dd-yyyy format
 import {
   PanGestureHandler,
   State,
   GestureHandlerGestureEvent,
 } from "react-native-gesture-handler";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { playCompleteSound } from "../../utils/playCompleteSound";
+import { playInvalidSound } from "../../utils/playInvalidSound";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useRef, useEffect, useState } from "react";
 import {
@@ -30,7 +36,7 @@ import FiBrArrowRight from "../../assets/icons/svg/fi-br-arrow-alt-right.svg";
 import FiBrArrowLeft from "../../assets/icons/svg/fi-br-arrow-alt-left.svg";
 import { useTasks } from "../../backend/storage/TasksContext";
 import { Task as ContextTask } from "../../backend/storage/TasksContext";
-
+import { Audio } from "expo-av";
 /**
  * **MyList Screen**
  *
@@ -417,8 +423,10 @@ export default function MyList() {
                             {
                               text: "Delete",
                               style: "destructive",
-                              onPress: () =>
-                                moveToRecentlyDeleted(item.id, listId),
+                              onPress: () => {
+                                playRemoveSound();
+                                moveToRecentlyDeleted(item.id, listId);
+                              },
                             },
                           ]
                         );
@@ -441,7 +449,15 @@ export default function MyList() {
                         styles.inlineButton,
                         { backgroundColor: "#fbbf24" },
                       ]}
-                      onPress={() => handleFlagToggle(item.id)}
+                      onPress={() => {
+                        const wasFlagged = item.flagged;
+                        handleFlagToggle(item.id);
+                        if (!wasFlagged) {
+                          playFlaggedSound();
+                        } else {
+                          playUnflaggedSound();
+                        }
+                      }}
                     >
                       <FiBrflagAlt
                         width={20}
@@ -469,7 +485,10 @@ export default function MyList() {
                           styles.inlineButton,
                           { backgroundColor: "rgb(16, 185, 129)" },
                         ]}
-                        onPress={() => handleIndentById(item.id)}
+                        onPress={() => {
+                          playIndentTasksound();
+                          handleIndentById(item.id);
+                        }}
                       >
                         {item.indent === 1 ? (
                           <FiBrArrowLeft
@@ -512,7 +531,11 @@ export default function MyList() {
                         return;
                       }
                     }
+                    const willComplete = !item.completed;
                     toggleTask(item.id);
+                    if (willComplete) {
+                      playCompleteSound();
+                    }
                   }}
                   onLongPress={() => {
                     // Default: start drag for reordering
@@ -620,6 +643,7 @@ export default function MyList() {
                     return;
                   }
                   if (listTasks.some((t) => t.title.trim() === desc)) {
+                    playInvalidSound();
                     setNewTaskError(
                       "A task with that description already exists."
                     );
@@ -680,6 +704,7 @@ export default function MyList() {
                       `Updating task with ID ${renameTaskId} to new text: ${renameText}`
                     );
                     updateTaskText(renameTaskId, renameText);
+                    playRenameTaskSound();
                   }
                   setRenameText("");
                   setRenameTaskId(null);

@@ -25,27 +25,71 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-make sure to download uicons-bold-rounded-2.6.0.zip from `https://www.flaticon.com/uicons/interface-icons` and extract the svg contents into "asstes/icon/svg"
+# DivideNDo - Task Management App
 
-fi-br-0.svg
-fi-br-1.svg
-fi-br-2.svg
-fi-br-3.svg
-fi-br-4.svg
-fi-br-5.svg
-fi-br-6.svg
-fi-br-7.svg
-fi-br-8.svg
-fi-br-9.svg
-fi-br-align-justify.svg
-fi-br-arrow-small-left.svg
-fi-br-arrow-turn-left-up.svg
-fi-br-ban.svg
-fi-br-cards-blank.svg
-fi-br-chart-scatter-3d.svg
-fi-br-confetti.svg
-fi-br-list-check.svg
-fi-br-plus-small.svg
-fi-br-plus.svg
-fi-br-text-box-edit.svg
-fi-br-trash.svg
+DivideNDo is a powerful task management application built with **React Native** and **Expo**, designed to simplify organizing, prioritizing, and managing tasks in an intuitive and user-friendly interface.
+
+---
+
+## 🚀 **Get Started**
+
+### 1️⃣ **Install Dependencies**
+
+```bash
+yarn install
+```
+
+---
+
+### 2️⃣ **Run the Application**
+
+```bash
+yarn start
+```
+
+- Scan the QR code with Expo Go (iOS or Android).
+- Or launch it directly in an emulator:
+  - Android: `yarn android`
+  - iOS: `yarn ios`
+
+---
+
+## ✨ **Features**
+
+- Real-time task synchronization
+- Custom list creation and navigation
+- Smooth swipe gestures with haptic feedback
+- Completed task segregation with visual indication
+- Dynamic username generation with Python integration
+- Full offline persistence using AsyncStorage
+
+---
+
+## 📌 **Upcoming Features**
+
+- Collaborative task sharing
+- Cross-device synchronization
+- Calendar and deadline view
+- Voice command integration
+
+---
+
+## 🤝 **Contributing**
+
+1. Fork the repository.
+2. Create a feature branch (`git checkout -b feature/my-feature`).
+3. Commit your changes (`git commit -m 'Add my feature'`).
+4. Push to the branch (`git push origin feature/my-feature`).
+5. Open a Pull Request.
+
+---
+
+## 📄 **License**
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 💬 **Contact**
+
+For questions or support, open an issue or reach out at [support@dividendo.com](mailto:support@dividendo.com).

@@ -1,3 +1,5 @@
+import { playInvalidSound } from "../utils/playInvalidSound";
+import { playRemoveSound } from "../utils/playRemoveSound";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -492,6 +494,7 @@ export default function HomeScreen() {
                               style: "destructive",
                               onPress: () => {
                                 removeList(item.id);
+                                playRemoveSound();
                               },
                             },
                           ]
@@ -613,6 +616,7 @@ export default function HomeScreen() {
                       list.name.toLowerCase() === trimmedName.toLowerCase()
                   );
                   if (isDuplicate) {
+                    playInvalidSound();
                     setDuplicateError(true);
                     return;
                   }
@@ -665,6 +669,7 @@ export default function HomeScreen() {
                     .filter((l) => l.id !== renameTarget.id)
                     .some((l) => l.name.trim().toLowerCase() === normalized);
                   if (duplicate || !trimmedName) {
+                    playInvalidSound();
                     setRenameError(true);
                     return;
                   }

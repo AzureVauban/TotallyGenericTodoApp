@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { PanGestureHandler } from "react-native-gesture-handler";
+import { playInvalidSound } from "../utils/playInvalidSound";
 
 /* ---------- Palette shared through the app ---------- */
 const COLORS = {
@@ -87,7 +88,10 @@ export default function ResetPassword() {
       setConfirmError(false);
     }
 
-    if (hasError) return;
+    if (hasError) {
+      playInvalidSound();
+      return;
+    }
 
     console.log("User pressed reset password");
     router.push("/verificationMethod");
