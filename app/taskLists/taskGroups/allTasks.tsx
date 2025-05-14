@@ -4,13 +4,11 @@
  * Shows every non-deleted task, regardless of state.
  */
 import React from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
-import { Pressable } from "react-native";
 import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
 import {
-  useTasks,
-  Task as ContextTask,
+  useTasks
 } from "../../../backend/storage/TasksContext";
 
 export default function AllTasks() {
@@ -38,7 +36,9 @@ export default function AllTasks() {
             )}
           >
             <View style={styles.item}>
-              <Text style={[styles.text, item.completed && styles.completedText]}>
+              <Text
+                style={[styles.text, item.completed && styles.completedText]}
+              >
                 {item.title}
               </Text>
             </View>

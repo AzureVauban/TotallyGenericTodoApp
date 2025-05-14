@@ -1,13 +1,13 @@
+import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
   StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
-import { useNavigation } from "@react-navigation/native";
 
 const COLORS = {
   dark_primary: "#101010",

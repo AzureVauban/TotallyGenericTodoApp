@@ -1,7 +1,5 @@
-import { playInvalidSound } from "../utils/playInvalidSound";
-import { playRemoveSound } from "../utils/playRemoveSound";
-import { useFocusEffect, useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import { Link, useFocusEffect, useRouter } from "expo-router";
+import React, { useRef, useState } from "react";
 import {
   Alert,
   Modal,
@@ -10,18 +8,9 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
-  Platform,
 } from "react-native";
-import FiBrburger from "../assets/icons/svg/fi-br-0.svg";
-import FiBrArrowSmallLeft from "../assets/icons/svg/fi-br-arrow-small-left.svg";
-import FiBrArrowTurnLeftUp from "../assets/icons/svg/fi-br-arrow-turn-left-up.svg";
-import FiBrcheck from "../assets/icons/svg/fi-br-list-check.svg";
-import FiBrplus from "../assets/icons/svg/fi-br-plus.svg";
-import FiBredit from "../assets/icons/svg/fi-br-text-box-edit.svg";
-import FiBrtrash from "../assets/icons/svg/fi-br-trash.svg";
-// simple JSON persistence (backend/storage/tasksStorage.ts)
-import { TouchableOpacity } from "react-native";
 import {
   FlatList,
   GestureHandlerGestureEvent,
@@ -30,18 +19,13 @@ import {
   State,
   Swipeable,
 } from "react-native-gesture-handler";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import FiBredit from "../assets/icons/svg/fi-br-text-box-edit.svg";
+import FiBrtrash from "../assets/icons/svg/fi-br-trash.svg";
 import { useTasks } from "../backend/storage/TasksContext";
-import { Link } from "expo-router";
+import { playInvalidSound } from "../utils/playInvalidSound";
+import { playRemoveSound } from "../utils/playRemoveSound";
 
 // Task group buttons (green)
-const taskGroups = [
-  { label: "Today" },
-  { label: "Scheduled" },
-  { label: "All" },
-  { label: "Flagged" },
-  { label: "Completed" },
-];
 // Additional styles for new UI elements
 const homeScreenStyles = StyleSheet.create({
   divider: {
@@ -477,7 +461,7 @@ export default function HomeScreen() {
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
                 <Swipeable
-                  renderRightActions={(progress, dragX) => (
+                  renderRightActions={() => (
                     <Pressable
                       style={[
                         homeScreenStyles.inlineButton,
@@ -504,7 +488,7 @@ export default function HomeScreen() {
                       <FiBrtrash width={20} height={20} fill="#fecaca" />
                     </Pressable>
                   )}
-                  renderLeftActions={(progress, dragX) => (
+                  renderLeftActions={() => (
                     <Pressable
                       style={[
                         homeScreenStyles.inlineButton,
@@ -657,7 +641,6 @@ export default function HomeScreen() {
                   marginBottom: 10,
                 }}
               />
-
               <Pressable
                 style={styles.modalButton}
                 onPress={() => {
@@ -682,7 +665,6 @@ export default function HomeScreen() {
               >
                 <Text style={styles.modalButtonText}>OK</Text>
               </Pressable>
-
               <Pressable
                 style={[styles.modalButton, { backgroundColor: "#888" }]}
                 onPress={() => setRenameModalVisible(false)}

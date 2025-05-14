@@ -1,38 +1,11 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Image,
-  TouchableOpacity,
-  Text,
-  ViewStyle,
-  Dimensions,
-} from "react-native";
+import { View, TouchableOpacity, Text, Dimensions } from "react-native";
 import { useRouter } from "expo-router";
 import { StyleSheet } from "react-native";
-import { Link } from "@react-navigation/native";
 import FISignatureIcon from "../assets/icons/svg/fi-br-chart-scatter-3d.svg";
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const BUTTON_WIDTH = SCREEN_WIDTH * 0.7;
 
-/*
-  Dark theme palette (left UI) with original hex codes:
-    dark_primary:    #101010
-    dark_secondary:  #1A1A1A
-    dark_tertiary:   #373737
-    dark_accents:    #F26C4F
-    dark_subaccents: #C5C5C5
-    dark_senary:     #808080
-    dark_icon_text:  #F26C4F
-
-  Light theme palette (right UI) with original hex codes:
-    light_primary:   #F26C4F
-    light_secondary: #FFFFFF
-    light_tertiary:  #CCCCCC
-    light_accents:   #101010
-    light_subaccents:#373737
-    light_senary:    #E8A87C
-    light_icon_text: #101010
-*/
 const COLORS = {
   //  Dark theme palette (left UI) with original hex codes:
   dark_primary: "#101010", // #101010
@@ -42,15 +15,6 @@ const COLORS = {
   dark_subaccents: "#C5C5C5", // #C5C5C5
   dark_senary: "#808080", // #808080
   dark_icon_text: "#F26C4F", // #F26C4F
-
-  // Light theme palette (right UI) with original hex codes:
-  light_primary: "#F26C4F", // #F26C4F
-  light_secondary: "#FFFFFF", // #FFFFFF
-  light_tertiary: "#CCCCCC", // #CCCCCC
-  light_accents: "#101010", // #101010
-  light_subaccents: "#373737", // #373737
-  light_senary: "#E8A87C", // #E8A87C
-  light_icon_text: "#101010", // #101010
 };
 const styles = StyleSheet.create({
   screenbackground: {
