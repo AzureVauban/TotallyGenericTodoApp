@@ -44,7 +44,7 @@ const homeScreenStyles = StyleSheet.create({
  *  • Swipe **right‑to‑left** on a list button to reveal a red **Delete** action.
  *    Confirming the alert removes the list, pushes it to the *recentlyDeleted* state array,
  *    and persists the change via `saveTasks`.
- *  • Tap a list button to navigate to `/myList/<id>` using Expo Router.
+ *  • Tap a list button to navigate to `/taskLists/<id>` using Expo Router.
  *  • Tap the big green “+” button to create a new list. An `Alert.prompt` collects the
  *    name, validates it, persists the new list, and immediately routes to its detail screen.
  *
@@ -124,7 +124,7 @@ export default function HomeScreen() {
         >
           <TouchableOpacity
             style={homeScreenStyles.taskListButton}
-            onPress={() => router.push(`/myList/${item.id}`)}
+            onPress={() => router.push(`/taskLists/${item.id}`)}
           >
             <Text style={{ color: "white", fontSize: 18 }}>{item.name}</Text>
           </TouchableOpacity>
@@ -152,7 +152,7 @@ export default function HomeScreen() {
                     const newTaskList = { id: Date.now().toString(), name };
                     setTasks((prev) => [...prev, newTaskList]);
                     saveTasks([...tasks, newTaskList]);
-                    router.push(`/myList/${newTaskList.id}`);
+                    router.push(`/taskLists/${newTaskList.id}`);
                   } else {
                     Alert.alert(
                       "Invalid Name",

@@ -140,6 +140,7 @@ const homeScreenStyles = StyleSheet.create({
     justifyContent: "center",
   },
   taskGroupsWrapper: {
+    marginTop: 60,
     marginHorizontal: 10,
     marginBottom: 20,
     alignItems: "flex-start",
@@ -191,7 +192,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.dark_primary,
     color: COLORS.dark_primary,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
   },
   container: {
@@ -262,20 +263,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
   },
-  homeButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 12,
-    backgroundColor: COLORS.dark_primary,
-    justifyContent: "center",
-    alignItems: "center",
-    position: "absolute",
-    bottom: 24,
-    right: 25,
-    borderColor: COLORS.dark_accents,
-    borderWidth: 2,
-    top: 20,
-  },
   taskRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -287,17 +274,6 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "space-between",
     borderColor: COLORS.dark_accents,
-  },
-  square: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: COLORS.dark_accents,
-    marginRight: 12,
-  },
-  squareDone: {
-    backgroundColor: COLORS.dark_secondary,
   },
   taskText: {
     flex: 1,
@@ -369,8 +345,6 @@ const styles = StyleSheet.create({
   },
 });
 
-//TODO: ADD DOCSTRING
-
 /**
  * **HomeScreen**
  *
@@ -378,7 +352,7 @@ const styles = StyleSheet.create({
  *  • Swipe **right‑to‑left** on a list button to reveal a red **Delete** action.
  *    Confirming the alert removes the list, pushes it to the *recentlyDeleted* state array,
  *    and persists the change via `saveTasks`.
- *  • Tap a list button to navigate to `/myList/<id>` using Expo Router.
+ *  • Tap a list button to navigate to `/taskLists/<id>` using Expo Router.
  *  • Tap the big green “+” button to create a new list. An `Alert.prompt` collects the
  *    name, validates it, persists the new list, and immediately routes to its detail screen.
  *
@@ -451,61 +425,45 @@ export default function HomeScreen() {
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent}>
       <View style={styles.screenbackground}>
-        {/* Search Bar */}
         {/* Task Groups (Green Buttons) */}
+
         <View style={homeScreenStyles.taskGroupsWrapper}>
           <View style={homeScreenStyles.taskGroupRow}>
             <Link
-              href="/myList/specialLists/today"
-              style={homeScreenStyles.taskGroupButton}
-            >
-              <Text style={homeScreenStyles.taskGroupButtonText}>Today</Text>
-            </Link>
-            <Link
-              href="/myList/specialLists/scheduledTasks"
+              href="/taskLists/taskGroups/scheduledTasks"
               style={homeScreenStyles.taskGroupButton}
             >
               <Text style={homeScreenStyles.taskGroupButtonText}>
                 Scheduled
               </Text>
             </Link>
-          </View>
-          <View style={homeScreenStyles.taskGroupRow}>
             <Link
-              href="/myList/specialLists/allTasks"
+              href="/taskLists/taskGroups/allTasks"
               style={homeScreenStyles.taskGroupButton}
             >
               <Text style={homeScreenStyles.taskGroupButtonText}>All</Text>
             </Link>
+          </View>
+          <View style={homeScreenStyles.taskGroupRow}>
             <Link
-              href="/myList/specialLists/flaggedTasks"
+              href="/taskLists/taskGroups/flaggedTasks"
               style={homeScreenStyles.taskGroupButton}
             >
               <Text style={homeScreenStyles.taskGroupButtonText}>Flagged</Text>
             </Link>
-          </View>
-          <View style={homeScreenStyles.taskGroupRow}>
             <Link
-              href="/myList/specialLists/completedTasks"
+              href="/taskLists/taskGroups/completedTasks"
               style={homeScreenStyles.taskGroupButton}
             >
               <Text style={homeScreenStyles.taskGroupButtonText}>
                 Completed
               </Text>
             </Link>
-            <Link
-              href="/myList/specialLists/recentlyDeleted"
-              style={homeScreenStyles.recentlyDeletedButton}
-            >
-              <Text style={homeScreenStyles.recentlyDeletedText}>
-                Recently Deleted
-              </Text>
-            </Link>
           </View>
           <View style={homeScreenStyles.divider} />
         </View>
         {/* User Lists (Blue Scrollable Region) */}
-        <View style={{ marginTop: 100 }}>
+        <View style={{ marginTop: 200 }}>
           <View style={homeScreenStyles.divider} />
           <ScrollView
             style={{ flexGrow: 0, maxHeight: 220 }}
@@ -562,7 +520,9 @@ export default function HomeScreen() {
                 >
                   <Pressable
                     style={homeScreenStyles.taskListButton}
-                    onPress={() => router.push(`/myList/${item.name}` as const)}
+                    onPress={() =>
+                      router.push(`/taskLists/${item.name}` as const)
+                    }
                   >
                     <Text style={homeScreenStyles.taskListButtonText}>
                       {item.name}
@@ -711,7 +671,7 @@ export default function HomeScreen() {
                   // Call context renameList to update storage and state
                   renameList(renameTarget.id, trimmedName);
                   // Navigate to the renamed list screen
-                  router.replace(`/myList/${trimmedName}`);
+                  router.replace(`/taskLists/${trimmedName}`);
                   setRenameModalVisible(false);
                 }}
               >

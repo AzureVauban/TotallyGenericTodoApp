@@ -34,7 +34,7 @@ import { Task as ContextTask } from "../../backend/storage/TasksContext";
 /**
  * **MyList Screen**
  *
- * Renders the task view for a single list route (e.g. `/myList/<list-name>`). The component handles
+ * Renders the task view for a single list route (e.g. `/taskLists/<list-name>`). The component handles
  * both *regular* user lists (persisted under `TASKS_<list-name>` in `AsyncStorage`) **and** the six
  * virtual “task-group” views (Today, Scheduled, All, Flagged, Completed, Recently Deleted). In
  * virtual views it aggregates tasks from *all* lists and applies in-memory filters so no additional
@@ -375,7 +375,13 @@ export default function MyList() {
             return (
               <Swipeable
                 renderRightActions={() => (
-                  <View style={{ flexDirection: "row", alignItems: "stretch", marginBottom: 5 }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "stretch",
+                      marginBottom: 5,
+                    }}
+                  >
                     <Pressable
                       style={[
                         styles.inlineButton,
@@ -423,7 +429,13 @@ export default function MyList() {
                   </View>
                 )}
                 renderLeftActions={() => (
-                  <View style={{ flexDirection: "row", alignItems: "stretch", marginBottom: 5 }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "stretch",
+                      marginBottom: 5,
+                    }}
+                  >
                     <Pressable
                       style={[
                         styles.inlineButton,
