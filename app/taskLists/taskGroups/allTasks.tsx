@@ -7,9 +7,7 @@ import React from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
-import {
-  useTasks
-} from "../../../backend/storage/TasksContext";
+import { useTasks } from "../../../backend/storage/TasksContext";
 
 export default function AllTasks() {
   const { tasks, removeTask } = useTasks();
