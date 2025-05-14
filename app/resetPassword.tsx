@@ -11,25 +11,9 @@ import {
 import { useRouter } from "expo-router";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import { playInvalidSound } from "../utils/playInvalidSound";
-
-/* ---------- Palette shared through the app ---------- */
-const COLORS = {
-  dark_primary: "#101010",
-  dark_secondary: "#1A1A1A",
-  dark_tertiary: "#373737",
-  dark_accents: "#F26C4F",
-  dark_subaccents: "#C5C5C5",
-  dark_senary: "#808080",
-  dark_icon_text: "#F26C4F",
-
-  light_primary: "#F26C4F",
-  light_secondary: "#FFFFFF",
-  light_tertiary: "#CCCCCC",
-  light_accents: "#101010",
-  light_subaccents: "#373737",
-  light_senary: "#E8A87C",
-  light_icon_text: "#101010",
-};
+import { useTheme } from "@theme/ThemeContext";
+import { useFocusEffect } from "@react-navigation/native";
+import { colors } from "@theme/colors";
 
 /**
  * **ResetPassword Screen**
@@ -43,9 +27,9 @@ const COLORS = {
  * 2. **Validation**
  *    * Any empty field sets an error flag that highlights the input with `#450a0a`.
  *    * Mismatched passwords also flag an error on the confirm box.
- * 3. **Next →**  
+ * 3. **Next →**
  *    * If validation passes, navigates to `/verificationMethod` via Expo Router.
- * 4. **Swipe‑to‑go‑back**  
+ * 4. **Swipe‑to‑go‑back**
  *    * A rightward PanGesture (> 50 px) sends the user to `/login`.
  *
  * ### State
@@ -56,6 +40,10 @@ const COLORS = {
  * @returns A scrollable React‑Native form wrapped in `PanGestureHandler`.
  */
 export default function ResetPassword() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  useFocusEffect(React.useCallback(() => {}, [theme]));
+
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [usernameError, setUsernameError] = useState(false);
@@ -109,15 +97,36 @@ export default function ResetPassword() {
 
   return (
     <PanGestureHandler onGestureEvent={handleSwipe}>
-      <SafeAreaView style={s.screen}>
+      <SafeAreaView
+        style={[
+          s.screen,
+          {
+            backgroundColor: isDark
+              ? colors.dark.background
+              : colors.light.background,
+          },
+        ]}
+      >
         <ScrollView
           contentContainerStyle={s.content}
           keyboardShouldPersistTaps="handled"
         >
           {/* ---------- header ---------- */}
           <View style={s.headerBlock}>
-            <Text style={s.title}>Reset{"\n"}Password</Text>
-            <Text style={s.subtitle}>
+            <Text
+              style={[
+                s.title,
+                { color: isDark ? colors.dark.accent : colors.light.accent },
+              ]}
+            >
+              Reset{"\n"}Password
+            </Text>
+            <Text
+              style={[
+                s.subtitle,
+                { color: isDark ? colors.dark.text : colors.light.text },
+              ]}
+            >
               input your username, phone number, or email
             </Text>
           </View>
@@ -126,24 +135,26 @@ export default function ResetPassword() {
           <View style={s.form}>
             <TextInput
               style={{
-                backgroundColor: COLORS.dark_secondary,
+                backgroundColor: isDark
+                  ? colors.dark.secondary
+                  : colors.light.secondary,
+                color: isDark ? colors.dark.text : colors.light.text,
                 borderRadius: 8,
                 padding: 12,
-                color: COLORS.dark_subaccents,
-                fontSize: 18,
-                textAlign: "left",
-                letterSpacing: 0,
-                marginBottom: 16,
               }}
               placeholder="Username or Email"
-              placeholderTextColor={COLORS.dark_senary}
+              placeholderTextColor={
+                isDark ? colors.dark.tertiary : colors.light.tertiary
+              }
               autoCapitalize="none"
               keyboardType="email-address"
             />
 
             <TextInput
               placeholder="Password"
-              placeholderTextColor={COLORS.dark_senary}
+              placeholderTextColor={
+                isDark ? colors.dark.tertiary : colors.light.tertiary
+              }
               secureTextEntry
               value={pwd}
               onChangeText={(text) => {
@@ -155,7 +166,9 @@ export default function ResetPassword() {
 
             <TextInput
               placeholder="Confirm password"
-              placeholderTextColor={COLORS.dark_senary}
+              placeholderTextColor={
+                isDark ? colors.dark.tertiary : colors.light.tertiary
+              }
               secureTextEntry
               value={confirm}
               onChangeText={(text) => {
@@ -167,8 +180,25 @@ export default function ResetPassword() {
           </View>
 
           {/* ---------- CTA ---------- */}
-          <TouchableOpacity style={s.nextBtn} onPress={handleNext}>
-            <Text style={s.nextTxt}>Next ›</Text>
+          <TouchableOpacity
+            style={[
+              s.nextBtn,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.accent
+                  : colors.light.accent,
+              },
+            ]}
+            onPress={handleNext}
+          >
+            <Text
+              style={[
+                s.nextTxt,
+                { color: isDark ? colors.dark.text : colors.light.text },
+              ]}
+            >
+              Next ›
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
@@ -180,7 +210,6 @@ export default function ResetPassword() {
 const s = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: COLORS.dark_primary,
   },
 
   content: {
@@ -196,12 +225,10 @@ const s = StyleSheet.create({
     fontSize: 32,
     lineHeight: 38,
     fontWeight: "bold",
-    color: COLORS.light_secondary,
   },
 
   subtitle: {
     fontSize: 14,
-    color: COLORS.dark_senary,
   },
 
   form: {
@@ -209,12 +236,10 @@ const s = StyleSheet.create({
   },
 
   input: {
-    backgroundColor: COLORS.dark_secondary,
     borderRadius: 8,
     paddingHorizontal: 20,
     paddingVertical: 14,
     fontSize: 16,
-    color: COLORS.light_secondary,
   },
 
   inputBackgroundError: {
@@ -223,7 +248,6 @@ const s = StyleSheet.create({
 
   nextBtn: {
     alignSelf: "center",
-    backgroundColor: COLORS.dark_accents,
     borderRadius: 12,
     paddingHorizontal: 64,
     paddingVertical: 14,
@@ -233,6 +257,5 @@ const s = StyleSheet.create({
   nextTxt: {
     fontSize: 16,
     fontWeight: "600",
-    color: COLORS.light_secondary,
   },
 });

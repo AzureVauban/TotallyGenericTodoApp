@@ -1,6 +1,13 @@
 // SETTINGS.tsx
 import React, { useRef, useState } from "react";
-import { View, Text, Image, TouchableOpacity, Switch, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Switch,
+  StyleSheet,
+} from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import {
   PanGestureHandler,
@@ -8,20 +15,13 @@ import {
   GestureHandlerGestureEvent,
 } from "react-native-gesture-handler";
 import FiBrAddressCard from "../assets/icons/svg/fi-br-address-card.svg";
-
-// Theme colors from home.tsx
-const COLORS = {
-  dark_primary: "#101010",
-  dark_secondary: "#1A1A1A",
-  dark_tertiary: "#373737",
-  dark_accents: "#F26C4F",
-  dark_subaccents: "#C5C5C5",
-};
+import { colors } from "@theme/colors";
+import { useTheme } from "@theme/ThemeContext";
 
 const settingsStyles = StyleSheet.create({
   screenbackground: {
     flex: 1,
-    backgroundColor: COLORS.dark_primary,
+    backgroundColor: colors.dark.primary,
     paddingTop: 40,
     paddingHorizontal: 20,
   },
@@ -29,7 +29,7 @@ const settingsStyles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 24,
     marginBottom: 20,
-    color: COLORS.dark_accents,
+    color: colors.dark.accent,
   },
   optionRow: {
     flexDirection: "row",
@@ -38,7 +38,7 @@ const settingsStyles = StyleSheet.create({
     marginVertical: 10,
   },
   optionText: {
-    color: COLORS.dark_subaccents,
+    color: colors.dark.text,
     fontSize: 16,
   },
   logoutButton: {
@@ -60,7 +60,7 @@ const settingsStyles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: "#444",
+    backgroundColor: colors.dark.tertiary,
     marginVertical: 10,
     width: "90%",
     alignSelf: "center",
@@ -108,13 +108,15 @@ export default function SettingsScreen() {
   const [bgColor, setBgColor] = useState("#eef2ff");
 
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [themeEnabled, setThemeEnabled] = useState(false);
+
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === "dark";
 
   useFocusEffect(
     React.useCallback(() => {
-      setBgColor("#eef2ff");
+      setBgColor(isDark ? colors.dark.background : colors.light.background);
       hasNavigated.current = false;
-    }, [])
+    }, [theme])
   );
 
   const onGestureEvent = (event: GestureHandlerGestureEvent) => {
@@ -122,23 +124,6 @@ export default function SettingsScreen() {
       event.nativeEvent as unknown as { translationX: number }
     ).translationX;
 
-    //?    if (translationX < 0) {
-    //?      // Left swipe: interpolate from white to orange
-    //?      if (translationX > -150) {
-    //?        const percent = Math.min(Math.abs(translationX) / 150, 1);
-    //?        const r = 255;
-    //?        const g = Math.floor(255 - 90 * percent);
-    //?        const b = Math.floor(255 - 255 * percent);
-    //?        setBgColor(`rgb(${r},${g},${b})`);
-    //?      } else {
-    //?        setBgColor("rgb(255,165,0)");
-    //?      }
-    //?      /* if (translationX < -100 && !hasNavigated.current) {
-    //?        hasNavigated.current = true;
-    //?        console.log("USER: SETTINGS <= LEADERBOARD");
-    //?        router.push("/leaderboard");
-    //?      } */
-    //?    }
     if (translationX > 0) {
       // Right swipe: interpolate from white to blue
       if (translationX < 150) {
@@ -149,7 +134,7 @@ export default function SettingsScreen() {
         router.push("/home");
       }
     } else {
-      setBgColor("#eef2ff");
+      setBgColor(isDark ? colors.dark.background : colors.light.background);
     }
 
     if (
@@ -159,30 +144,94 @@ export default function SettingsScreen() {
     ) {
       setTimeout(() => {
         hasNavigated.current = false;
-        setBgColor("#eef2ff");
+        setBgColor(isDark ? colors.dark.background : colors.light.background);
       }, 1500);
     }
   };
 
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent}>
-      <View style={settingsStyles.screenbackground}>
-        <Text style={settingsStyles.title}>SETTINGS</Text>
-        <View style={settingsStyles.divider} />
+      <View
+        style={[
+          settingsStyles.screenbackground,
+          {
+            backgroundColor: isDark
+              ? colors.dark.background
+              : colors.light.background,
+          },
+        ]}
+      >
+        <Text
+          style={[
+            settingsStyles.title,
+            { color: isDark ? colors.dark.accent : colors.light.accent },
+          ]}
+        >
+          SETTINGS
+        </Text>
+        <View
+          style={[
+            settingsStyles.divider,
+            {
+              backgroundColor: isDark
+                ? colors.dark.tertiary
+                : colors.light.tertiary,
+            },
+          ]}
+        />
         <View style={{ marginTop: 30 }}>
           <View style={settingsStyles.optionRow}>
-            <Text style={settingsStyles.optionText}>Enable Sound Effects</Text>
+            <Text
+              style={[
+                settingsStyles.optionText,
+                { color: isDark ? colors.dark.text : colors.light.text },
+              ]}
+            >
+              Enable Sound Effects
+            </Text>
             <Switch value={soundEnabled} onValueChange={setSoundEnabled} />
           </View>
-          <View style={settingsStyles.divider} />
+          <View
+            style={[
+              settingsStyles.divider,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.tertiary
+                  : colors.light.tertiary,
+              },
+            ]}
+          />
           <View style={settingsStyles.optionRow}>
-            <Text style={settingsStyles.optionText}>Light/Dark Theme</Text>
-            <Switch value={themeEnabled} onValueChange={setThemeEnabled} />
+            <Text
+              style={[
+                settingsStyles.optionText,
+                { color: isDark ? colors.dark.text : colors.light.text },
+              ]}
+            >
+              Light/Dark Theme
+            </Text>
+            <Switch value={isDark} onValueChange={toggleTheme} />
           </View>
         </View>
-        <View style={settingsStyles.divider} />
+        <View
+          style={[
+            settingsStyles.divider,
+            {
+              backgroundColor: isDark
+                ? colors.dark.tertiary
+                : colors.light.tertiary,
+            },
+          ]}
+        />
         <TouchableOpacity
-          style={settingsStyles.logoutButton}
+          style={[
+            settingsStyles.logoutButton,
+            {
+              backgroundColor: isDark
+                ? colors.dark.secondary
+                : colors.light.secondary,
+            },
+          ]}
           onPress={() => {
             console.log("USER LOGGED OUT");
             router.push("/login");
@@ -191,10 +240,17 @@ export default function SettingsScreen() {
           <FiBrAddressCard
             width={20}
             height={20}
-            fill={settingsStyles.logoutButtonText.color}
+            fill={isDark ? colors.dark.text : colors.light.text}
             style={{ marginRight: 8 }}
           />
-          <Text style={settingsStyles.logoutButtonText}>Log Out</Text>
+          <Text
+            style={[
+              settingsStyles.logoutButtonText,
+              { color: isDark ? colors.dark.text : colors.light.text },
+            ]}
+          >
+            Log Out
+          </Text>
         </TouchableOpacity>
       </View>
     </PanGestureHandler>

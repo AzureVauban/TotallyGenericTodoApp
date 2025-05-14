@@ -1,3 +1,6 @@
+import { useTheme } from "@theme/ThemeContext";
+import { useFocusEffect } from "@react-navigation/native";
+import { colors } from "@theme/colors";
 import { playRemoveSound } from "../../utils/playRemoveSound";
 import { playIndentTasksound } from "../../utils/playIndentTaskSound";
 import { playRenameTaskSound } from "../../utils/playRenameSound";
@@ -84,22 +87,22 @@ const getTomorrowMidnight = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#101010",
+    backgroundColor: colors.dark.primary,
     padding: 20,
   },
   title: {
     fontSize: 22,
-    color: "#fff",
+    color: colors.light.accent,
     marginBottom: 10,
   },
   taskItem: {
-    backgroundColor: "#1A1A1A",
+    backgroundColor: colors.dark.secondary,
     padding: 15,
     marginBottom: 5,
     borderRadius: 8,
   },
   taskText: {
-    color: "#fff",
+    color: colors.dark.text,
     fontSize: 16,
   },
   indentedTask: {
@@ -107,14 +110,14 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     borderWidth: 1,
-    borderColor: "#555",
+    borderColor: colors.dark.tertiary,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
     marginHorizontal: 16,
     marginTop: 18,
-    color: "#fff",
-    backgroundColor: "#1A1A1A",
+    color: colors.dark.text,
+    backgroundColor: colors.dark.secondary,
     fontSize: 16,
   },
   listTitleWrapper: {
@@ -124,7 +127,7 @@ const styles = StyleSheet.create({
   listTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#4A90E2",
+    color: colors.light.accent,
     marginTop: 25,
   },
   scrollContainer: {
@@ -133,13 +136,13 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: "#444",
+    backgroundColor: colors.dark.tertiary,
     marginVertical: 10,
     width: 300,
     alignSelf: "center",
   },
   addTaskButton: {
-    backgroundColor: "#2563eb",
+    backgroundColor: colors.light.primary,
     paddingVertical: 12,
     paddingHorizontal: 24,
     marginVertical: 16,
@@ -148,7 +151,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   addTaskButtonText: {
-    color: "#fff",
+    color: colors.light.text,
     fontSize: 16,
     fontWeight: "500",
   },
@@ -159,26 +162,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalContent: {
-    backgroundColor: "#1A1A1A",
+    backgroundColor: colors.dark.secondary,
     padding: 20,
     borderRadius: 12,
     width: "80%",
   },
   modalTitle: {
-    color: "#fff",
+    color: colors.dark.text,
     fontSize: 18,
     marginBottom: 12,
     fontWeight: "bold",
   },
   modalInput: {
     borderWidth: 1,
-    borderColor: "#555",
-    color: "#fff",
+    borderColor: colors.dark.tertiary,
+    color: colors.dark.text,
     padding: 8,
     borderRadius: 6,
     marginBottom: 12,
   },
-  // Inserted color picker styles here
   colorPickerContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -192,14 +194,14 @@ const styles = StyleSheet.create({
     margin: 4,
   },
   modalButton: {
-    backgroundColor: "#2563eb",
+    backgroundColor: colors.light.primary,
     padding: 12,
     borderRadius: 6,
     marginBottom: 8,
     alignItems: "center",
   },
   modalButtonText: {
-    color: "#fff",
+    color: colors.light.text,
     fontSize: 16,
   },
   inlineButton: {
@@ -214,6 +216,13 @@ const styles = StyleSheet.create({
 });
 
 export default function MyList() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  useFocusEffect(
+    React.useCallback(() => {
+      // no-op, but ensures re-render on theme change
+    }, [theme])
+  );
   const router = useRouter();
   const hasNavigated = useRef(false);
   const { id } = useLocalSearchParams();
@@ -362,9 +371,25 @@ export default function MyList() {
 
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent}>
-      <View style={styles.container}>
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor: isDark
+              ? colors.dark.background
+              : colors.light.background,
+          },
+        ]}
+      >
         <View style={styles.listTitleWrapper}>
-          <Text style={styles.listTitle}>{listId}</Text>
+          <Text
+            style={[
+              styles.listTitle,
+              { color: isDark ? colors.dark.accent : colors.light.accent },
+            ]}
+          >
+            {listId}
+          </Text>
         </View>
 
         <DraggableFlatList
@@ -391,7 +416,7 @@ export default function MyList() {
                     <Pressable
                       style={[
                         styles.inlineButton,
-                        { backgroundColor: "rgb(67,56,202)" },
+                        { backgroundColor: colors.dark.accent },
                       ]}
                       onPress={() => {
                         setSelectedTask(item);
@@ -412,7 +437,7 @@ export default function MyList() {
                     <Pressable
                       style={[
                         styles.inlineButton,
-                        { backgroundColor: "#7f1d1d" },
+                        { backgroundColor: colors.dark.accent },
                       ]}
                       onPress={() => {
                         Alert.alert(
@@ -447,7 +472,7 @@ export default function MyList() {
                     <Pressable
                       style={[
                         styles.inlineButton,
-                        { backgroundColor: "#fbbf24" },
+                        { backgroundColor: colors.dark.tertiary },
                       ]}
                       onPress={() => {
                         const wasFlagged = item.flagged;
@@ -468,7 +493,7 @@ export default function MyList() {
                     <Pressable
                       style={[
                         styles.inlineButton,
-                        { backgroundColor: "#93c5fd" },
+                        { backgroundColor: colors.light.accent },
                       ]}
                       onPress={() => {
                         setRenameTaskId(item.id);
@@ -483,7 +508,7 @@ export default function MyList() {
                       <Pressable
                         style={[
                           styles.inlineButton,
-                          { backgroundColor: "rgb(16, 185, 129)" },
+                          { backgroundColor: colors.light.secondary },
                         ]}
                         onPress={() => {
                           playIndentTasksound();
@@ -547,23 +572,30 @@ export default function MyList() {
                       styles.taskItem,
                       item.indent === 1 && styles.indentedTask,
                       item.completed
-                        ? { backgroundColor: "#2d2d2d" }
+                        ? { backgroundColor: colors.dark.tertiary }
                         : item.buttonColor
                         ? { backgroundColor: item.buttonColor }
-                        : {},
+                        : {
+                            backgroundColor: isDark
+                              ? colors.dark.secondary
+                              : colors.light.secondary,
+                          },
                     ]}
                   >
                     <Text
                       style={[
                         styles.taskText,
+                        {
+                          color: isDark ? colors.dark.text : colors.light.text,
+                        },
                         item.completed && {
                           textDecorationLine: "line-through",
-                          color: "#888",
+                          color: colors.dark.tertiary,
                         },
                         item.indent === 1 &&
                           item.completed && {
                             textDecorationLine: "line-through",
-                            color: "#888",
+                            color: colors.dark.tertiary,
                           },
                       ]}
                     >
@@ -588,13 +620,16 @@ export default function MyList() {
                     style={[
                       styles.taskItem,
                       item.indent === 1 && styles.indentedTask,
-                      { backgroundColor: "#2d2d2d" },
+                      { backgroundColor: colors.dark.tertiary },
                     ]}
                   >
                     <Text
                       style={[
                         styles.taskText,
-                        { textDecorationLine: "line-through", color: "#888" },
+                        {
+                          textDecorationLine: "line-through",
+                          color: colors.dark.tertiary,
+                        },
                       ]}
                     >
                       {item.title}
@@ -608,10 +643,24 @@ export default function MyList() {
 
         {/* Only show add task button (always, since only regular lists) */}
         <TouchableOpacity
-          style={styles.addTaskButton}
+          style={[
+            styles.addTaskButton,
+            {
+              backgroundColor: isDark
+                ? colors.dark.accent
+                : colors.light.primary,
+            },
+          ]}
           onPress={() => setNewTaskModalVisible(true)}
         >
-          <Text style={styles.addTaskButtonText}>+ Add Task</Text>
+          <Text
+            style={[
+              styles.addTaskButtonText,
+              { color: isDark ? colors.dark.text : colors.light.text },
+            ]}
+          >
+            + Add Task
+          </Text>
         </TouchableOpacity>
 
         {/* New Task Modal */}
@@ -623,14 +672,14 @@ export default function MyList() {
                 value={newTaskText}
                 onChangeText={setNewTaskText}
                 placeholder="Task description"
-                placeholderTextColor="#ccc"
+                placeholderTextColor={colors.dark.text}
                 style={[
                   styles.modalInput,
                   newTaskError && { borderColor: "#450a0a" },
                 ]}
               />
               {newTaskError ? (
-                <Text style={{ color: "#450a0a", marginBottom: 8 }}>
+                <Text style={{ color: colors.dark.accent, marginBottom: 8 }}>
                   {newTaskError}
                 </Text>
               ) : null}
@@ -671,7 +720,10 @@ export default function MyList() {
                 <Text style={styles.modalButtonText}>Add</Text>
               </Pressable>
               <Pressable
-                style={[styles.modalButton, { backgroundColor: "#888" }]}
+                style={[
+                  styles.modalButton,
+                  { backgroundColor: colors.dark.tertiary },
+                ]}
                 onPress={() => {
                   setNewTaskText("");
                   setNewTaskError("");
@@ -693,7 +745,7 @@ export default function MyList() {
                 value={renameText}
                 onChangeText={setRenameText}
                 placeholder="Task description"
-                placeholderTextColor="#ccc"
+                placeholderTextColor={colors.dark.text}
                 style={styles.modalInput}
               />
               <Pressable
@@ -714,7 +766,10 @@ export default function MyList() {
                 <Text style={styles.modalButtonText}>Save</Text>
               </Pressable>
               <Pressable
-                style={[styles.modalButton, { backgroundColor: "#888" }]}
+                style={[
+                  styles.modalButton,
+                  { backgroundColor: colors.dark.tertiary },
+                ]}
                 onPress={() => {
                   setRenameText("");
                   setRenameTaskId(null);
@@ -736,7 +791,7 @@ export default function MyList() {
                 value={detailDesc}
                 onChangeText={setDetailDesc}
                 placeholder={selectedTask?.title}
-                placeholderTextColor="rgb(161, 161, 170)"
+                placeholderTextColor={colors.dark.text}
                 style={styles.modalInput}
               />
 
@@ -744,7 +799,7 @@ export default function MyList() {
                 value={detailDate}
                 onChangeText={setDetailDate}
                 placeholder="Scheduled Date"
-                placeholderTextColor="#ccc"
+                placeholderTextColor={colors.dark.text}
                 style={styles.modalInput}
               />
 
@@ -795,7 +850,7 @@ export default function MyList() {
                 value={detailColor}
                 onChangeText={setDetailColor}
                 placeholder="Button Color (hex)"
-                placeholderTextColor="#ccc"
+                placeholderTextColor={colors.dark.text}
                 style={styles.modalInput}
               />
               <Pressable
@@ -816,7 +871,10 @@ export default function MyList() {
                 <Text style={styles.modalButtonText}>Save</Text>
               </Pressable>
               <Pressable
-                style={[styles.modalButton, { backgroundColor: "#888" }]}
+                style={[
+                  styles.modalButton,
+                  { backgroundColor: colors.dark.tertiary },
+                ]}
                 onPress={() => setDetailModalVisible(false)}
               >
                 <Text style={styles.modalButtonText}>Cancel</Text>

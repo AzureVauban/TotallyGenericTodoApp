@@ -3,24 +3,17 @@ import { View, TouchableOpacity, Text, Dimensions } from "react-native";
 import { useRouter } from "expo-router";
 import { StyleSheet } from "react-native";
 import FISignatureIcon from "../assets/icons/svg/fi-br-chart-scatter-3d.svg";
+import { colors } from "@theme/colors";
+import { useTheme } from "@theme/ThemeContext";
+import { useFocusEffect } from "@react-navigation/native";
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const BUTTON_WIDTH = SCREEN_WIDTH * 0.7;
 
-const COLORS = {
-  //  Dark theme palette (left UI) with original hex codes:
-  dark_primary: "#101010", // #101010
-  dark_secondary: "#1A1A1A", // #1A1A1A
-  dark_tertiary: "#373737", // #373737
-  dark_accents: "#F26C4F", // #F26C4F
-  dark_subaccents: "#C5C5C5", // #C5C5C5
-  dark_senary: "#808080", // #808080
-  dark_icon_text: "#F26C4F", // #F26C4F
-};
 const styles = StyleSheet.create({
   screenbackground: {
     flex: 1,
-    backgroundColor: COLORS.dark_primary,
-    color: COLORS.dark_primary,
+    backgroundColor: colors.dark.primary,
+    color: colors.dark.text,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -38,21 +31,21 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
-    color: COLORS.dark_subaccents,
+    color: colors.dark.text,
   },
   subtitle: {
     fontSize: 16,
-    color: COLORS.dark_senary,
+    color: colors.dark.text,
     marginBottom: 20,
   },
   linktext: {
     fontSize: 16,
-    color: COLORS.dark_senary,
+    color: colors.dark.text,
     marginBottom: 20,
     fontWeight: "bold",
   },
   button: {
-    backgroundColor: COLORS.dark_accents,
+    backgroundColor: colors.dark.accent,
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -62,7 +55,7 @@ const styles = StyleSheet.create({
     // width removed
   },
   buttonText: {
-    color: COLORS.dark_secondary,
+    color: colors.dark.secondary,
     fontWeight: "bold",
   },
   buttonSecondary: {
@@ -102,6 +95,10 @@ const styles = StyleSheet.create({
  */
 
 export default function LoginScreen() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  useFocusEffect(React.useCallback(() => {}, [theme]));
+
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
   const router = useRouter();
   // Helper to compute the complementary color of a hex code
@@ -128,7 +125,16 @@ export default function LoginScreen() {
   // Shared button style so both buttons have the same width.
 
   return (
-    <View style={styles.screenbackground}>
+    <View
+      style={[
+        styles.screenbackground,
+        {
+          backgroundColor: isDark
+            ? colors.dark.background
+            : colors.light.background,
+        },
+      ]}
+    >
       <View
         style={{
           flex: 1,
@@ -141,45 +147,51 @@ export default function LoginScreen() {
           style={styles.icon}
           width={300}
           height={300}
-          fill={COLORS.dark_accents}
+          fill={colors.dark.accent}
         />
         <Text
           style={[
             styles.title,
-            {
-              /* NONE */
-            },
+            { color: isDark ? colors.dark.accent : colors.light.accent },
           ]}
         >
-          Welcome to{" "}
-          <Text style={{ color: getComplement(COLORS.dark_accents) }}>
-            Divide
-          </Text>
-          &
-          <Text style={{ color: COLORS.dark_accents, fontWeight: "bold" }}>
-            Do
-          </Text>
-          !
+          {" "}
+          {/* add back duotone sentence later */}
+          This is a cool todo app!
         </Text>
         <Text
           style={[
             styles.subtitle,
             {
               paddingBottom: 50,
-              /* NONE */
+              color: isDark ? colors.dark.text : colors.light.text,
             },
           ]}
         >
-          Compete with your friends to be the best!
+          Compete tasks, get stuff done!
         </Text>
         <TouchableOpacity
-          style={[styles.button, { flexDirection: "row", width: BUTTON_WIDTH }]}
+          style={[
+            styles.button,
+            {
+              flexDirection: "row",
+              width: BUTTON_WIDTH,
+              backgroundColor: isDark
+                ? colors.dark.secondary
+                : colors.light.secondary,
+            },
+          ]}
           onPress={() => {
             console.log("USER LOGGED IN");
             setIsUserLoggedIn(true);
           }}
         >
-          <Text style={{ fontSize: 16, fontWeight: "600" }}>
+          <Text
+            style={[
+              { fontSize: 16, fontWeight: "600" },
+              { color: isDark ? colors.dark.text : colors.light.text },
+            ]}
+          >
             Login with Email
           </Text>
         </TouchableOpacity>
@@ -187,19 +199,39 @@ export default function LoginScreen() {
         <TouchableOpacity
           style={[
             styles.buttonSecondary,
-            { flexDirection: "row", width: BUTTON_WIDTH, marginBottom: 20 },
+            {
+              flexDirection: "row",
+              width: BUTTON_WIDTH,
+              marginBottom: 20,
+              backgroundColor: isDark
+                ? colors.dark.tertiary
+                : colors.light.tertiary,
+            },
           ]}
           onPress={() => {
             console.log("User pressed reset password");
             router.push("/resetPassword");
           }}
         >
-          <Text style={{ color: COLORS.dark_subaccents, fontWeight: "600" }}>
+          <Text
+            style={{
+              color: isDark ? colors.dark.text : colors.light.text,
+              fontWeight: "600",
+            }}
+          >
             Forgot Password?
           </Text>
         </TouchableOpacity>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={[styles.subtitle, { fontWeight: "500" }]}>
+          <Text
+            style={[
+              styles.subtitle,
+              {
+                fontWeight: "500",
+                color: isDark ? colors.dark.text : colors.light.text,
+              },
+            ]}
+          >
             Don't have an account?{" "}
           </Text>
           <TouchableOpacity
@@ -208,7 +240,14 @@ export default function LoginScreen() {
               router.push("/signup");
             }}
           >
-            <Text style={[styles.linktext]}>Sign Up</Text>
+            <Text
+              style={[
+                styles.linktext,
+                { color: isDark ? colors.dark.text : colors.light.text },
+              ]}
+            >
+              Sign Up
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

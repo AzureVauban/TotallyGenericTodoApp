@@ -1,3 +1,4 @@
+import { colors } from "@theme/colors";
 import React, { useState } from "react";
 import {
   View,
@@ -12,32 +13,15 @@ import { useRouter } from "expo-router";
 import { StyleSheet } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
+import { useTheme } from "@theme/ThemeContext";
+import { useFocusEffect } from "@react-navigation/native";
 import { playInvalidSound } from "../utils/playInvalidSound";
 
-const COLORS = {
-  //  Dark theme palette (left UI) with original hex codes:
-  dark_primary: "#101010", // #101010
-  dark_secondary: "#1A1A1A", // #1A1A1A
-  dark_tertiary: "#373737", // #373737
-  dark_accents: "#F26C4F", // #F26C4F
-  dark_subaccents: "#C5C5C5", // #C5C5C5
-  dark_senary: "#808080", // #808080
-  dark_icon_text: "#F26C4F", // #F26C4F
-
-  // Light theme palette (right UI) with original hex codes:
-  light_primary: "#F26C4F", // #F26C4F
-  light_secondary: "#FFFFFF", // #FFFFFF
-  light_tertiary: "#CCCCCC", // #CCCCCC
-  light_accents: "#101010", // #101010
-  light_subaccents: "#373737", // #373737
-  light_senary: "#E8A87C", // #E8A87C
-  light_icon_text: "#101010", // #101010
-};
 const styles = StyleSheet.create({
   screenbackground: {
     flex: 1,
-    backgroundColor: COLORS.dark_primary,
-    color: COLORS.dark_primary,
+    backgroundColor: colors.dark.primary,
+    color: colors.dark.primary,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -45,7 +29,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#104C64",
+    backgroundColor: colors.dark.primary,
   },
   content: {
     width: "80%",
@@ -55,16 +39,16 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
-    color: COLORS.dark_subaccents,
+    color: colors.dark.text,
   },
   subtitle: {
     fontSize: 16,
-    color: "#C6C6D0",
+    color: colors.light.text,
     marginBottom: 20,
     fontWeight: "bold",
   },
   button: {
-    backgroundColor: " #D59D80",
+    backgroundColor: colors.light.primary,
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -73,11 +57,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   buttonText: {
-    color: "#C6C6D0",
+    color: colors.light.text,
     fontWeight: "bold",
   },
   buttonSecondary: {
-    backgroundColor: " #104C64",
+    backgroundColor: colors.dark.secondary,
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -88,8 +72,8 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginBottom: 20,
-    color: " #D59D80",
-    backgroundColor: " #D59D80",
+    color: colors.dark.secondary,
+    backgroundColor: colors.dark.secondary,
   },
 });
 
@@ -121,6 +105,10 @@ export default function SignUpScreen() {
   const router = useRouter();
   const navigation = useNavigation();
 
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  useFocusEffect(React.useCallback(() => {}, [theme]));
+
   const handleSwipe = ({ nativeEvent }) => {
     if (nativeEvent.translationX > 50) {
       navigation.goBack();
@@ -151,7 +139,16 @@ export default function SignUpScreen() {
 
   return (
     <PanGestureHandler onHandlerStateChange={handleSwipe}>
-      <View style={styles.screenbackground}>
+      <View
+        style={[
+          styles.screenbackground,
+          {
+            backgroundColor: isDark
+              ? colors.dark.background
+              : colors.light.background,
+          },
+        ]}
+      >
         <Image
           style={{
             width: 200,
@@ -166,13 +163,17 @@ export default function SignUpScreen() {
           style={[
             sharedButtonStyle,
             {
-              backgroundColor: usernameValid ? "#1A1A1A" : "#450a0a",
-              color: "#fff",
+              backgroundColor: usernameValid
+                ? isDark
+                  ? colors.dark.secondary
+                  : colors.light.secondary
+                : "#450a0a",
+              color: isDark ? colors.dark.text : colors.light.text,
               marginBottom: 12,
             },
           ]}
           placeholder="Username"
-          placeholderTextColor="#999"
+          placeholderTextColor={isDark ? colors.dark.text : colors.light.text}
           value={username}
           onChangeText={(text) => {
             setUsername(text);
@@ -184,13 +185,17 @@ export default function SignUpScreen() {
           style={[
             sharedButtonStyle,
             {
-              backgroundColor: passwordValid ? "#1A1A1A" : "#450a0a",
-              color: "#fff",
+              backgroundColor: passwordValid
+                ? isDark
+                  ? colors.dark.secondary
+                  : colors.light.secondary
+                : "#450a0a",
+              color: isDark ? colors.dark.text : colors.light.text,
               marginBottom: 12,
             },
           ]}
           placeholder="Password"
-          placeholderTextColor="#999"
+          placeholderTextColor={isDark ? colors.dark.text : colors.light.text}
           secureTextEntry
           value={password}
           onChangeText={(text) => {
@@ -203,13 +208,17 @@ export default function SignUpScreen() {
           style={[
             sharedButtonStyle,
             {
-              backgroundColor: emailValid ? "#1A1A1A" : "#450a0a",
-              color: "#fff",
+              backgroundColor: emailValid
+                ? isDark
+                  ? colors.dark.secondary
+                  : colors.light.secondary
+                : "#450a0a",
+              color: isDark ? colors.dark.text : colors.light.text,
               marginBottom: 12,
             },
           ]}
           placeholder="Email"
-          placeholderTextColor="#999"
+          placeholderTextColor={isDark ? colors.dark.text : colors.light.text}
           value={email}
           onChangeText={(text) => {
             setEmail(text);
@@ -222,13 +231,17 @@ export default function SignUpScreen() {
           style={[
             sharedButtonStyle,
             {
-              backgroundColor: phoneValid ? "#1A1A1A" : "#450a0a",
-              color: "#fff",
+              backgroundColor: phoneValid
+                ? isDark
+                  ? colors.dark.secondary
+                  : colors.light.secondary
+                : "#450a0a",
+              color: isDark ? colors.dark.text : colors.light.text,
               marginBottom: 12,
             },
           ]}
           placeholder="Phone Number"
-          placeholderTextColor="#999"
+          placeholderTextColor={isDark ? colors.dark.text : colors.light.text}
           keyboardType="phone-pad"
           value={phone}
           onChangeText={(text) => {
@@ -242,9 +255,11 @@ export default function SignUpScreen() {
           style={[
             sharedButtonStyle as ViewStyle,
             {
-              backgroundColor: "#F26C4F",
+              backgroundColor: isDark
+                ? colors.dark.accent
+                : colors.light.primary,
               marginBottom: 12,
-              alignItems: "center", // This ensures the text is centered
+              alignItems: "center",
               justifyContent: "center",
             },
           ]}
@@ -272,8 +287,14 @@ export default function SignUpScreen() {
             }
           }}
         >
-          <Text style={{ color: "#fff", fontSize: 16, textAlign: "center" }}>
-            Signup & Login
+          <Text
+            style={{
+              color: isDark ? colors.dark.text : colors.light.text,
+              fontSize: 16,
+              textAlign: "center",
+            }}
+          >
+            Register Account
           </Text>
         </TouchableOpacity>
       </View>

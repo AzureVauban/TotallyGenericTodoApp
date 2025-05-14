@@ -8,27 +8,14 @@ import {
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-
-const COLORS = {
-  //  Dark theme palette (left UI) with original hex codes:
-  dark_primary: "#101010",
-  dark_secondary: "#1A1A1A",
-  dark_tertiary: "#373737",
-  dark_accents: "#F26C4F",
-  dark_subaccents: "#C5C5C5",
-
-  // Light theme palette (right UI) with original hex codes:
-  light_primary: "#E76F51",
-  light_secondary: "#F4A261",
-  light_tertiary: "#E9C46A",
-  light_accents: "#2A9D8F",
-  light_subaccents: "#264653",
-};
+import { colors } from "@theme/colors";
+import { useTheme } from "@theme/ThemeContext";
+import { useFocusEffect } from "@react-navigation/native";
 
 const styles = StyleSheet.create({
   screenbackground: {
     flex: 1,
-    backgroundColor: COLORS.dark_primary,
+    backgroundColor: colors.dark.primary,
   },
   container: {
     flex: 1,
@@ -39,18 +26,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    color: COLORS.dark_accents,
+    color: colors.dark.accent,
     marginBottom: 16,
     textAlign: "center",
   },
   subtitle: {
     fontSize: 16,
-    color: COLORS.dark_subaccents,
+    color: colors.dark.text,
     marginBottom: 32,
     textAlign: "center",
   },
   button: {
-    backgroundColor: COLORS.dark_secondary,
+    backgroundColor: colors.dark.secondary,
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 8,
@@ -61,7 +48,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   buttonText: {
-    color: COLORS.dark_subaccents,
+    color: colors.dark.text,
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",
@@ -90,25 +77,77 @@ const styles = StyleSheet.create({
 
 export default function verifyPhone() {
   const router = useRouter();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  useFocusEffect(React.useCallback(() => {}, [theme]));
 
   return (
-    <SafeAreaView style={styles.screenbackground}>
+    <SafeAreaView
+      style={[
+        styles.screenbackground,
+        {
+          backgroundColor: isDark
+            ? colors.dark.background
+            : colors.light.background,
+        },
+      ]}
+    >
       <View style={styles.container}>
-        <Text style={styles.title}>Verify Your Phone</Text>
-        <Text style={styles.subtitle}>
+        <Text
+          style={[
+            styles.title,
+            { color: isDark ? colors.dark.accent : colors.light.accent },
+          ]}
+        >
+          Verify Your Phone
+        </Text>
+        <Text
+          style={[
+            styles.subtitle,
+            { color: isDark ? colors.dark.text : colors.light.text },
+          ]}
+        >
           Please enter your phone number to receive a verification code.
         </Text>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Send Verification Code</Text>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            {
+              backgroundColor: isDark
+                ? colors.dark.secondary
+                : colors.light.secondary,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.buttonText,
+              { color: isDark ? colors.dark.text : colors.light.text },
+            ]}
+          >
+            Send Verification Code
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[
             styles.button,
-            { backgroundColor: COLORS.dark_tertiary, marginTop: 12 },
+            {
+              backgroundColor: isDark
+                ? colors.dark.tertiary
+                : colors.light.tertiary,
+              marginTop: 12,
+            },
           ]}
           onPress={() => router.push("/inputCode")}
         >
-          <Text style={styles.buttonText}>Input Code</Text>
+          <Text
+            style={[
+              styles.buttonText,
+              { color: isDark ? colors.dark.text : colors.light.text },
+            ]}
+          >
+            Input Code
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

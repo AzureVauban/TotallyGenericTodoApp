@@ -1,3 +1,6 @@
+import { colors } from "@theme/colors";
+import { useTheme } from "@theme/ThemeContext";
+import { useFocusEffect } from "@react-navigation/native";
 /**
  * Scheduled Screen
  *
@@ -23,6 +26,13 @@ interface TaskItem {
 }
 
 export default function ScheduledTasks() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  useFocusEffect(
+    React.useCallback(() => {
+      // no-op, but ensures re-render on theme change
+    }, [theme])
+  );
   const { tasks, removeTask } = useTasks();
   const today = new Date();
   const visibleTasks = tasks.filter((t) => {
@@ -37,8 +47,24 @@ export default function ScheduledTasks() {
   });
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Scheduled Tasks</Text>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark
+            ? colors.dark.background
+            : colors.light.background,
+        },
+      ]}
+    >
+      <Text
+        style={[
+          styles.title,
+          { color: isDark ? colors.dark.accent : colors.light.accent },
+        ]}
+      >
+        Scheduled Tasks
+      </Text>
       <View style={styles.divider} />
       <FlatList
         data={visibleTasks}
@@ -48,53 +74,77 @@ export default function ScheduledTasks() {
             renderRightActions={() => (
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Pressable
-                  style={[styles.inlineButton, { backgroundColor: "#7f1d1d" }]}
+                  style={[
+                    styles.inlineButton,
+                    { backgroundColor: colors.dark.accent },
+                  ]}
                   onPress={() => removeTask(item.id)}
                 >
-                  <FiBrtrash width={20} height={20} fill="#fecaca" />
+                  <FiBrtrash
+                    width={20}
+                    height={20}
+                    fill={colors.light.secondary}
+                  />
                 </Pressable>
               </View>
             )}
           >
-            <View style={styles.item}>
+            <View
+              style={[
+                styles.item,
+                {
+                  backgroundColor: isDark
+                    ? colors.dark.secondary
+                    : colors.light.secondary,
+                },
+              ]}
+            >
               <Text
-                style={[styles.text, item.completed && styles.completedText]}
+                style={[
+                  styles.text,
+                  { color: isDark ? colors.dark.text : colors.light.text },
+                  item.completed && styles.completedText,
+                ]}
               >
                 {item.title}
               </Text>
             </View>
           </Swipeable>
         )}
-        contentContainerStyle={{ backgroundColor: "#101010" }}
+        contentContainerStyle={{
+          backgroundColor: isDark
+            ? colors.dark.background
+            : colors.light.background,
+        }}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#101010" },
+  container: { flex: 1, padding: 20, backgroundColor: colors.dark.primary },
   title: {
     fontSize: 24,
-    color: "#4A90E2",
+    color: colors.light.accent,
     marginBottom: 10,
     marginTop: 20,
     textAlign: "center",
     fontWeight: "bold",
   },
   item: {
-    backgroundColor: "#1A1A1A",
+    backgroundColor: colors.dark.secondary,
     padding: 15,
     marginBottom: 6,
     borderRadius: 8,
   },
-  text: { color: "#fff", fontSize: 16 },
+  text: { color: colors.dark.text, fontSize: 16 },
   completedText: {
-    color: "#888",
+    color: colors.dark.tertiary,
     textDecorationLine: "line-through",
   },
   divider: {
     height: 1,
-    backgroundColor: "#444",
+    backgroundColor: colors.dark.tertiary,
     marginVertical: 10,
     width: "100%",
   },

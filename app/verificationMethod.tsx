@@ -8,6 +8,9 @@ import {
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useTheme } from "@theme/ThemeContext";
+import { useFocusEffect } from "@react-navigation/native";
+import { colors } from "@theme/colors";
 
 /**
  * **VerificationMethod Screen**
@@ -43,10 +46,35 @@ export default function VerificationMethod() {
   >(null);
   const [errorMessage, setErrorMessage] = useState("");
 
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  useFocusEffect(React.useCallback(() => {}, [theme]));
+
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Verification Method</Text>
-      <Text style={styles.subtitle}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark
+            ? colors.dark.background
+            : colors.light.background,
+        },
+      ]}
+    >
+      <Text
+        style={[
+          styles.title,
+          { color: isDark ? colors.dark.accent : colors.light.accent },
+        ]}
+      >
+        Verification Method
+      </Text>
+      <Text
+        style={[
+          styles.subtitle,
+          { color: isDark ? colors.dark.text : colors.light.text },
+        ]}
+      >
         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.
       </Text>
 
@@ -54,8 +82,13 @@ export default function VerificationMethod() {
         <TouchableOpacity
           style={[
             styles.optionBox,
+            {
+              backgroundColor: isDark
+                ? colors.dark.secondary
+                : colors.light.secondary,
+            },
             selectedMethod === "email" && {
-              borderColor: "#F26C4F",
+              borderColor: isDark ? colors.dark.accent : colors.light.accent,
               borderWidth: 2,
             },
           ]}
@@ -63,16 +96,39 @@ export default function VerificationMethod() {
             setSelectedMethod(selectedMethod === "email" ? null : "email")
           }
         >
-          <MaterialIcons name="email" size={24} color="#F26C4F" />
-          <Text style={styles.optionTitle}>Email</Text>
-          <Text style={styles.optionInfo}>amanda.samarth@email.com</Text>
+          <MaterialIcons
+            name="email"
+            size={24}
+            color={isDark ? colors.dark.accent : colors.light.accent}
+          />
+          <Text
+            style={[
+              styles.optionTitle,
+              { color: isDark ? colors.dark.text : colors.light.text },
+            ]}
+          >
+            Email
+          </Text>
+          <Text
+            style={[
+              styles.optionInfo,
+              { color: isDark ? colors.dark.text : colors.light.text },
+            ]}
+          >
+            amanda.samarth@email.com
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[
             styles.optionBox,
+            {
+              backgroundColor: isDark
+                ? colors.dark.secondary
+                : colors.light.secondary,
+            },
             selectedMethod === "phone" && {
-              borderColor: "#F26C4F",
+              borderColor: isDark ? colors.dark.accent : colors.light.accent,
               borderWidth: 2,
             },
           ]}
@@ -80,15 +136,40 @@ export default function VerificationMethod() {
             setSelectedMethod(selectedMethod === "phone" ? null : "phone")
           }
         >
-          <Ionicons name="call" size={24} color="#F26C4F" />
-          <Text style={styles.optionTitle}>Phone</Text>
-          <Text style={styles.optionInfo}>+62 000-0000-0000</Text>
+          <Ionicons
+            name="call"
+            size={24}
+            color={isDark ? colors.dark.accent : colors.light.accent}
+          />
+          <Text
+            style={[
+              styles.optionTitle,
+              { color: isDark ? colors.dark.text : colors.light.text },
+            ]}
+          >
+            Phone
+          </Text>
+          <Text
+            style={[
+              styles.optionInfo,
+              { color: isDark ? colors.dark.text : colors.light.text },
+            ]}
+          >
+            +62 000-0000-0000
+          </Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.footerContainer}>
         <TouchableOpacity
-          style={styles.nextButton}
+          style={[
+            styles.nextButton,
+            {
+              backgroundColor: isDark
+                ? colors.dark.accent
+                : colors.light.accent,
+            },
+          ]}
           onPress={() => {
             if (!selectedMethod) {
               setErrorMessage("Please select a verification method.");
@@ -100,9 +181,21 @@ export default function VerificationMethod() {
             }
           }}
         >
-          <Text style={styles.nextButtonText}>Next</Text>
+          <Text
+            style={[
+              styles.nextButtonText,
+              { color: isDark ? colors.dark.text : colors.light.text },
+            ]}
+          >
+            Next
+          </Text>
         </TouchableOpacity>
-        <Text style={styles.errorMessage}>
+        <Text
+          style={[
+            styles.errorMessage,
+            { color: isDark ? colors.dark.accent : colors.light.accent },
+          ]}
+        >
           {errorMessage ? errorMessage : " "}
         </Text>
       </View>

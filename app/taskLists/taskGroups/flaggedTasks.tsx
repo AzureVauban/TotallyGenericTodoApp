@@ -6,6 +6,7 @@
 import React from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
 import { useTasks } from "../../../backend/storage/TasksContext";
+import { colors } from "@theme/colors";
 
 export default function FlaggedTasks() {
   const { tasks } = useTasks();
@@ -28,29 +29,29 @@ export default function FlaggedTasks() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#101010" },
+  container: { flex: 1, padding: 20, backgroundColor: colors.dark.background },
   title: {
     fontSize: 24,
-    color: "#4A90E2",
+    color: colors.dark.accent,
     marginBottom: 10,
     marginTop: 20,
     textAlign: "center",
     fontWeight: "bold",
   },
   item: {
-    backgroundColor: "#1A1A1A",
+    backgroundColor: colors.dark.secondary,
     padding: 15,
     marginBottom: 6,
     borderRadius: 8,
   },
-  text: { color: "#fff", fontSize: 16 },
+  text: { color: colors.dark.text, fontSize: 16 },
   completedText: {
-    color: "#888",
+    color: colors.dark.tertiary,
     textDecorationLine: "line-through",
   },
   divider: {
     height: 1,
-    backgroundColor: "#444",
+    backgroundColor: colors.dark.tertiary,
     marginVertical: 10,
     width: "100%",
   },

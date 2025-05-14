@@ -7,6 +7,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useTheme } from "@theme/ThemeContext";
+import { useFocusEffect } from "@react-navigation/native";
+import { colors } from "@theme/colors";
 /**
  * **VerifyPhone Screen**
  *
@@ -31,6 +34,10 @@ export default function VerifyPhone() {
   const [code, setCode] = useState("");
   const router = useRouter();
 
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  useFocusEffect(React.useCallback(() => {}, [theme]));
+
   const handlePress = (digit: string) => {
     if (code.length < 4) setCode(code + digit);
   };
@@ -42,52 +49,164 @@ export default function VerifyPhone() {
   const digits = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Verify Phone</Text>
-      <Text style={styles.subtitle}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark
+            ? colors.dark.background
+            : colors.light.background,
+        },
+      ]}
+    >
+      <Text
+        style={[
+          styles.title,
+          { color: isDark ? colors.dark.accent : colors.light.accent },
+        ]}
+      >
+        Verify Phone
+      </Text>
+      <Text
+        style={[
+          styles.subtitle,
+          { color: isDark ? colors.dark.text : colors.light.text },
+        ]}
+      >
         We sent a code to your number. Enter it to continue.
       </Text>
 
       <View style={styles.codeContainer}>
         {Array.from({ length: 4 }).map((_, i) => (
-          <View key={i} style={styles.codeBox}>
-            <Text style={styles.codeText}>{code[i] || ""}</Text>
+          <View
+            key={i}
+            style={[
+              styles.codeBox,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.secondary
+                  : colors.light.secondary,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.codeText,
+                { color: isDark ? colors.dark.text : colors.light.text },
+              ]}
+            >
+              {code[i] || ""}
+            </Text>
           </View>
         ))}
       </View>
 
       <TouchableOpacity
-        style={styles.verifyButton}
+        style={[
+          styles.verifyButton,
+          {
+            backgroundColor: isDark ? colors.dark.accent : colors.light.accent,
+          },
+        ]}
         onPress={() => {
           if (code.length === 4) {
             router.replace("/home");
           }
         }}
       >
-        <Text style={styles.verifyButtonText}>Verify and continue</Text>
+        <Text
+          style={[
+            styles.verifyButtonText,
+            { color: isDark ? colors.dark.text : colors.light.text },
+          ]}
+        >
+          Verify and continue
+        </Text>
       </TouchableOpacity>
 
       <View style={styles.keypad}>
         {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d) => (
           <TouchableOpacity
             key={d}
-            style={styles.key}
+            style={[
+              styles.key,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.secondary
+                  : colors.light.secondary,
+              },
+            ]}
             onPress={() => handlePress(d)}
           >
-            <Text style={styles.keyText}>{d}</Text>
+            <Text
+              style={[
+                styles.keyText,
+                { color: isDark ? colors.dark.text : colors.light.text },
+              ]}
+            >
+              {d}
+            </Text>
           </TouchableOpacity>
         ))}
-        <TouchableOpacity style={styles.key} onPress={() => handlePress("0")}>
-          <Text style={styles.keyText}>0</Text>
+        <TouchableOpacity
+          style={[
+            styles.key,
+            {
+              backgroundColor: isDark
+                ? colors.dark.secondary
+                : colors.light.secondary,
+            },
+          ]}
+          onPress={() => handlePress("0")}
+        >
+          <Text
+            style={[
+              styles.keyText,
+              { color: isDark ? colors.dark.text : colors.light.text },
+            ]}
+          >
+            0
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.key}
+          style={[
+            styles.key,
+            {
+              backgroundColor: isDark
+                ? colors.dark.secondary
+                : colors.light.secondary,
+            },
+          ]}
           onPress={() => router.replace("/verificationMethod")}
         >
-          <Text style={styles.keyText}>←</Text>
+          <Text
+            style={[
+              styles.keyText,
+              { color: isDark ? colors.dark.text : colors.light.text },
+            ]}
+          >
+            ←
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.key} onPress={handleBackspace}>
-          <Text style={styles.keyText}>⌫</Text>
+        <TouchableOpacity
+          style={[
+            styles.key,
+            {
+              backgroundColor: isDark
+                ? colors.dark.secondary
+                : colors.light.secondary,
+            },
+          ]}
+          onPress={handleBackspace}
+        >
+          <Text
+            style={[
+              styles.keyText,
+              { color: isDark ? colors.dark.text : colors.light.text },
+            ]}
+          >
+            ⌫
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

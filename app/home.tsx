@@ -1,3 +1,5 @@
+import { useTheme } from "@theme/ThemeContext";
+import { colors } from "@theme/colors";
 import { Link, useFocusEffect, useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
@@ -30,7 +32,7 @@ import { playRemoveSound } from "../utils/playRemoveSound";
 const homeScreenStyles = StyleSheet.create({
   divider: {
     height: 1,
-    backgroundColor: "#444",
+    backgroundColor: colors.dark.tertiary,
     marginVertical: 10,
     width: 300,
     alignSelf: "center",
@@ -38,16 +40,16 @@ const homeScreenStyles = StyleSheet.create({
   taskGroupRow: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginBottom: 2, // reduced the spacing further
+    marginBottom: 2,
     width: "100%",
   },
   taskGroupButtonText: {
-    color: "#fff",
+    color: colors.light.text,
     fontWeight: "bold",
     fontSize: 15,
   },
   taskListButton: {
-    backgroundColor: "#2563eb",
+    backgroundColor: colors.light.primary,
     paddingVertical: 12,
     paddingHorizontal: 15,
     borderRadius: 8,
@@ -57,7 +59,7 @@ const homeScreenStyles = StyleSheet.create({
     height: 45,
     width: 300,
     alignSelf: "center",
-    shadowColor: "#000",
+    shadowColor: colors.dark.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
@@ -72,12 +74,12 @@ const homeScreenStyles = StyleSheet.create({
     borderRadius: 8,
   },
   taskListButtonText: {
-    color: "#93c5fd",
+    color: colors.light.accent,
     fontWeight: "500",
     fontSize: 16,
   },
   recentlyDeletedButton: {
-    backgroundColor: "#4A4A4A",
+    backgroundColor: colors.dark.secondary,
     borderRadius: 12,
     paddingVertical: 20,
     paddingHorizontal: 20,
@@ -87,26 +89,26 @@ const homeScreenStyles = StyleSheet.create({
     justifyContent: "center",
   },
   deleteButton: {
-    backgroundColor: "#D9534F",
+    backgroundColor: colors.dark.accent,
     justifyContent: "center",
     alignItems: "center",
     width: 70,
     height: "100%",
   },
   renameButton: {
-    backgroundColor: "#5BC0DE",
+    backgroundColor: colors.light.secondary,
     justifyContent: "center",
     alignItems: "center",
     width: 70,
     height: "100%",
   },
   recentlyDeletedText: {
-    color: "#fff",
+    color: colors.light.text,
     fontWeight: "500",
     fontSize: 15,
   },
   scrollRegion: {
-    backgroundColor: "#F4A261",
+    backgroundColor: colors.light.secondary,
     borderRadius: 16,
     padding: 10,
     marginHorizontal: 12,
@@ -116,11 +118,11 @@ const homeScreenStyles = StyleSheet.create({
     minHeight: 200,
   },
   taskGroupButton: {
-    backgroundColor: "#4A4A4A",
+    backgroundColor: colors.dark.secondary,
     borderRadius: 12,
     paddingVertical: 20,
     paddingHorizontal: 20,
-    margin: 2, // reduced from 5 to 2
+    margin: 2,
     width: "45%",
     alignItems: "center",
     justifyContent: "center",
@@ -133,39 +135,22 @@ const homeScreenStyles = StyleSheet.create({
     marginLeft: 12,
     width: "100%",
   },
-
   addTaskListButton: {
-    backgroundColor: "#0284c7",
+    backgroundColor: colors.light.secondary,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
-    // marginVertical: 16,
     alignItems: "center",
     justifyContent: "center",
     width: "78.0%",
   },
   addTaskListButtonText: {
-    color: "#bae6fd",
+    color: colors.light.text,
     fontSize: 16,
     fontWeight: "500",
   },
 });
 
-const COLORS = {
-  //  Dark theme palette (left UI) with original hex codes:
-  dark_primary: "#101010", // #101010
-  dark_secondary: "#1A1A1A", // #1A1A1A
-  dark_tertiary: "#373737", // #373737
-  dark_accents: "#F26C4F", // #F26C4F
-  dark_subaccents: "#C5C5C5", // #C5C5C5
-
-  // Light theme palette (right UI) with original hex codes:
-  light_primary: "#E76F51", // #E76F51
-  light_secondary: "#F4A261", // #F4A261
-  light_tertiary: "#E9C46A", // #E9C46A
-  light_accents: "#2A9D8F", // #2A9D8F
-  light_subaccents: "#264653", // #264653
-};
 const styles = StyleSheet.create({
   leftAction: {
     justifyContent: "center",
@@ -176,8 +161,8 @@ const styles = StyleSheet.create({
   },
   screenbackground: {
     flex: 1,
-    backgroundColor: COLORS.dark_primary,
-    color: COLORS.dark_primary,
+    backgroundColor: colors.dark.primary,
+    color: colors.dark.primary,
     justifyContent: "flex-start",
     alignItems: "center",
   },
@@ -185,7 +170,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#104C64",
+    backgroundColor: colors.dark.primary,
   },
   content: {
     width: "80%",
@@ -195,11 +180,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
-    color: COLORS.dark_accents,
+    color: colors.dark.accent,
   },
   subtitle: {
     fontSize: 16,
-    color: COLORS.dark_accents,
+    color: colors.dark.accent,
     marginTop: 10,
     fontWeight: "bold",
     paddingHorizontal: 15,
@@ -208,7 +193,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   button: {
-    backgroundColor: COLORS.dark_secondary,
+    backgroundColor: colors.dark.secondary,
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -217,11 +202,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   buttonText: {
-    color: "#93c5fd",
+    color: colors.dark.text,
     fontWeight: "bold",
   },
   buttonSecondary: {
-    backgroundColor: COLORS.dark_secondary,
+    backgroundColor: colors.dark.secondary,
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -232,11 +217,11 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginBottom: 20,
-    //color: " #D59D80",
-    //fill: COLORS.dark_secondary,
+    //color: colors.dark.secondary,
+    //fill: colors.dark.secondary,
   },
   addTaskListButton: {
-    backgroundColor: "#0284c7",
+    backgroundColor: colors.light.secondary,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
@@ -245,34 +230,34 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   addTaskListButtonText: {
-    color: "#bae6fd",
+    color: colors.light.text,
     fontSize: 16,
     fontWeight: "500",
   },
   taskRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: COLORS.dark_tertiary,
+    backgroundColor: colors.dark.tertiary,
     borderRadius: 12,
     paddingHorizontal: 15,
     paddingVertical: 10,
     height: 60,
     width: "100%",
     justifyContent: "space-between",
-    borderColor: COLORS.dark_accents,
+    borderColor: colors.dark.accent,
   },
   taskText: {
     flex: 1,
-    color: COLORS.dark_subaccents,
+    color: colors.dark.text,
     fontSize: 16,
   },
   taskTextDone: {
     textDecorationLine: "line-through",
-    color: COLORS.dark_subaccents, // ensure contrast against row background
+    color: colors.dark.text,
     opacity: 0.6,
   },
   taskDue: {
-    color: COLORS.dark_accents,
+    color: colors.dark.accent,
     fontSize: 14,
   },
   modalOverlay: {
@@ -288,18 +273,18 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: "80%",
-    backgroundColor: COLORS.dark_secondary,
+    backgroundColor: colors.dark.secondary,
     borderRadius: 12,
     padding: 16,
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: COLORS.dark_subaccents,
+    color: colors.dark.text,
     marginBottom: 12,
   },
   modalButton: {
-    backgroundColor: "#2563eb",
+    backgroundColor: colors.light.primary,
     padding: 12,
     borderRadius: 6,
     marginBottom: 8,
@@ -307,27 +292,27 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   modalButtonText: {
-    color: "#fff",
+    color: colors.light.text,
     fontSize: 16,
   },
   modalOption: {
     paddingVertical: 10,
     borderTopWidth: 1,
-    borderTopColor: COLORS.dark_tertiary,
+    borderTopColor: colors.dark.tertiary,
   },
   showListsButtons: {
     width: 56,
     height: 56,
     borderRadius: 15,
-    backgroundColor: COLORS.dark_primary,
+    backgroundColor: colors.dark.primary,
     alignItems: "center",
     position: "absolute",
     justifyContent: "center",
     bottom: 24,
     left: 24,
-    borderColor: COLORS.dark_accents,
+    borderColor: colors.dark.accent,
     borderWidth: 1.5,
-    color: COLORS.dark_accents,
+    color: colors.dark.accent,
   },
 });
 
@@ -354,6 +339,8 @@ const styles = StyleSheet.create({
  */
 
 export default function HomeScreen() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const { lists, addList, removeList, renameList } = useTasks();
 
   // Add-list modal state
@@ -408,40 +395,108 @@ export default function HomeScreen() {
   // Add-list duplicate error state
   const [duplicateError, setDuplicateError] = useState(false);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      hasNavigated.current = false;
+      // no-op for theme
+    }, [theme])
+  );
+
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent}>
-      <View style={styles.screenbackground}>
+      <View
+        style={[
+          styles.screenbackground,
+          {
+            backgroundColor: isDark
+              ? colors.dark.background
+              : colors.light.background,
+          },
+        ]}
+      >
         {/* Task Groups (Green Buttons) */}
 
         <View style={homeScreenStyles.taskGroupsWrapper}>
           <View style={homeScreenStyles.taskGroupRow}>
             <Link
               href="/taskLists/taskGroups/scheduledTasks"
-              style={homeScreenStyles.taskGroupButton}
+              style={[
+                homeScreenStyles.taskGroupButton,
+                {
+                  backgroundColor: isDark
+                    ? colors.dark.secondary
+                    : colors.light.secondary,
+                },
+              ]}
             >
-              <Text style={homeScreenStyles.taskGroupButtonText}>
+              <Text
+                style={[
+                  homeScreenStyles.taskGroupButtonText,
+                  { color: isDark ? colors.dark.text : colors.light.text },
+                ]}
+              >
                 Scheduled
               </Text>
             </Link>
             <Link
               href="/taskLists/taskGroups/allTasks"
-              style={homeScreenStyles.taskGroupButton}
+              style={[
+                homeScreenStyles.taskGroupButton,
+                {
+                  backgroundColor: isDark
+                    ? colors.dark.secondary
+                    : colors.light.secondary,
+                },
+              ]}
             >
-              <Text style={homeScreenStyles.taskGroupButtonText}>All</Text>
+              <Text
+                style={[
+                  homeScreenStyles.taskGroupButtonText,
+                  { color: isDark ? colors.dark.text : colors.light.text },
+                ]}
+              >
+                All
+              </Text>
             </Link>
           </View>
           <View style={homeScreenStyles.taskGroupRow}>
             <Link
               href="/taskLists/taskGroups/flaggedTasks"
-              style={homeScreenStyles.taskGroupButton}
+              style={[
+                homeScreenStyles.taskGroupButton,
+                {
+                  backgroundColor: isDark
+                    ? colors.dark.secondary
+                    : colors.light.secondary,
+                },
+              ]}
             >
-              <Text style={homeScreenStyles.taskGroupButtonText}>Flagged</Text>
+              <Text
+                style={[
+                  homeScreenStyles.taskGroupButtonText,
+                  { color: isDark ? colors.dark.text : colors.light.text },
+                ]}
+              >
+                Flagged
+              </Text>
             </Link>
             <Link
               href="/taskLists/taskGroups/completedTasks"
-              style={homeScreenStyles.taskGroupButton}
+              style={[
+                homeScreenStyles.taskGroupButton,
+                {
+                  backgroundColor: isDark
+                    ? colors.dark.secondary
+                    : colors.light.secondary,
+                },
+              ]}
             >
-              <Text style={homeScreenStyles.taskGroupButtonText}>
+              <Text
+                style={[
+                  homeScreenStyles.taskGroupButtonText,
+                  { color: isDark ? colors.dark.text : colors.light.text },
+                ]}
+              >
                 Completed
               </Text>
             </Link>
@@ -465,7 +520,7 @@ export default function HomeScreen() {
                     <Pressable
                       style={[
                         homeScreenStyles.inlineButton,
-                        { backgroundColor: "#7f1d1d" },
+                        { backgroundColor: colors.dark.accent },
                       ]}
                       onPress={() => {
                         Alert.alert(
@@ -492,7 +547,7 @@ export default function HomeScreen() {
                     <Pressable
                       style={[
                         homeScreenStyles.inlineButton,
-                        { backgroundColor: "#93c5fd" },
+                        { backgroundColor: colors.light.accent },
                       ]}
                       onPress={() => {
                         setRenameTarget(item);
@@ -506,12 +561,28 @@ export default function HomeScreen() {
                   )}
                 >
                   <Pressable
-                    style={homeScreenStyles.taskListButton}
+                    style={[
+                      homeScreenStyles.taskListButton,
+                      {
+                        backgroundColor: isDark
+                          ? colors.dark.secondary
+                          : colors.light.primary,
+                      },
+                    ]}
                     onPress={() =>
                       router.push(`/taskLists/${item.name}` as const)
                     }
                   >
-                    <Text style={homeScreenStyles.taskListButtonText}>
+                    <Text
+                      style={[
+                        homeScreenStyles.taskListButtonText,
+                        {
+                          color: isDark
+                            ? colors.dark.accent
+                            : colors.light.accent,
+                        },
+                      ]}
+                    >
                       {item.name}
                     </Text>
                   </Pressable>
@@ -543,11 +614,21 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={[
               homeScreenStyles.addTaskListButton,
-              { width: 300 }, // uniform width with the other list buttons
+              {
+                width: 300,
+                backgroundColor: isDark
+                  ? colors.dark.secondary
+                  : colors.light.secondary,
+              },
             ]}
             onPress={() => setAddModalVisible(true)}
           >
-            <Text style={homeScreenStyles.addTaskListButtonText}>
+            <Text
+              style={[
+                homeScreenStyles.addTaskListButtonText,
+                { color: isDark ? colors.dark.text : colors.light.text },
+              ]}
+            >
               + Add Task List
             </Text>
           </TouchableOpacity>
@@ -561,13 +642,13 @@ export default function HomeScreen() {
                 value={newListName}
                 onChangeText={setNewListName}
                 placeholder="List name"
-                placeholderTextColor={COLORS.dark_subaccents}
+                placeholderTextColor={colors.dark.text}
                 style={{
                   borderWidth: 1,
                   borderColor: duplicateError
                     ? "#450a0a"
-                    : COLORS.dark_tertiary,
-                  color: COLORS.dark_subaccents,
+                    : colors.dark.tertiary,
+                  color: colors.dark.text,
                   padding: 8,
                   borderRadius: 8,
                   marginBottom: 10,
@@ -575,13 +656,20 @@ export default function HomeScreen() {
               />
               {duplicateError && (
                 <Text
-                  style={{ color: "#ef4444", marginBottom: 8, fontSize: 12 }}
+                  style={{
+                    color: colors.dark.accent,
+                    marginBottom: 8,
+                    fontSize: 12,
+                  }}
                 >
                   List name already exists
                 </Text>
               )}
               <Pressable
-                style={[styles.modalButton, { backgroundColor: "#888" }]}
+                style={[
+                  styles.modalButton,
+                  { backgroundColor: colors.dark.tertiary },
+                ]}
                 onPress={() => {
                   setAddModalVisible(false);
                   setNewListName("");
@@ -631,13 +719,13 @@ export default function HomeScreen() {
                   setRenameError(false);
                 }}
                 placeholder="New name"
-                placeholderTextColor={COLORS.dark_subaccents}
+                placeholderTextColor={colors.dark.text}
                 style={{
                   borderWidth: 1,
-                  borderColor: renameError ? "#450a0a" : COLORS.dark_tertiary,
+                  borderColor: renameError ? "#450a0a" : colors.dark.tertiary,
                   borderRadius: 8,
                   padding: 8,
-                  color: COLORS.dark_subaccents,
+                  color: colors.dark.text,
                   marginBottom: 10,
                 }}
               />
@@ -666,7 +754,10 @@ export default function HomeScreen() {
                 <Text style={styles.modalButtonText}>OK</Text>
               </Pressable>
               <Pressable
-                style={[styles.modalButton, { backgroundColor: "#888" }]}
+                style={[
+                  styles.modalButton,
+                  { backgroundColor: colors.dark.tertiary },
+                ]}
                 onPress={() => setRenameModalVisible(false)}
               >
                 <Text style={styles.modalButtonText}>Cancel</Text>
