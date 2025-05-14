@@ -1,6 +1,6 @@
 // SETTINGS.tsx
 import React, { useRef, useState } from "react";
-import { View, Text, Button, Image, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Switch, StyleSheet } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import {
   PanGestureHandler,
