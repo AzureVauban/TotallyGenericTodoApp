@@ -1,10 +1,9 @@
-// backend/storage/tasksStorage.ts
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const STORAGE_KEY = "MY_TASK_LISTS";
 
 /**
- * Load the saved task lists (returns [] if none).
+ * Loads the saved tasks (returns [] if none).
  */
 export async function loadTasks(): Promise<any[]> {
   try {
@@ -17,7 +16,7 @@ export async function loadTasks(): Promise<any[]> {
 }
 
 /**
- * Save the given task lists.
+ * Saves the given tasks array.
  */
 export async function saveTasks(tasks: any[]): Promise<void> {
   try {

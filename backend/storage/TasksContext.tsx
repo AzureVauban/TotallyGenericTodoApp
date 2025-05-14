@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { View, Text } from "react-native";
 const TASKS_STORAGE_KEY = "TASKS_STORAGE_KEY";
 const LISTS_STORAGE_KEY = "LISTS_STORAGE_KEY";
 
@@ -10,6 +10,10 @@ export interface Task {
   completed: boolean;
   flagged?: boolean;
   indent?: number;
+  listName?: string;
+  scheduleDate?: string;
+  buttonColor?: string;
+  recentlyDeleted?: boolean;
 }
 
 export interface ListEntry {
@@ -25,9 +29,11 @@ export interface TasksContextValue {
   addList: (name: string) => void;
   removeList: (id: string) => void;
   renameList: (id: string, newName: string) => void;
+  renameTask: (id: string, newName: string) => void;
   updateTaskText: (id: string, newText: string) => void;
   updateTask: (id: string, updatedTask: Task) => void;
   indentTask: (id: string, indentLevel: number) => void;
+  reorderTasks: (listName: string, newOrder: Task[]) => void;
   flagTask: (id: string, isFlagged: boolean) => void;
 }
 
@@ -45,9 +51,11 @@ export const TasksContext = createContext<TasksContextValue>({
   addList: () => {},
   removeList: () => {},
   renameList: () => {},
+  renameTask: () => {},
   updateTaskText: () => {},
   updateTask: () => {},
   indentTask: () => {},
+  reorderTasks: () => {},
   flagTask: () => {},
 });
 
@@ -102,7 +110,9 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
     parsedTasks.push(newTask);
 
     // Ensure unique IDs before storing
-    const uniqueTasks = Array.from(new Map(parsedTasks.map(task => [task.id, task])).values());
+    const uniqueTasks = Array.from(
+      new Map(parsedTasks.map((task) => [task.id, task])).values()
+    );
     await AsyncStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(uniqueTasks));
 
     // Force-refresh to verify it's persisted
@@ -110,7 +120,10 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
     const refreshedTasks = await AsyncStorage.getItem(TASKS_STORAGE_KEY);
 
     if (refreshedTasks) {
-      console.log("🔄 Force-refreshing tasks from AsyncStorage", JSON.parse(refreshedTasks));
+      console.log(
+        "🔄 Force-refreshing tasks from AsyncStorage",
+        JSON.parse(refreshedTasks)
+      );
       setTasks(JSON.parse(refreshedTasks));
     }
   };
@@ -172,6 +185,20 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const renameTask = (id: string, newName: string) => {
+    if (newName.trim() === "") {
+      console.warn("Invalid name. Rename failed.");
+      return;
+    }
+    setLists((old) => {
+      const updated = old.map((list) =>
+        list.id === id ? { ...list, name: newName } : list
+      );
+      AsyncStorage.setItem(LISTS_STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   /**
    * Updates the text (title) of a task and synchronizes with AsyncStorage.
    * This ensures changes are reflected immediately and persist across sessions.
@@ -194,7 +221,9 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
         console.log("Force-refreshing tasks from AsyncStorage", parsed);
 
         // If the update didn't take, force it here
-        if (!parsed.find((task: Task) => task.id === id && task.title === newText)) {
+        if (
+          !parsed.find((task: Task) => task.id === id && task.title === newText)
+        ) {
           console.warn("Title did not sync. Forcing update.");
           const forceUpdated = parsed.map((task: Task) =>
             task.id === id ? { ...task, title: newText } : task
@@ -234,6 +263,23 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  // Reorders tasks within a specific list and persists the new order
+  const reorderTasks = (listName: string, newOrder: Task[]) => {
+    setTasks((old) => {
+      // Keep tasks from other lists intact
+      const other = old.filter((t) => t.listName !== listName);
+      const reordered = [...other, ...newOrder];
+      AsyncStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(reordered));
+      return reordered;
+    });
+  };
+  if (!hydrated) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
   return (
     <TasksContext.Provider
       value={{
@@ -245,9 +291,11 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
         addList,
         removeList,
         renameList,
+        renameTask,
         updateTaskText,
         updateTask,
         indentTask,
+        reorderTasks: reorderTasks,
         flagTask,
       }}
     >
