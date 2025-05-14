@@ -115,6 +115,28 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 });
+
+/**
+ * **LoginScreen**
+ *
+ * Presents the root login interface where a user may:
+ *  • Tap **“Login with Email”** – sets `isUserLoggedIn` and redirects to `/home`.
+ *  • Tap **“Forgot Password?”** – pushes the `/resetPassword` route.
+ *  • Tap **“Sign Up”** – pushes the `/signup` route.
+ *
+ * ### Visuals
+ * * Displays the Divide&Do signature SVG in brand colours.
+ * * Shows the app welcome title with the accent colour’s complementary hue computed at runtime.
+ *
+ * ### State / Hooks
+ * * `isUserLoggedIn` – local `useState` boolean; when `true`, a `useEffect` redirects with
+ *   `router.replace("/home")`.
+ * * `getComplement(hex)` – helper that returns the complementary colour of a hex string.
+ * * `useRouter` from **expo-router** handles navigation.
+ *
+ * @returns A centred React‑Native view containing the login buttons and links.
+ */
+
 export default function LoginScreen() {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
   const router = useRouter();
@@ -195,6 +217,21 @@ export default function LoginScreen() {
         >
           <Text style={{ fontSize: 16, fontWeight: "600" }}>
             Login with Email
+          </Text>
+        </TouchableOpacity>
+        {/* Reset password button */}
+        <TouchableOpacity
+          style={[
+            styles.buttonSecondary,
+            { flexDirection: "row", width: BUTTON_WIDTH, marginBottom: 20 },
+          ]}
+          onPress={() => {
+            console.log("User pressed reset password");
+            router.push("/resetPassword");
+          }}
+        >
+          <Text style={{ color: COLORS.dark_subaccents, fontWeight: "600" }}>
+            Forgot Password?
           </Text>
         </TouchableOpacity>
         <View style={{ flexDirection: "row", alignItems: "center" }}>

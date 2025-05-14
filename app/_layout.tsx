@@ -1,31 +1,22 @@
-import { Stack } from "expo-router";
-import * as React from "react";
+import React from "react";
+import { Slot, Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-
-/**
- * Root layout component for Expo Router navigation.
- *
- * This file establishes the overall structure for the mobile application by rendering
- * a higher-level layout component (in this case, "Stack"). It acts as the base component
- * upon which other UI elements, components, or pages are layered.
- *
- * Conceptually, this file serves as the entry point for the app's structure, akin to a
- * directory or map that outlines the overarching layout and navigation patterns.
- *
- * @component
- */
+import { TasksProvider } from "../backend/storage/TasksContext";
 
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <Stack
-        screenOptions={{
-          gestureEnabled: true, // enables swipe gestures
-          gestureDirection: "horizontal", // swipe right/left
-          headerShown: false, // hides the header
-          contentStyle: { backgroundColor: "#eef2ff" }, // background color for the content
-        }}
-      />
+      <TasksProvider>
+        <Stack
+          screenOptions={{
+            gestureEnabled: true,
+            gestureDirection: "horizontal",
+            headerShown: false,
+          }}
+        >
+          <Stack.Screen name="home" options={{ headerShown: false }} />
+        </Stack>
+      </TasksProvider>
     </GestureHandlerRootView>
   );
 }
