@@ -92,4 +92,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 💬 **Contact**
 
-For questions or support, open an issue or reach out at [support@dividendo.com](mailto:support@dividendo.com).
+Contact has not yet been set up
