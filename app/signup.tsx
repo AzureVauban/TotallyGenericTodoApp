@@ -8,6 +8,8 @@ import {
   ViewStyle,
   TextInput,
   TextStyle,
+  SafeAreaView,
+  ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { StyleSheet } from "react-native";
@@ -139,7 +141,7 @@ export default function SignUpScreen() {
 
   return (
     <PanGestureHandler onHandlerStateChange={handleSwipe}>
-      <View
+      <SafeAreaView
         style={[
           styles.screenbackground,
           {
@@ -149,155 +151,210 @@ export default function SignUpScreen() {
           },
         ]}
       >
-        <Image
-          style={{
-            width: 200,
-            height: 200,
-            marginBottom: 40,
-            marginTop: -80,
-          }}
-          source={require("../assets/images/test5.png")}
-        />
-
-        <TextInput
-          style={[
-            sharedButtonStyle,
-            {
-              backgroundColor: usernameValid
-                ? isDark
-                  ? colors.dark.secondary
-                  : colors.light.secondary
-                : "#450a0a",
-              color: isDark ? colors.dark.text : colors.light.text,
-              marginBottom: 12,
-            },
-          ]}
-          placeholder="Username"
-          placeholderTextColor={isDark ? colors.dark.text : colors.light.text}
-          value={username}
-          onChangeText={(text) => {
-            setUsername(text);
-            setUsernameValid(true);
-          }}
-        />
-
-        <TextInput
-          style={[
-            sharedButtonStyle,
-            {
-              backgroundColor: passwordValid
-                ? isDark
-                  ? colors.dark.secondary
-                  : colors.light.secondary
-                : "#450a0a",
-              color: isDark ? colors.dark.text : colors.light.text,
-              marginBottom: 12,
-            },
-          ]}
-          placeholder="Password"
-          placeholderTextColor={isDark ? colors.dark.text : colors.light.text}
-          secureTextEntry
-          value={password}
-          onChangeText={(text) => {
-            setPassword(text);
-            setPasswordValid(true);
-          }}
-        />
-
-        <TextInput
-          style={[
-            sharedButtonStyle,
-            {
-              backgroundColor: emailValid
-                ? isDark
-                  ? colors.dark.secondary
-                  : colors.light.secondary
-                : "#450a0a",
-              color: isDark ? colors.dark.text : colors.light.text,
-              marginBottom: 12,
-            },
-          ]}
-          placeholder="Email"
-          placeholderTextColor={isDark ? colors.dark.text : colors.light.text}
-          value={email}
-          onChangeText={(text) => {
-            setEmail(text);
-            setEmailValid(true);
-          }}
-          onBlur={() => setEmailValid(validateEmail(email))}
-        />
-
-        <TextInput
-          style={[
-            sharedButtonStyle,
-            {
-              backgroundColor: phoneValid
-                ? isDark
-                  ? colors.dark.secondary
-                  : colors.light.secondary
-                : "#450a0a",
-              color: isDark ? colors.dark.text : colors.light.text,
-              marginBottom: 12,
-            },
-          ]}
-          placeholder="Phone Number"
-          placeholderTextColor={isDark ? colors.dark.text : colors.light.text}
-          keyboardType="phone-pad"
-          value={phone}
-          onChangeText={(text) => {
-            setPhone(text);
-            setPhoneValid(true);
-          }}
-          onBlur={() => setPhoneValid(validatePhone(phone))}
-        />
-
-        <TouchableOpacity
-          style={[
-            sharedButtonStyle as ViewStyle,
-            {
-              backgroundColor: isDark
-                ? colors.dark.accent
-                : colors.light.primary,
-              marginBottom: 12,
-              alignItems: "center",
-              justifyContent: "center",
-            },
-          ]}
-          onPress={() => {
-            const isEmailValid = validateEmail(email);
-            const isPhoneValid = validatePhone(phone);
-            const isUsernameValid = username.trim().length > 0;
-            const isPasswordValid = password.trim().length > 0;
-
-            setEmailValid(isEmailValid);
-            setPhoneValid(isPhoneValid);
-            setUsernameValid(isUsernameValid);
-            setPasswordValid(isPasswordValid);
-
-            if (
-              isEmailValid &&
-              isPhoneValid &&
-              isUsernameValid &&
-              isPasswordValid
-            ) {
-              console.log("Navigating to verificationMethod");
-              router.replace("/verificationMethod");
-            } else {
-              playInvalidSound();
-            }
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingHorizontal: 32,
+            paddingVertical: 48,
           }}
         >
-          <Text
-            style={{
-              color: isDark ? colors.dark.text : colors.light.text,
-              fontSize: 16,
-              textAlign: "center",
+          {/* Header + Logo */}
+          <View
+            style={{ alignItems: "center", marginTop: 150, marginBottom: 32 }}
+          >
+            <Text
+              style={[
+                styles.title,
+                { color: isDark ? colors.dark.accent : colors.light.accent },
+              ]}
+            >
+              Register
+            </Text>
+            <Text
+              style={[
+                styles.subtitle,
+                { color: isDark ? colors.dark.text : colors.light.text },
+              ]}
+            >
+              Create your account
+            </Text>
+          </View>
+
+          {/* Form */}
+          <View style={{ gap: 16 }}>
+            {/* Username */}
+            <TextInput
+              style={[
+                sharedButtonStyle,
+                {
+                  backgroundColor: usernameValid
+                    ? isDark
+                      ? colors.dark.secondary
+                      : colors.light.secondary
+                    : "#450a0a",
+                  color: isDark ? colors.dark.text : colors.light.text,
+                },
+              ]}
+              placeholder="Username"
+              placeholderTextColor={
+                isDark ? colors.dark.text : colors.light.text
+              }
+              value={username}
+              onChangeText={(t) => {
+                setUsername(t);
+                setUsernameValid(true);
+              }}
+            />
+            <View
+              style={{
+                height: 1,
+                backgroundColor: isDark
+                  ? colors.dark.tertiary
+                  : colors.light.tertiary,
+              }}
+            />
+
+            {/* Password */}
+            <TextInput
+              style={[
+                sharedButtonStyle,
+                {
+                  backgroundColor: passwordValid
+                    ? isDark
+                      ? colors.dark.secondary
+                      : colors.light.secondary
+                    : "#450a0a",
+                  color: isDark ? colors.dark.text : colors.light.text,
+                },
+              ]}
+              placeholder="Password"
+              placeholderTextColor={
+                isDark ? colors.dark.text : colors.light.text
+              }
+              secureTextEntry
+              value={password}
+              onChangeText={(t) => {
+                setPassword(t);
+                setPasswordValid(true);
+              }}
+            />
+            <View
+              style={{
+                height: 1,
+                backgroundColor: isDark
+                  ? colors.dark.tertiary
+                  : colors.light.tertiary,
+              }}
+            />
+
+            {/* Email */}
+            <TextInput
+              style={[
+                sharedButtonStyle,
+                {
+                  backgroundColor: emailValid
+                    ? isDark
+                      ? colors.dark.secondary
+                      : colors.light.secondary
+                    : "#450a0a",
+                  color: isDark ? colors.dark.text : colors.light.text,
+                },
+              ]}
+              placeholder="Email"
+              placeholderTextColor={
+                isDark ? colors.dark.text : colors.light.text
+              }
+              value={email}
+              onChangeText={(t) => {
+                setEmail(t);
+                setEmailValid(true);
+              }}
+              onBlur={() => setEmailValid(validateEmail(email))}
+            />
+            <View
+              style={{
+                height: 1,
+                backgroundColor: isDark
+                  ? colors.dark.tertiary
+                  : colors.light.tertiary,
+              }}
+            />
+
+            {/* Phone */}
+            <TextInput
+              style={[
+                sharedButtonStyle,
+                {
+                  backgroundColor: phoneValid
+                    ? isDark
+                      ? colors.dark.secondary
+                      : colors.light.secondary
+                    : "#450a0a",
+                  color: isDark ? colors.dark.text : colors.light.text,
+                },
+              ]}
+              placeholder="Phone Number"
+              placeholderTextColor={
+                isDark ? colors.dark.text : colors.light.text
+              }
+              keyboardType="phone-pad"
+              value={phone}
+              onChangeText={(t) => {
+                setPhone(t);
+                setPhoneValid(true);
+              }}
+              onBlur={() => setPhoneValid(validatePhone(phone))}
+            />
+          </View>
+
+          {/* CTA */}
+          <TouchableOpacity
+            style={[
+              sharedButtonStyle as ViewStyle,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.accent
+                  : colors.light.accent,
+                alignSelf: "center",
+                marginTop: 20,
+              },
+            ]}
+            onPress={() => {
+              const isEmailValid = validateEmail(email);
+              const isPhoneValid = validatePhone(phone);
+              const isUsernameValid = username.trim().length > 0;
+              const isPasswordValid = password.trim().length > 0;
+
+              setEmailValid(isEmailValid);
+              setPhoneValid(isPhoneValid);
+              setUsernameValid(isUsernameValid);
+              setPasswordValid(isPasswordValid);
+
+              if (
+                isEmailValid &&
+                isPhoneValid &&
+                isUsernameValid &&
+                isPasswordValid
+              ) {
+                console.log("Navigating to verificationMethod");
+                router.replace("/verificationMethod");
+              } else {
+                playInvalidSound();
+              }
             }}
           >
-            Register Account
-          </Text>
-        </TouchableOpacity>
-      </View>
+            <Text
+              style={{
+                color: isDark ? colors.dark.text : colors.light.text,
+                fontSize: 16,
+                textAlign: "center",
+              }}
+            >
+              Register Account
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </SafeAreaView>
     </PanGestureHandler>
   );
 }

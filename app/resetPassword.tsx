@@ -134,20 +134,37 @@ export default function ResetPassword() {
           {/* ---------- form ---------- */}
           <View style={s.form}>
             <TextInput
-              style={{
-                backgroundColor: isDark
-                  ? colors.dark.secondary
-                  : colors.light.secondary,
-                color: isDark ? colors.dark.text : colors.light.text,
-                borderRadius: 8,
-                padding: 12,
-              }}
+              style={[
+                s.input,
+                usernameError && s.inputBackgroundError,
+                {
+                  backgroundColor: isDark
+                    ? colors.dark.secondary
+                    : colors.light.secondary,
+                  color: isDark ? colors.dark.text : colors.light.text,
+                },
+              ]}
               placeholder="Username or Email"
               placeholderTextColor={
                 isDark ? colors.dark.tertiary : colors.light.tertiary
               }
               autoCapitalize="none"
               keyboardType="email-address"
+              value={username}
+              onChangeText={(text) => {
+                setUsername(text);
+                if (text) setUsernameError(false);
+              }}
+            />
+
+            <View
+              style={{
+                height: 1,
+                backgroundColor: isDark
+                  ? colors.dark.tertiary
+                  : colors.light.tertiary,
+                marginVertical: 0,
+              }}
             />
 
             <TextInput
@@ -162,6 +179,16 @@ export default function ResetPassword() {
                 if (text) setPwdError(false);
               }}
               style={[s.input, pwdError ? s.inputBackgroundError : null]}
+            />
+
+            <View
+              style={{
+                height: 1,
+                backgroundColor: isDark
+                  ? colors.dark.tertiary
+                  : colors.light.tertiary,
+                marginVertical: 0,
+              }}
             />
 
             <TextInput
