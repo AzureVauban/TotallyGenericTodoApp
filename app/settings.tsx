@@ -42,7 +42,6 @@ const settingsStyles = StyleSheet.create({
     fontSize: 16,
   },
   logoutButton: {
-    backgroundColor: "#b91c1c",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
@@ -55,7 +54,6 @@ const settingsStyles = StyleSheet.create({
     marginBottom: 20,
   },
   logoutButtonText: {
-    color: "#fee2e2",
     fontWeight: "bold",
   },
   divider: {
@@ -228,8 +226,8 @@ export default function SettingsScreen() {
             settingsStyles.logoutButton,
             {
               backgroundColor: isDark
-                ? colors.dark.secondary
-                : colors.light.secondary,
+                ? colors.dark.redbutton_background
+                : colors.light.redbutton_background,
             },
           ]}
           onPress={() => {
@@ -240,13 +238,21 @@ export default function SettingsScreen() {
           <FiBrAddressCard
             width={20}
             height={20}
-            fill={isDark ? colors.dark.text : colors.light.text}
+            fill={
+              isDark
+                ? colors.dark.redbutton_text_icon
+                : colors.light.redbutton_text_icon
+            }
             style={{ marginRight: 8 }}
           />
           <Text
             style={[
               settingsStyles.logoutButtonText,
-              { color: isDark ? colors.dark.text : colors.light.text },
+              {
+                color: isDark
+                  ? colors.dark.redbutton_text_icon
+                  : colors.light.redbutton_text_icon,
+              },
             ]}
           >
             Log Out

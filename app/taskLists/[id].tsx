@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    color: colors.light.accent,
+    color: colors.dark.primary,
     marginBottom: 10,
   },
   taskItem: {
@@ -348,7 +348,7 @@ export default function MyList() {
     const translationX = event.nativeEvent.translationX as number;
 
     // Left-swipe (>100px to the left) → Home
-    if (translationX > -100 && !hasNavigated.current) {
+    if (translationX > 100 && !hasNavigated.current) {
       hasNavigated.current = true;
       console.log(`USER: ${listId} <= HOME`);
       router.push("/home");
@@ -416,7 +416,11 @@ export default function MyList() {
                     <Pressable
                       style={[
                         styles.inlineButton,
-                        { backgroundColor: colors.dark.accent },
+                        {
+                          backgroundColor: isDark
+                            ? colors.dark.purplebutton_background
+                            : colors.light.purplebutton_background,
+                        },
                       ]}
                       onPress={() => {
                         setSelectedTask(item);
@@ -431,13 +435,21 @@ export default function MyList() {
                       <FiBrsettings
                         width={20}
                         height={20}
-                        fill="rgb(165,180,252)"
+                        fill={
+                          isDark
+                            ? colors.dark.purplebutton_text_icon
+                            : colors.light.purplebutton_text_icon
+                        }
                       />
                     </Pressable>
                     <Pressable
                       style={[
                         styles.inlineButton,
-                        { backgroundColor: colors.dark.accent },
+                        {
+                          backgroundColor: isDark
+                            ? colors.dark.redbutton_background
+                            : colors.light.redbutton_background,
+                        },
                       ]}
                       onPress={() => {
                         Alert.alert(
@@ -457,7 +469,15 @@ export default function MyList() {
                         );
                       }}
                     >
-                      <FiBrtrash width={20} height={20} fill="#fecaca" />
+                      <FiBrtrash
+                        width={20}
+                        height={20}
+                        fill={
+                          isDark
+                            ? colors.dark.redbutton_text_icon
+                            : colors.light.redbutton_text_icon
+                        }
+                      />
                     </Pressable>
                   </View>
                 )}
@@ -472,7 +492,11 @@ export default function MyList() {
                     <Pressable
                       style={[
                         styles.inlineButton,
-                        { backgroundColor: colors.dark.tertiary },
+                        {
+                          backgroundColor: isDark
+                            ? colors.dark.yellowbutton_background
+                            : colors.light.yellowbutton_background,
+                        },
                       ]}
                       onPress={() => {
                         const wasFlagged = item.flagged;
@@ -487,13 +511,21 @@ export default function MyList() {
                       <FiBrflagAlt
                         width={20}
                         height={20}
-                        fill={item.flagged ? "#b45309" : "#fde68a"}
+                        fill={
+                          isDark
+                            ? colors.dark.yellowbutton_text_icon
+                            : colors.light.yellowbutton_text_icon
+                        }
                       />
                     </Pressable>
                     <Pressable
                       style={[
                         styles.inlineButton,
-                        { backgroundColor: colors.light.accent },
+                        {
+                          backgroundColor: isDark
+                            ? colors.dark.bluebutton_background
+                            : colors.light.bluebutton_background,
+                        },
                       ]}
                       onPress={() => {
                         setRenameTaskId(item.id);
@@ -501,14 +533,26 @@ export default function MyList() {
                         setRenameModalVisible(true);
                       }}
                     >
-                      <FiBredit width={20} height={20} fill="#2563eb" />
+                      <FiBredit
+                        width={20}
+                        height={20}
+                        fill={
+                          isDark
+                            ? colors.dark.bluebutton_text_icon
+                            : colors.light.bluebutton_text_icon
+                        }
+                      />
                     </Pressable>
                     {/* Indent/Outdent button for non-special lists */}
                     {activeIndex >= 0 && (
                       <Pressable
                         style={[
                           styles.inlineButton,
-                          { backgroundColor: colors.light.secondary },
+                          {
+                            backgroundColor: isDark
+                              ? colors.dark.greenbutton_background
+                              : colors.light.greenbutton_background,
+                          },
                         ]}
                         onPress={() => {
                           playIndentTasksound();
@@ -519,13 +563,21 @@ export default function MyList() {
                           <FiBrArrowLeft
                             width={20}
                             height={20}
-                            fill="rgb(167, 243, 208)"
+                            fill={
+                              isDark
+                                ? colors.dark.greenbutton_text_icon
+                                : colors.light.greenbutton_text_icon
+                            }
                           />
                         ) : (
                           <FiBrArrowRight
                             width={20}
                             height={20}
-                            fill="rgb(167, 243, 208)"
+                            fill={
+                              isDark
+                                ? colors.dark.greenbutton_text_icon
+                                : colors.light.greenbutton_text_icon
+                            }
                           />
                         )}
                       </Pressable>
@@ -572,7 +624,7 @@ export default function MyList() {
                       styles.taskItem,
                       item.indent === 1 && styles.indentedTask,
                       item.completed
-                        ? { backgroundColor: colors.dark.tertiary }
+                        ? { backgroundColor: colors.dark.secondary }
                         : item.buttonColor
                         ? { backgroundColor: item.buttonColor }
                         : {
@@ -620,7 +672,7 @@ export default function MyList() {
                     style={[
                       styles.taskItem,
                       item.indent === 1 && styles.indentedTask,
-                      { backgroundColor: colors.dark.tertiary },
+                      { backgroundColor: colors.dark.secondary },
                     ]}
                   >
                     <Text
@@ -647,8 +699,8 @@ export default function MyList() {
             styles.addTaskButton,
             {
               backgroundColor: isDark
-                ? colors.dark.accent
-                : colors.light.primary,
+                ? colors.dark.bluebutton_background
+                : colors.light.bluebutton_background,
             },
           ]}
           onPress={() => setNewTaskModalVisible(true)}
@@ -656,7 +708,11 @@ export default function MyList() {
           <Text
             style={[
               styles.addTaskButtonText,
-              { color: isDark ? colors.dark.text : colors.light.text },
+              {
+                color: isDark
+                  ? colors.dark.bluebutton_text_icon
+                  : colors.light.bluebutton_text_icon,
+              },
             ]}
           >
             + Add Task

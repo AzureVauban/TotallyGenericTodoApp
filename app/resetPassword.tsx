@@ -116,7 +116,7 @@ export default function ResetPassword() {
             <Text
               style={[
                 s.title,
-                { color: isDark ? colors.dark.accent : colors.light.accent },
+                { color: isDark ? colors.dark.accent : colors.light.primary },
               ]}
             >
               Reset{"\n"}Password
@@ -139,8 +139,8 @@ export default function ResetPassword() {
                 usernameError && s.inputBackgroundError,
                 {
                   backgroundColor: isDark
-                    ? colors.dark.secondary
-                    : colors.light.secondary,
+                    ? colors.light.primary
+                    : colors.dark.primary,
                   color: isDark ? colors.dark.text : colors.light.text,
                 },
               ]}
@@ -212,8 +212,8 @@ export default function ResetPassword() {
               s.nextBtn,
               {
                 backgroundColor: isDark
-                  ? colors.dark.accent
-                  : colors.light.accent,
+                  ? colors.dark.purplebutton_background
+                  : colors.light.purplebutton_background,
               },
             ]}
             onPress={handleNext}
@@ -221,7 +221,11 @@ export default function ResetPassword() {
             <Text
               style={[
                 s.nextTxt,
-                { color: isDark ? colors.dark.text : colors.light.text },
+                {
+                  color: isDark
+                    ? colors.dark.purplebutton_text_icon
+                    : colors.light.purplebutton_text_icon,
+                },
               ]}
             >
               Next ›

@@ -177,8 +177,8 @@ export default function LoginScreen() {
               flexDirection: "row",
               width: BUTTON_WIDTH,
               backgroundColor: isDark
-                ? colors.dark.secondary
-                : colors.light.secondary,
+                ? colors.dark.bluebutton_background
+                : colors.light.bluebutton_background,
             },
           ]}
           onPress={() => {
@@ -189,7 +189,11 @@ export default function LoginScreen() {
           <Text
             style={[
               { fontSize: 16, fontWeight: "600" },
-              { color: isDark ? colors.dark.text : colors.light.text },
+              {
+                color: isDark
+                  ? colors.dark.bluebutton_text_icon
+                  : colors.light.bluebutton_text_icon,
+              },
             ]}
           >
             Login with Email
@@ -204,8 +208,8 @@ export default function LoginScreen() {
               width: BUTTON_WIDTH,
               marginBottom: 20,
               backgroundColor: isDark
-                ? colors.dark.tertiary
-                : colors.light.tertiary,
+                ? colors.dark.bluebutton_background
+                : colors.light.bluebutton_background,
             },
           ]}
           onPress={() => {
@@ -215,7 +219,10 @@ export default function LoginScreen() {
         >
           <Text
             style={{
-              color: isDark ? colors.dark.text : colors.light.text,
+              color: isDark
+                ? colors.dark.bluebutton_text_icon
+                : colors.light.bluebutton_text_icon,
+              fontSize: 16,
               fontWeight: "600",
             }}
           >
@@ -228,7 +235,7 @@ export default function LoginScreen() {
               styles.subtitle,
               {
                 fontWeight: "500",
-                color: isDark ? colors.dark.text : colors.light.text,
+                color: isDark ? colors.dark.secondary : colors.light.secondary,
               },
             ]}
           >
@@ -243,7 +250,11 @@ export default function LoginScreen() {
             <Text
               style={[
                 styles.linktext,
-                { color: isDark ? colors.dark.text : colors.light.text },
+                {
+                  color: isDark
+                    ? colors.dark.bluebutton_text_icon
+                    : colors.light.bluebutton_text_icon,
+                },
               ]}
             >
               Sign Up

@@ -313,8 +313,8 @@ export default function SignUpScreen() {
               sharedButtonStyle as ViewStyle,
               {
                 backgroundColor: isDark
-                  ? colors.dark.accent
-                  : colors.light.accent,
+                  ? colors.dark.purplebutton_background
+                  : colors.light.purplebutton_background,
                 alignSelf: "center",
                 marginTop: 20,
               },
@@ -345,7 +345,9 @@ export default function SignUpScreen() {
           >
             <Text
               style={{
-                color: isDark ? colors.dark.text : colors.light.text,
+                color: isDark
+                  ? colors.dark.purplebutton_text_icon
+                  : colors.light.purplebutton_text_icon,
                 fontSize: 16,
                 textAlign: "center",
               }}

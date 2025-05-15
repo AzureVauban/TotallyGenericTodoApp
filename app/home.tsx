@@ -44,7 +44,7 @@ const homeScreenStyles = StyleSheet.create({
     width: "100%",
   },
   taskGroupButtonText: {
-    color: colors.light.text,
+    color: colors.light.primary,
     fontWeight: "bold",
     fontSize: 15,
   },
@@ -424,15 +424,17 @@ export default function HomeScreen() {
                 homeScreenStyles.taskGroupButton,
                 {
                   backgroundColor: isDark
-                    ? colors.dark.secondary
-                    : colors.light.secondary,
+                    ? colors.dark.primary
+                    : colors.light.primary,
                 },
               ]}
             >
               <Text
                 style={[
                   homeScreenStyles.taskGroupButtonText,
-                  { color: isDark ? colors.dark.text : colors.light.text },
+                  {
+                    color: isDark ? colors.light.primary : colors.dark.primary,
+                  },
                 ]}
               >
                 Scheduled
@@ -444,15 +446,17 @@ export default function HomeScreen() {
                 homeScreenStyles.taskGroupButton,
                 {
                   backgroundColor: isDark
-                    ? colors.dark.secondary
-                    : colors.light.secondary,
+                    ? colors.dark.primary
+                    : colors.light.primary,
                 },
               ]}
             >
               <Text
                 style={[
                   homeScreenStyles.taskGroupButtonText,
-                  { color: isDark ? colors.dark.text : colors.light.text },
+                  {
+                    color: isDark ? colors.light.primary : colors.dark.primary,
+                  },
                 ]}
               >
                 All
@@ -466,15 +470,17 @@ export default function HomeScreen() {
                 homeScreenStyles.taskGroupButton,
                 {
                   backgroundColor: isDark
-                    ? colors.dark.secondary
-                    : colors.light.secondary,
+                    ? colors.dark.primary
+                    : colors.light.primary,
                 },
               ]}
             >
               <Text
                 style={[
                   homeScreenStyles.taskGroupButtonText,
-                  { color: isDark ? colors.dark.text : colors.light.text },
+                  {
+                    color: isDark ? colors.light.primary : colors.dark.primary,
+                  },
                 ]}
               >
                 Flagged
@@ -486,15 +492,17 @@ export default function HomeScreen() {
                 homeScreenStyles.taskGroupButton,
                 {
                   backgroundColor: isDark
-                    ? colors.dark.secondary
-                    : colors.light.secondary,
+                    ? colors.dark.primary
+                    : colors.light.primary,
                 },
               ]}
             >
               <Text
                 style={[
                   homeScreenStyles.taskGroupButtonText,
-                  { color: isDark ? colors.dark.text : colors.light.text },
+                  {
+                    color: isDark ? colors.light.primary : colors.dark.primary,
+                  },
                 ]}
               >
                 Completed
@@ -520,7 +528,11 @@ export default function HomeScreen() {
                     <Pressable
                       style={[
                         homeScreenStyles.inlineButton,
-                        { backgroundColor: colors.dark.accent },
+                        {
+                          backgroundColor: isDark
+                            ? colors.dark.redbutton_background
+                            : colors.light.redbutton_background,
+                        },
                       ]}
                       onPress={() => {
                         Alert.alert(
@@ -540,14 +552,26 @@ export default function HomeScreen() {
                         );
                       }}
                     >
-                      <FiBrtrash width={20} height={20} fill="#fecaca" />
+                      <FiBrtrash
+                        width={20}
+                        height={20}
+                        fill={
+                          isDark
+                            ? colors.dark.redbutton_text_icon
+                            : colors.light.redbutton_text_icon
+                        }
+                      />
                     </Pressable>
                   )}
                   renderLeftActions={() => (
                     <Pressable
                       style={[
                         homeScreenStyles.inlineButton,
-                        { backgroundColor: colors.light.accent },
+                        {
+                          backgroundColor: isDark
+                            ? colors.dark.bluebutton_background
+                            : colors.light.bluebutton_background,
+                        },
                       ]}
                       onPress={() => {
                         setRenameTarget(item);
@@ -556,7 +580,15 @@ export default function HomeScreen() {
                         setRenameModalVisible(true);
                       }}
                     >
-                      <FiBredit width={20} height={20} fill="#2563eb" />
+                      <FiBredit
+                        width={20}
+                        height={20}
+                        fill={
+                          isDark
+                            ? colors.dark.bluebutton_text_icon
+                            : colors.light.bluebutton_text_icon
+                        }
+                      />
                     </Pressable>
                   )}
                 >
@@ -578,8 +610,8 @@ export default function HomeScreen() {
                         homeScreenStyles.taskListButtonText,
                         {
                           color: isDark
-                            ? colors.dark.accent
-                            : colors.light.accent,
+                            ? colors.light.primary
+                            : colors.dark.primary,
                         },
                       ]}
                     >
@@ -617,8 +649,8 @@ export default function HomeScreen() {
               {
                 width: 300,
                 backgroundColor: isDark
-                  ? colors.dark.secondary
-                  : colors.light.secondary,
+                  ? colors.dark.bluebutton_background
+                  : colors.light.bluebutton_background,
               },
             ]}
             onPress={() => setAddModalVisible(true)}
@@ -626,7 +658,11 @@ export default function HomeScreen() {
             <Text
               style={[
                 homeScreenStyles.addTaskListButtonText,
-                { color: isDark ? colors.dark.text : colors.light.text },
+                {
+                  color: isDark
+                    ? colors.dark.bluebutton_text_icon
+                    : colors.light.bluebutton_text_icon,
+                },
               ]}
             >
               + Add Task List
