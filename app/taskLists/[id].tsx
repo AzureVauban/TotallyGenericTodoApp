@@ -385,7 +385,11 @@ export default function MyList() {
           <Text
             style={[
               styles.listTitle,
-              { color: isDark ? colors.dark.accent : colors.light.accent },
+              {
+                color: isDark
+                  ? colors.dark.bluebutton_background
+                  : colors.light.bluebutton_background,
+              },
             ]}
           >
             {listId}
@@ -629,8 +633,8 @@ export default function MyList() {
                         ? { backgroundColor: item.buttonColor }
                         : {
                             backgroundColor: isDark
-                              ? colors.dark.secondary
-                              : colors.light.secondary,
+                              ? colors.dark.primary
+                              : colors.light.accent,
                           },
                     ]}
                   >
@@ -638,7 +642,9 @@ export default function MyList() {
                       style={[
                         styles.taskText,
                         {
-                          color: isDark ? colors.dark.text : colors.light.text,
+                          color: isDark
+                            ? colors.dark.text
+                            : colors.dark.primary,
                         },
                         item.completed && {
                           textDecorationLine: "line-through",
