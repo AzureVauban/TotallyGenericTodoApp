@@ -1,23 +1,21 @@
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { colors } from "@theme/colors";
-import React, { useState, useEffect } from "react";
-import { generateUsername } from "../utils/generateUsername";
+import { useTheme } from "@theme/ThemeContext";
+import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
-  View,
-  Image,
-  TouchableOpacity,
-  Text,
-  ViewStyle,
-  TextInput,
-  TextStyle,
   SafeAreaView,
   ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { StyleSheet } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
-import { useNavigation } from "@react-navigation/native";
-import { useTheme } from "@theme/ThemeContext";
-import { useFocusEffect } from "@react-navigation/native";
+import { generateUsername } from "../utils/generateUsername";
 import { playInvalidSound } from "../utils/playInvalidSound";
 
 const styles = StyleSheet.create({
