@@ -1,5 +1,6 @@
 import { colors } from "@theme/colors";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { generateUsername } from "../utils/generateUsername";
 import {
   View,
   Image,
@@ -126,6 +127,12 @@ export default function SignUpScreen() {
   };
 
   const [username, setUsername] = useState("");
+  const [initialUsername, setInitialUsername] = useState("");
+  useEffect(() => {
+    const generated = generateUsername();
+    setUsername(generated);
+    setInitialUsername(generated);
+  }, []);
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -187,12 +194,20 @@ export default function SignUpScreen() {
               style={[
                 sharedButtonStyle,
                 {
+                  fontWeight: "700",
                   backgroundColor: usernameValid
                     ? isDark
-                      ? colors.dark.secondary
-                      : colors.light.secondary
+                      ? colors.dark.background
+                      : colors.light.background
                     : "#450a0a",
-                  color: isDark ? colors.dark.text : colors.light.text,
+                  color:
+                    username === initialUsername
+                      ? isDark
+                        ? colors.dark.yellowbutton_text_icon
+                        : colors.light.yellowbutton_text_icon
+                      : isDark
+                      ? colors.dark.text
+                      : colors.light.text,
                 },
               ]}
               placeholder="Username"
@@ -219,12 +234,13 @@ export default function SignUpScreen() {
               style={[
                 sharedButtonStyle,
                 {
+                  fontWeight: "700",
                   backgroundColor: passwordValid
                     ? isDark
-                      ? colors.dark.secondary
-                      : colors.light.secondary
+                      ? colors.dark.background
+                      : colors.light.background
                     : "#450a0a",
-                  color: isDark ? colors.dark.text : colors.light.text,
+                  color: isDark ? colors.dark.primary : colors.dark.text,
                 },
               ]}
               placeholder="Password"
@@ -252,12 +268,13 @@ export default function SignUpScreen() {
               style={[
                 sharedButtonStyle,
                 {
+                  fontWeight: "700",
                   backgroundColor: emailValid
                     ? isDark
-                      ? colors.dark.secondary
-                      : colors.light.secondary
+                      ? colors.dark.background
+                      : colors.light.background
                     : "#450a0a",
-                  color: isDark ? colors.dark.text : colors.light.text,
+                  color: isDark ? colors.dark.primary : colors.dark.text,
                 },
               ]}
               placeholder="Email"
@@ -285,12 +302,13 @@ export default function SignUpScreen() {
               style={[
                 sharedButtonStyle,
                 {
+                  fontWeight: "700",
                   backgroundColor: phoneValid
                     ? isDark
-                      ? colors.dark.secondary
-                      : colors.light.secondary
+                      ? colors.dark.background
+                      : colors.light.background
                     : "#450a0a",
-                  color: isDark ? colors.dark.text : colors.light.text,
+                  color: isDark ? colors.dark.primary : colors.dark.text,
                 },
               ]}
               placeholder="Phone Number"
