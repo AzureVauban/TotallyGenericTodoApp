@@ -18,6 +18,19 @@ export const dark = {
   icon:         "rgb(63 ,63 ,70)"   ,
   background:   "rgb(24, 24 ,27)"   ,
 };
+
+export const colors_themeagonistic= {
+  purplebutton_background:  "rgb(161 ,161 ,170)",
+  purplebutton_text:        "rgb(161 ,161 ,170)",
+  bluebutton_background:    "rgb(161 ,161 ,170)",
+  bluebutton_text:          "rgb(161 ,161 ,170)",
+  redbutton_background:     "rgb(161 ,161 ,170)",
+  redbutton_text:           "rgb(161 ,161 ,170)",
+  greenbutton_background:   "rgb(161 ,161 ,170)",
+  greenbutton_text:         "rgb(161 ,161 ,170)",
+  amberbutton_background:   "rgb(161 ,161 ,170)",
+  amberbutton_text:         "rgb(161 ,161 ,170)",
+};
 // zinc
 export const colors = {light,dark,}; //? include for single entry point
 
