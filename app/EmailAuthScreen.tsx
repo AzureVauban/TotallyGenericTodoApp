@@ -6,7 +6,6 @@ import {
   StyleSheet,
   SafeAreaView,
 } from "react-native";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { colors } from "@theme/colors";
 import { useTheme } from "@theme/ThemeContext";
@@ -56,26 +55,25 @@ const styles = StyleSheet.create({
 });
 
 /**
- * **VerifyPhone Screen**
+ * **EmailAuthScreen Screen**
  *
- * Mirrors **VerifyEmail** but for SMS verification. Displays four code boxes
- * and a numeric keypad; once the user enters all four digits, the **Verify →**
- * button becomes active.
+ * Shows the 4-digit OTP interface for email verification. Four boxes fill as
+ * the user taps digits on a custom keypad rendered below.
  *
  * #### Interaction
- * • **Digit tap** – appends a digit (cap 4).
- * • **⌫ Backspace** – deletes the most recent digit.
- * • **← Back** – returns to `/verificationMethod`.
- * • **Verify →** – active when `code` is full; navigates to `/home`.
+ * • **Digit tap** – appends the digit to `code` (max 4).
+ * • **⌫ Backspace** – removes the last digit.
+ * • **← Back** – navigates back to `/verificationMethod`.
+ * • **Verify →** – enabled only when `code.length === 4`; routes to `/home`.
  *
  * #### State / Hooks
- * • `code` – 4-digit SMS code.
- * • `useRouter` – Expo Router navigation.
+ * • `code` – string holding the current 4-digit OTP.
+ * • `useRouter` – Expo Router instance for navigation.
  *
- * @returns A `SafeAreaView` wrapping the verification UI.
+ * @returns A `SafeAreaView` containing the code boxes and numeric keypad.
  */
 
-export default function verifyPhone() {
+export default function PhoneAuthScreen() {
   const router = useRouter();
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -99,7 +97,7 @@ export default function verifyPhone() {
             { color: isDark ? colors.dark.accent : colors.light.accent },
           ]}
         >
-          Verify Your Phone
+          Verify Your Email
         </Text>
         <Text
           style={[
@@ -107,7 +105,7 @@ export default function verifyPhone() {
             { color: isDark ? colors.dark.text : colors.light.text },
           ]}
         >
-          Please enter your phone number to receive a verification code.
+          Please enter your address to receive a verification code.
         </Text>
         <TouchableOpacity
           style={[

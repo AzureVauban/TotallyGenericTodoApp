@@ -25,8 +25,8 @@ import type { PanGestureHandlerGestureEvent } from "react-native-gesture-handler
  * * Pressing **Next**:
  *   - If _no_ option is selected, sets an error message (“Please select a
  *     verification method.”) displayed in red beneath the button.
- *   - If **Email** is selected, navigates to `/verifyEmail`.
- *   - If **Phone** is selected, navigates to `/verifyPhone`.
+ *   - If **Email** is selected, navigates to `/EmailAuthScreen`.
+ *   - If **Phone** is selected, navigates to `/PhoneAuthScreen`.
  *
  * ### Visuals
  * * Two rounded boxes show the available methods with icons and sample
@@ -186,7 +186,9 @@ export default function VerificationMethod() {
               } else {
                 setErrorMessage("");
                 router.replace(
-                  selectedMethod === "email" ? "/verifyEmail" : "/verifyPhone"
+                  selectedMethod === "email"
+                    ? "/EmailAuthScreen"
+                    : "/PhoneAuthScreen"
                 );
               }
             }}

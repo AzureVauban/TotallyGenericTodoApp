@@ -11,7 +11,7 @@ import { useTheme } from "@theme/ThemeContext";
 import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "@theme/colors";
 /**
- * **VerifyPhone Screen**
+ * **PhoneAuthScreen Screen**
  *
  * Renders a 4‑digit SMS/OTP verification UI for the phone‑number sign‑in flow.
  *
@@ -30,7 +30,7 @@ import { colors } from "@theme/colors";
  *
  * @returns A React‑Native `SafeAreaView` containing the verification UI.
  */
-export default function VerifyPhone() {
+export default function PhoneAuthScreen() {
   const [code, setCode] = useState("");
   const router = useRouter();
 
