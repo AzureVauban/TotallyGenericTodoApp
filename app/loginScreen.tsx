@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, TouchableOpacity, Text, Dimensions } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  Dimensions,
+  Platform,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { StyleSheet } from "react-native";
 import FISignatureIcon from "../assets/icons/svg/fi-br-description-alt.svg";
@@ -95,6 +101,7 @@ const styles = StyleSheet.create({
  */
 
 export default function LoginScreen() {
+  console.log("User navigated to account login screen");
   const { theme } = useTheme();
   const isDark = theme === "dark";
   useFocusEffect(React.useCallback(() => {}, [theme]));
@@ -144,8 +151,11 @@ export default function LoginScreen() {
         }}
       >
         <FISignatureIcon
-          style={styles.icon}
-          width={300}
+          style={[
+            styles.icon,
+            Platform.OS === "android" && { marginBottom: -20 },
+          ]}
+          width={250}
           height={300}
           fill={colors.dark.accent}
         />

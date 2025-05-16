@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Platform,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -54,7 +55,7 @@ export default function VerificationMethod() {
 
   const onSwipe = ({ nativeEvent }: PanGestureHandlerGestureEvent) => {
     if (nativeEvent.state === State.END && nativeEvent.translationX > 100) {
-      router.replace("/signup");
+      router.replace("/registerAccount");
     }
   };
 
@@ -73,7 +74,11 @@ export default function VerificationMethod() {
         <Text
           style={[
             styles.title,
-            { color: isDark ? colors.dark.accent : colors.light.accent },
+            {
+              color: isDark
+                ? colors.dark.purplebutton_background
+                : colors.light.purplebutton_background,
+            },
           ]}
         >
           Verification Method
@@ -84,23 +89,28 @@ export default function VerificationMethod() {
             { color: isDark ? colors.dark.text : colors.light.text },
           ]}
         >
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod.
+          Choose your desired account verification method
         </Text>
 
-        <View style={styles.optionsContainer}>
+        <View
+          style={[
+            styles.optionsContainer,
+            Platform.OS === "ios" && { paddingHorizontal: 20 },
+          ]}
+        >
           <TouchableOpacity
             style={[
               styles.optionBox,
               {
                 backgroundColor: isDark
                   ? colors.dark.secondary
-                  : colors.light.secondary,
+                  : colors.dark.secondary,
               },
               selectedMethod === "email" && {
                 borderColor: isDark ? colors.dark.accent : colors.light.accent,
                 borderWidth: 2,
               },
+              Platform.OS === "ios" && { marginBottom: 16 },
             ]}
             onPress={() =>
               setSelectedMethod(selectedMethod === "email" ? null : "email")
@@ -114,7 +124,7 @@ export default function VerificationMethod() {
             <Text
               style={[
                 styles.optionTitle,
-                { color: isDark ? colors.dark.text : colors.light.text },
+                { color: isDark ? colors.light.text : colors.light.text },
               ]}
             >
               Email
@@ -135,12 +145,13 @@ export default function VerificationMethod() {
               {
                 backgroundColor: isDark
                   ? colors.dark.secondary
-                  : colors.light.secondary,
+                  : colors.dark.secondary,
               },
               selectedMethod === "phone" && {
                 borderColor: isDark ? colors.dark.accent : colors.light.accent,
                 borderWidth: 2,
               },
+              Platform.OS === "ios" && { marginBottom: 16 },
             ]}
             onPress={() =>
               setSelectedMethod(selectedMethod === "phone" ? null : "phone")
@@ -176,9 +187,10 @@ export default function VerificationMethod() {
               styles.nextButton,
               {
                 backgroundColor: isDark
-                  ? colors.dark.accent
-                  : colors.light.accent,
+                  ? colors.dark.purplebutton_background
+                  : colors.light.purplebutton_background,
               },
+              Platform.OS === "ios" && { marginTop: 24 },
             ]}
             onPress={() => {
               if (!selectedMethod) {
@@ -196,7 +208,11 @@ export default function VerificationMethod() {
             <Text
               style={[
                 styles.nextButtonText,
-                { color: isDark ? colors.dark.text : colors.light.text },
+                {
+                  color: isDark
+                    ? colors.dark.purplebutton_text_icon
+                    : colors.light.purplebutton_text_icon,
+                },
               ]}
             >
               Next
@@ -228,12 +244,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#fff",
     marginTop: 40,
+    textAlign: "center",
   },
   subtitle: {
     color: "#ccc",
     fontSize: 14,
     marginTop: 10,
     marginBottom: 30,
+    textAlign: "center",
   },
   optionsContainer: {
     flexDirection: "row",

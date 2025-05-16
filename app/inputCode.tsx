@@ -13,6 +13,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "@theme/colors";
 
 const InputCodeScreen = () => {
+  console.log("User navigated to OTP screen");
   const { theme } = useTheme();
   const isDark = theme === "dark";
   useFocusEffect(React.useCallback(() => {}, [theme]));
@@ -49,10 +50,14 @@ const InputCodeScreen = () => {
         <Text
           style={[
             styles.title,
-            { color: isDark ? colors.dark.accent : colors.light.accent },
+            {
+              color: isDark
+                ? colors.dark.purplebutton_background
+                : colors.dark.purplebutton_background,
+            },
           ]}
         >
-          Type in code
+          Input your OTP
         </Text>
         <TextInput
           style={[
@@ -60,7 +65,7 @@ const InputCodeScreen = () => {
             {
               backgroundColor: isDark
                 ? colors.dark.secondary
-                : colors.light.secondary,
+                : colors.light.primary,
               color: isDark ? colors.dark.text : colors.light.text,
             },
           ]}
@@ -109,7 +114,11 @@ const InputCodeScreen = () => {
               <Text
                 style={[
                   styles.numButtonText,
-                  { color: isDark ? colors.dark.text : colors.light.text },
+                  {
+                    color: isDark
+                      ? colors.dark.secondary
+                      : colors.light.primary,
+                  },
                 ]}
               >
                 {num}
@@ -131,7 +140,9 @@ const InputCodeScreen = () => {
             <Text
               style={[
                 styles.numButtonText,
-                { color: isDark ? colors.dark.text : colors.light.text },
+                {
+                  color: isDark ? colors.dark.secondary : colors.light.primary,
+                },
               ]}
             >
               0
@@ -151,7 +162,9 @@ const InputCodeScreen = () => {
             <Text
               style={[
                 styles.numButtonText,
-                { color: isDark ? colors.dark.text : colors.light.text },
+                {
+                  color: isDark ? colors.dark.secondary : colors.light.primary,
+                },
               ]}
             >
               ⌫

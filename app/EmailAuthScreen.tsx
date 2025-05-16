@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import EnvelopeIcon from "../assets/icons/svg/fi-br-address-card.svg";
 import {
   View,
   Text,
@@ -74,6 +75,7 @@ const styles = StyleSheet.create({
  */
 
 export default function PhoneAuthScreen() {
+  console.log("User navigated to email authentication screen");
   const router = useRouter();
   const { theme } = useTheme();
   const isDark = theme === "dark";
@@ -91,10 +93,20 @@ export default function PhoneAuthScreen() {
       ]}
     >
       <View style={styles.container}>
+        <EnvelopeIcon
+          width={250}
+          height={250}
+          fill={isDark ? colors.dark.accent : colors.light.accent}
+          style={{ alignSelf: "center", marginBottom: 8 }}
+        />
         <Text
           style={[
             styles.title,
-            { color: isDark ? colors.dark.accent : colors.light.accent },
+            {
+              color: isDark
+                ? colors.dark.purplebutton_background
+                : colors.light.purplebutton_background,
+            },
           ]}
         >
           Verify Your Email
@@ -112,15 +124,19 @@ export default function PhoneAuthScreen() {
             styles.button,
             {
               backgroundColor: isDark
-                ? colors.dark.secondary
-                : colors.light.secondary,
+                ? colors.dark.purplebutton_background
+                : colors.dark.purplebutton_text_icon,
             },
           ]}
         >
           <Text
             style={[
               styles.buttonText,
-              { color: isDark ? colors.dark.text : colors.light.text },
+              {
+                color: isDark
+                  ? colors.dark.purplebutton_text_icon
+                  : colors.light.purplebutton_background,
+              },
             ]}
           >
             Send Verification Code
@@ -131,8 +147,8 @@ export default function PhoneAuthScreen() {
             styles.button,
             {
               backgroundColor: isDark
-                ? colors.dark.tertiary
-                : colors.light.tertiary,
+                ? colors.dark.purplebutton_background
+                : colors.dark.purplebutton_text_icon,
               marginTop: 12,
             },
           ]}
@@ -141,7 +157,11 @@ export default function PhoneAuthScreen() {
           <Text
             style={[
               styles.buttonText,
-              { color: isDark ? colors.dark.text : colors.light.text },
+              {
+                color: isDark
+                  ? colors.dark.purplebutton_text_icon
+                  : colors.light.purplebutton_background,
+              },
             ]}
           >
             Input Code

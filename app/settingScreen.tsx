@@ -187,7 +187,13 @@ export default function SettingsScreen() {
             >
               Enable Sound Effects
             </Text>
-            <Switch value={soundEnabled} onValueChange={setSoundEnabled} />
+            <Switch
+              value={soundEnabled}
+              onValueChange={(value) => {
+                console.log("Sound Effects toggled:", value);
+                setSoundEnabled(value);
+              }}
+            />
           </View>
           <View
             style={[
@@ -208,7 +214,13 @@ export default function SettingsScreen() {
             >
               Light/Dark Theme
             </Text>
-            <Switch value={isDark} onValueChange={toggleTheme} />
+            <Switch
+              value={isDark}
+              onValueChange={(value) => {
+                console.log("Theme toggled, now dark:", value);
+                toggleTheme();
+              }}
+            />
           </View>
         </View>
         <View
