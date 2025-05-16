@@ -373,7 +373,7 @@ export default function HomeScreen() {
     if (translationX < -100 && !hasNavigated.current) {
       hasNavigated.current = true;
       console.log("USER: HOME <= SETTINGS");
-      router.push("/settings");
+      router.push("/settingScreen");
     }
     /*  if (translationX > 100 && !hasNavigated.current) {
       hasNavigated.current = true;

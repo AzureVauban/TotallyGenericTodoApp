@@ -90,7 +90,7 @@ export default function ResetPassword() {
   const handleSwipe = ({ nativeEvent }) => {
     if (nativeEvent.translationX > 50 && !isNavigating) {
       setIsNavigating(true);
-      router.push("/login");
+      router.push("/loginScreen");
       setTimeout(() => setIsNavigating(false), 500);
     }
   };

@@ -118,7 +118,7 @@ export default function LoginScreen() {
   };
   useEffect(() => {
     if (isUserLoggedIn) {
-      router.replace("/homeScreen");
+      router.replace("/home");
     }
   }, [isUserLoggedIn, router]);
 
