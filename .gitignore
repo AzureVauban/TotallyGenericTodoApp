@@ -62,3 +62,4 @@ assets/soundeffects/
 674A53ac6gQM8vx.md
 .env
 .env.local
+*.sh
