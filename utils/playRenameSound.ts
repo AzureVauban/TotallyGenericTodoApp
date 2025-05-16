@@ -3,10 +3,12 @@ import { Audio } from "expo-av";
 let soundObject: Audio.Sound | null = null;
 
 export async function playRenameTaskSound() {
+  const sound_file_name: string = "toggle-button-off.mp3";
+  console.log("request to play", sound_file_name, "was inputted");
   try {
     if (!soundObject) {
       const { sound } = await Audio.Sound.createAsync(
-        require("../assets/sfx/button-pressed-38129.mp3")
+        require("../assets/sfx/button-pressed-38129.mp3"),
       );
       soundObject = sound;
     }

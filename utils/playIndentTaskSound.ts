@@ -3,10 +3,12 @@ import { Audio } from "expo-av";
 let soundObject: Audio.Sound | null = null;
 
 export async function playIndentTasksound() {
+  const sound_file_name: string = "ui-button-click-5-327756.mp3";
+  console.log("request to play", sound_file_name, "was inputted");
   try {
     if (!soundObject) {
       const { sound } = await Audio.Sound.createAsync(
-        require("../assets/sfx/ui-button-click-5-327756.mp3")
+        require("../assets/sfx/" + sound_file_name),
       );
       soundObject = sound;
     }

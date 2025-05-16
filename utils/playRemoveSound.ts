@@ -3,10 +3,12 @@ import { Audio } from "expo-av";
 let soundObject: Audio.Sound | null = null;
 
 export async function playRemoveSound() {
+  const sound_file_name: string = "crumple-03-40747.mp3";
+  console.log("request to play", sound_file_name, "was inputted");
   try {
     if (!soundObject) {
       const { sound } = await Audio.Sound.createAsync(
-        require("../assets/sfx/crumple-03-40747.mp3") //? it's old name is denie-96177.mp3
+        require("../assets/sfx/" + sound_file_name),
       );
       soundObject = sound;
     }

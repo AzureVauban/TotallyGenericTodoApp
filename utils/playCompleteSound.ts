@@ -4,10 +4,13 @@ import { Audio } from "expo-av";
 let soundObject: Audio.Sound | null = null;
 
 export async function playCompleteSound() {
+  const sound_file_name: string = "ding-sfx-330333.mp3";
+  console.log("request to play", sound_file_name, "was inputted");
+
   try {
     if (!soundObject) {
       const { sound } = await Audio.Sound.createAsync(
-        require("../assets/sfx/ding-sfx-330333.mp3")
+        require("../assets/sfx/" + sound_file_name),
       );
       soundObject = sound;
     }
