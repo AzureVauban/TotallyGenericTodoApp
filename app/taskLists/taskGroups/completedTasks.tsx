@@ -3,19 +3,16 @@
  *
  * Shows every task marked done (and not deleted).
  */
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 // import { useTasks } from "../../../backend/storage/TasksContext";
 
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { Pressable } from "react-native";
 import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
-import {
-  useTasks,
-  Task as ContextTask,
-} from "../../../backend/storage/TasksContext";
+import { useTasks } from "../../../backend/storage/TasksContext";
 import { colors } from "@theme/colors";
+import { useTheme } from "../../theme/ThemeContext";
 // Local TaskItem shape
 interface TaskItem {
   id: string;
@@ -27,12 +24,43 @@ interface TaskItem {
 
 export default function AllTasks() {
   const { tasks, removeTask } = useTasks();
+  const { theme: themeMode } = useTheme();
+  const isDark = themeMode === "dark";
   const visibleTasks = tasks.filter((t) => t.completed && !t.recentlyDeleted);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Completed Tasks</Text>
-      <View style={styles.divider} />
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark
+            ? colors.dark.background
+            : colors.light.background,
+        },
+      ]}
+    >
+      <Text
+        style={[
+          styles.title,
+          {
+            color: isDark
+              ? colors.dark.bluebutton_background
+              : colors.light.bluebutton_background,
+          },
+        ]}
+      >
+        Completed Tasks
+      </Text>
+      <View
+        style={[
+          styles.divider,
+          {
+            backgroundColor: isDark
+              ? colors.dark.tertiary
+              : colors.light.tertiary,
+          },
+        ]}
+      />
       <FlatList
         data={visibleTasks}
         keyExtractor={(t) => t.id}
@@ -47,7 +75,10 @@ export default function AllTasks() {
                 }}
               >
                 <Pressable
-                  style={[styles.inlineButton, { backgroundColor: "#7f1d1d" }]}
+                  style={[
+                    styles.inlineButton,
+                    { backgroundColor: colors.dark.primary },
+                  ]}
                   onPress={() => removeTask(item.id)}
                 >
                   <FiBrtrash width={20} height={20} fill="#fecaca" />
@@ -55,16 +86,40 @@ export default function AllTasks() {
               </View>
             )}
           >
-            <View style={styles.item}>
+            <View
+              style={[
+                styles.item,
+                {
+                  backgroundColor: isDark
+                    ? colors.dark.secondary
+                    : colors.light.primary,
+                },
+              ]}
+            >
               <Text
-                style={[styles.text, item.completed && styles.completedText]}
+                style={[
+                  {
+                    color: isDark ? colors.dark.text : colors.light.text,
+                    fontSize: 16,
+                  },
+                  item.completed && {
+                    color: isDark
+                      ? colors.dark.tertiary
+                      : colors.light.tertiary,
+                    textDecorationLine: "line-through",
+                  },
+                ]}
               >
                 {item.title}
               </Text>
             </View>
           </Swipeable>
         )}
-        contentContainerStyle={{ backgroundColor: colors.dark.background }}
+        contentContainerStyle={{
+          backgroundColor: isDark
+            ? colors.dark.background
+            : colors.light.background,
+        }}
       />
     </View>
   );

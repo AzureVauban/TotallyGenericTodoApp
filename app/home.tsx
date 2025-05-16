@@ -273,7 +273,6 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: "80%",
-    backgroundColor: colors.dark.secondary,
     borderRadius: 12,
     padding: 16,
   },
@@ -284,7 +283,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   modalButton: {
-    backgroundColor: colors.light.primary,
     padding: 12,
     borderRadius: 6,
     marginBottom: 8,
@@ -672,7 +670,16 @@ export default function HomeScreen() {
         {/* Add List Modal */}
         <Modal visible={addModalVisible} transparent animationType="fade">
           <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
+            <View
+              style={[
+                styles.modalContent,
+                {
+                  backgroundColor: isDark
+                    ? colors.dark.bluebutton_background
+                    : colors.light.bluebutton_background,
+                },
+              ]}
+            >
               <Text style={styles.modalTitle}>New List</Text>
               <TextInput
                 value={newListName}
@@ -715,7 +722,14 @@ export default function HomeScreen() {
                 <Text style={styles.modalButtonText}>Cancel</Text>
               </Pressable>
               <Pressable
-                style={styles.modalButton}
+                style={[
+                  styles.modalButton,
+                  {
+                    backgroundColor: isDark
+                      ? colors.dark.purplebutton_background
+                      : colors.light.purplebutton_background,
+                  },
+                ]}
                 onPress={() => {
                   const trimmedName = newListName.trim();
                   // Check for duplicates (case-insensitive)
@@ -746,7 +760,16 @@ export default function HomeScreen() {
 
         <Modal visible={renameModalVisible} transparent animationType="fade">
           <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
+            <View
+              style={[
+                styles.modalContent,
+                {
+                  backgroundColor: isDark
+                    ? colors.dark.primary
+                    : colors.light.primary,
+                },
+              ]}
+            >
               <Text style={styles.modalTitle}>Rename List</Text>
               <TextInput
                 value={renameName}
@@ -766,7 +789,14 @@ export default function HomeScreen() {
                 }}
               />
               <Pressable
-                style={styles.modalButton}
+                style={[
+                  styles.modalButton,
+                  {
+                    backgroundColor: isDark
+                      ? colors.dark.bluebutton_background
+                      : colors.light.bluebutton_background,
+                  },
+                ]}
                 onPress={() => {
                   if (!renameTarget) return;
                   const trimmedName = renameName.trim();
@@ -787,12 +817,27 @@ export default function HomeScreen() {
                   setRenameModalVisible(false);
                 }}
               >
-                <Text style={styles.modalButtonText}>OK</Text>
+                <Text
+                  style={[
+                    styles.modalButtonText,
+                    {
+                      color: isDark
+                        ? colors.dark.bluebutton_text_icon
+                        : colors.light.bluebutton_text_icon,
+                    },
+                  ]}
+                >
+                  Ok
+                </Text>
               </Pressable>
               <Pressable
                 style={[
                   styles.modalButton,
-                  { backgroundColor: colors.dark.tertiary },
+                  {
+                    backgroundColor: isDark
+                      ? colors.dark.secondary
+                      : colors.dark.secondary,
+                  },
                 ]}
                 onPress={() => setRenameModalVisible(false)}
               >

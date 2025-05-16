@@ -7,20 +7,64 @@ import React from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
 import { useTasks } from "../../../backend/storage/TasksContext";
 import { colors } from "@theme/colors";
-
+import { useTheme } from "../../theme/ThemeContext";
+// …
 export default function FlaggedTasks() {
   const { tasks } = useTasks();
+  const { theme: themeMode } = useTheme();
+  const isDark = themeMode === "dark";
   const flaggedTasks = tasks.filter((t) => !!t.flagged);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Flagged</Text>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark
+            ? colors.dark.background
+            : colors.light.background,
+        },
+      ]}
+    >
+      <Text
+        style={[
+          styles.title,
+          {
+            color: isDark
+              ? colors.dark.bluebutton_background
+              : colors.light.bluebutton_background,
+          },
+        ]}
+      >
+        Flagged
+      </Text>
       <FlatList
         data={flaggedTasks}
         keyExtractor={(t) => t.id}
+        contentContainerStyle={{
+          backgroundColor: isDark
+            ? colors.dark.background
+            : colors.light.background,
+        }}
         renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text style={styles.text}>{item.title}</Text>
+          <View
+            style={[
+              styles.item,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.accent
+                  : colors.light.accent,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.text,
+                { color: isDark ? colors.dark.text : colors.light.text },
+              ]}
+            >
+              {item.title}
+            </Text>
           </View>
         )}
       />
@@ -29,10 +73,10 @@ export default function FlaggedTasks() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: colors.dark.background },
+  container: { flex: 1, padding: 20, backgroundColor: colors.dark.primary },
   title: {
     fontSize: 24,
-    color: colors.dark.accent,
+    color: colors.light.accent,
     marginBottom: 10,
     marginTop: 20,
     textAlign: "center",

@@ -4,6 +4,7 @@
  * Shows every non-deleted task, regardless of state.
  */
 import { colors } from "@theme/colors";
+import { useTheme } from "../../theme/ThemeContext";
 import React from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
@@ -12,12 +13,43 @@ import { useTasks } from "../../../backend/storage/TasksContext";
 
 export default function AllTasks() {
   const { tasks, removeTask } = useTasks();
+  const { theme: themeMode } = useTheme();
+  const isDark = themeMode === "dark";
   const visibleTasks = tasks.filter((t) => !t.recentlyDeleted);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>All Tasks</Text>
-      <View style={styles.divider} />
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark
+            ? colors.dark.background
+            : colors.light.background,
+        },
+      ]}
+    >
+      <Text
+        style={[
+          styles.title,
+          {
+            color: isDark
+              ? colors.dark.bluebutton_background
+              : colors.light.bluebutton_background,
+          },
+        ]}
+      >
+        All Tasks
+      </Text>
+      <View
+        style={[
+          styles.divider,
+          {
+            backgroundColor: isDark
+              ? colors.dark.tertiary
+              : colors.light.tertiary,
+          },
+        ]}
+      />
       <FlatList
         data={visibleTasks}
         keyExtractor={(t) => t.id}
@@ -34,16 +66,38 @@ export default function AllTasks() {
               </View>
             )}
           >
-            <View style={styles.item}>
+            <View
+              style={[
+                styles.item,
+                {
+                  backgroundColor: isDark
+                    ? colors.dark.secondary
+                    : colors.light.secondary,
+                },
+              ]}
+            >
               <Text
-                style={[styles.text, item.completed && styles.completedText]}
+                style={[
+                  styles.text,
+                  { color: isDark ? colors.dark.text : colors.light.text },
+                  item.completed && {
+                    color: isDark
+                      ? colors.dark.tertiary
+                      : colors.light.tertiary,
+                    textDecorationLine: "line-through",
+                  },
+                ]}
               >
                 {item.title}
               </Text>
             </View>
           </Swipeable>
         )}
-        contentContainerStyle={{ backgroundColor: colors.dark.background }}
+        contentContainerStyle={{
+          backgroundColor: isDark
+            ? colors.dark.background
+            : colors.light.background,
+        }}
       />
     </View>
   );

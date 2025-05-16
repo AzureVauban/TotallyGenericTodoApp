@@ -60,7 +60,11 @@ export default function ScheduledTasks() {
       <Text
         style={[
           styles.title,
-          { color: isDark ? colors.dark.accent : colors.light.accent },
+          {
+            color: isDark
+              ? colors.dark.bluebutton_background
+              : colors.light.bluebutton_background,
+          },
         ]}
       >
         Scheduled Tasks
