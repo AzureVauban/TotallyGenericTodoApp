@@ -1,15 +1,9 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-} from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, SafeAreaView } from "react-native";
+import { supabase } from "../lib/supabaseClient";
+import { useTheme } from "@theme/ThemeContext";
 import { useRouter } from "expo-router";
 import { colors } from "@theme/colors";
-import { useTheme } from "@theme/ThemeContext";
-import { useFocusEffect } from "@react-navigation/native";
 
 const styles = StyleSheet.create({
   screenbackground: {
@@ -45,6 +39,7 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 320,
     elevation: 2,
+    marginTop: 16,
   },
   buttonText: {
     color: colors.dark.text,
@@ -52,99 +47,54 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
+  input: {
+    width: "100%",
+    maxWidth: 320,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 20,
+    color: colors.dark.text,
+    backgroundColor: "#222",
+  },
 });
 
-/**
- * **EmailAuthScreen Screen**
- *
- * Shows the 4-digit OTP interface for email verification. Four boxes fill as
- * the user taps digits on a custom keypad rendered below.
- *
- * #### Interaction
- * • **Digit tap** – appends the digit to `code` (max 4).
- * • **⌫ Backspace** – removes the last digit.
- * • **← Back** – navigates back to `/verificationMethod`.
- * • **Verify →** – enabled only when `code.length === 4`; routes to `/home`.
- *
- * #### State / Hooks
- * • `code` – string holding the current 4-digit OTP.
- * • `useRouter` – Expo Router instance for navigation.
- *
- * @returns A `SafeAreaView` containing the code boxes and numeric keypad.
- */
-
-export default function PhoneAuthScreen() {
-  const router = useRouter();
+export default function EmailAuthScreen() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  useFocusEffect(React.useCallback(() => {}, [theme]));
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+
+  const sendOtp = async () => {
+    const { error } = await supabase.auth.signInWithOtp({ email });
+    if (error) {
+      Alert.alert("Error sending OTP", error.message);
+    } else {
+      Alert.alert("OTP sent", "Please check your email for the code.");
+      router.replace("/inputCode");
+    }
+  };
 
   return (
-    <SafeAreaView
-      style={[
-        styles.screenbackground,
-        {
-          backgroundColor: isDark
-            ? colors.dark.background
-            : colors.light.background,
-        },
-      ]}
-    >
+    <SafeAreaView style={[styles.screenbackground, { backgroundColor: isDark ? colors.dark.background : colors.light.background }]}>
       <View style={styles.container}>
-        <Text
-          style={[
-            styles.title,
-            { color: isDark ? colors.dark.accent : colors.light.accent },
-          ]}
-        >
-          Verify Your Email
+        <Text style={[styles.title, { color: isDark ? colors.dark.accent : colors.light.accent }]}>Verify Your Email</Text>
+        <Text style={[styles.subtitle, { color: isDark ? colors.dark.text : colors.light.text }]}>
+          Enter your email to receive a one-time code.
         </Text>
-        <Text
-          style={[
-            styles.subtitle,
-            { color: isDark ? colors.dark.text : colors.light.text },
-          ]}
-        >
-          Please enter your address to receive a verification code.
-        </Text>
-        <TouchableOpacity
-          style={[
-            styles.button,
-            {
-              backgroundColor: isDark
-                ? colors.dark.secondary
-                : colors.light.secondary,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.buttonText,
-              { color: isDark ? colors.dark.text : colors.light.text },
-            ]}
-          >
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          autoCapitalize="none"
+          keyboardType="email-address"
+          onChangeText={setEmail}
+          value={email}
+        />
+        <TouchableOpacity style={styles.button} onPress={sendOtp}>
+          <Text style={[styles.buttonText, { color: isDark ? colors.dark.text : colors.light.text }]}>
             Send Verification Code
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.button,
-            {
-              backgroundColor: isDark
-                ? colors.dark.tertiary
-                : colors.light.tertiary,
-              marginTop: 12,
-            },
-          ]}
-          onPress={() => router.push("/inputCode")}
-        >
-          <Text
-            style={[
-              styles.buttonText,
-              { color: isDark ? colors.dark.text : colors.light.text },
-            ]}
-          >
-            Input Code
           </Text>
         </TouchableOpacity>
       </View>

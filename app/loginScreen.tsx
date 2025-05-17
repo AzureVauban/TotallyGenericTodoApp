@@ -1,3 +1,4 @@
+import "react-native-url-polyfill/auto";
 import React, { useState, useEffect } from "react";
 import { View, TouchableOpacity, Text, Dimensions } from "react-native";
 import { useRouter } from "expo-router";
@@ -6,6 +7,7 @@ import FISignatureIcon from "../assets/icons/svg/fi-br-description-alt.svg";
 import { colors } from "@theme/colors";
 import { useTheme } from "@theme/ThemeContext";
 import { useFocusEffect } from "@react-navigation/native";
+import { createClient, SupabaseClient, Session } from "@supabase/supabase-js";
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const BUTTON_WIDTH = SCREEN_WIDTH * 0.7;
 
@@ -95,6 +97,9 @@ const styles = StyleSheet.create({
  */
 
 export default function LoginScreen() {
+  console.log(`Current file name: loginScreen`);
+  //TODO https://supabase.com/docs/guides/auth/quickstarts/react-native (current on step 5)
+
   const { theme } = useTheme();
   const isDark = theme === "dark";
   useFocusEffect(React.useCallback(() => {}, [theme]));
@@ -102,20 +107,6 @@ export default function LoginScreen() {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
   const router = useRouter();
   // Helper to compute the complementary color of a hex code
-  const getComplement = (hex: string): string => {
-    // Remove the hash if it exists
-    hex = hex.replace("#", "");
-    // Parse the red, green, blue components
-    const r = 255 - parseInt(hex.substring(0, 2), 16);
-    const g = 255 - parseInt(hex.substring(2, 4), 16);
-    const b = 255 - parseInt(hex.substring(4, 6), 16);
-
-    // Convert the components back to hex, ensuring 2 digits for each
-    const rHex = r.toString(16).padStart(2, "0");
-    const gHex = g.toString(16).padStart(2, "0");
-    const bHex = b.toString(16).padStart(2, "0");
-    return `#${rHex}${gHex}${bHex}`;
-  };
   useEffect(() => {
     if (isUserLoggedIn) {
       router.replace("/home");

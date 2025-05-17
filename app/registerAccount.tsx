@@ -1,3 +1,5 @@
+import { supabase } from "../lib/supabaseClient";
+import { Alert } from "react-native";
 import { colors } from "@theme/colors";
 import React, { useState, useEffect } from "react";
 import { generateUsername } from "../utils/generateUsername";
@@ -105,6 +107,9 @@ const styles = StyleSheet.create({
  */
 
 export default function SignUpScreen() {
+  console.log(`Current file name: SignUpScreen`);
+  //TODO https://supabase.com/docs/guides/auth/quickstarts/react-native (current on step 5)
+
   const router = useRouter();
   const navigation = useNavigation();
 
@@ -354,8 +359,28 @@ export default function SignUpScreen() {
                 isUsernameValid &&
                 isPasswordValid
               ) {
-                console.log("Navigating to verificationMethod");
-                router.replace("/verificationMethod");
+            // Check username uniqueness
+            (async () => {
+              const { data: existing, error: existingError } = await supabase
+                .from("profiles")
+                .select("id")
+                .eq("username", username)
+                .limit(1)
+                .maybeSingle();
+              if (existing) {
+                console.error("Username already taken. Please choose another.");
+                return;
+              }
+              // Sign up with Supabase
+              const { data, error } = await supabase.auth.signUp({ email, password });
+              if (error) {
+                Alert.alert("Error signing up", error.message);
+                return;
+              }
+              // Insert profile record
+              await supabase.from("profiles").insert({ id: data.user?.id, username, phone });
+              router.replace("/verificationMethod");
+            })();
               } else {
                 playInvalidSound();
               }

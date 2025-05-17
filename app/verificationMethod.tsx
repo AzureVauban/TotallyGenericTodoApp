@@ -54,7 +54,7 @@ export default function VerificationMethod() {
 
   const onSwipe = ({ nativeEvent }: PanGestureHandlerGestureEvent) => {
     if (nativeEvent.state === State.END && nativeEvent.translationX > 100) {
-      router.replace("/signup");
+      router.replace("/registerAccount");
     }
   };
 

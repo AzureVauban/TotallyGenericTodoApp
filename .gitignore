@@ -63,3 +63,4 @@ assets/soundeffects/
 .env
 .env.local
 *.sh
+*.txt

@@ -62,6 +62,7 @@ const homeScreenStyles = StyleSheet.create({
  * @returns A fully‑interactive React Native view wrapped in `Swipeable` components.
  */
 export default function HomeScreen() {
+  console.log(`Current file name: HomeScreen()`);
   const [tasks, setTasks] = useState([]);
   const [doneTasks, setDoneTasks] = useState([]);
   const [recentlyDeleted, setRecentlyDeleted] = useState([]);
