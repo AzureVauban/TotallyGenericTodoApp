@@ -6,13 +6,19 @@
 import React from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
 import { useTasks } from "../../../backend/storage/TasksContext";
+import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "@theme/colors";
 import { useTheme } from "../../theme/ThemeContext";
 // …
 export default function FlaggedTasks() {
-  const { tasks } = useTasks();
+  const { tasks, exportDataAsJSON } = useTasks();
   const { theme: themeMode } = useTheme();
   const isDark = themeMode === "dark";
+  useFocusEffect(
+    React.useCallback(() => {
+      exportDataAsJSON();
+    }, [themeMode])
+  );
   const flaggedTasks = tasks.filter((t) => !!t.flagged);
 
   return (

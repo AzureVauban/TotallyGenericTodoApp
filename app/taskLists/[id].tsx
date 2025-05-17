@@ -39,7 +39,7 @@ import FiBrArrowRight from "../../assets/icons/svg/fi-br-arrow-alt-right.svg";
 import FiBrArrowLeft from "../../assets/icons/svg/fi-br-arrow-alt-left.svg";
 import { useTasks } from "../../backend/storage/TasksContext";
 import { Task as ContextTask } from "../../backend/storage/TasksContext";
-import { Audio } from "expo-av";
+import { Audio, Video } from 'expo-av';
 /**
  * **MyList Screen**
  *
@@ -220,6 +220,7 @@ export default function MyList() {
   const isDark = theme === "dark";
   useFocusEffect(
     React.useCallback(() => {
+      exportDataAsJSON();
       // no-op, but ensures re-render on theme change
     }, [theme])
   );
@@ -239,6 +240,7 @@ export default function MyList() {
     flagTask,
     indentTask,
     reorderTasks: reorderTask,
+    exportDataAsJSON,
   } = useTasks();
 
   // Handler for flagging a task using context method
@@ -434,6 +436,7 @@ export default function MyList() {
                         setDetailColor(item.buttonColor ?? "");
                         setDetailDesc(item.title);
                         setDetailModalVisible(true);
+                        exportDataAsJSON();
                       }}
                     >
                       <FiBrsettings
@@ -467,6 +470,7 @@ export default function MyList() {
                               onPress: () => {
                                 playRemoveSound();
                                 moveToRecentlyDeleted(item.id, listId);
+                                exportDataAsJSON();
                               },
                             },
                           ]
@@ -510,6 +514,7 @@ export default function MyList() {
                         } else {
                           playUnflaggedSound();
                         }
+                        exportDataAsJSON();
                       }}
                     >
                       <FiBrflagAlt
@@ -535,6 +540,7 @@ export default function MyList() {
                         setRenameTaskId(item.id);
                         setRenameText(item.title);
                         setRenameModalVisible(true);
+                        exportDataAsJSON();
                       }}
                     >
                       <FiBredit
@@ -561,6 +567,7 @@ export default function MyList() {
                         onPress={() => {
                           playIndentTasksound();
                           handleIndentById(item.id);
+                          exportDataAsJSON();
                         }}
                       >
                         {item.indent === 1 ? (
@@ -617,6 +624,7 @@ export default function MyList() {
                     if (willComplete) {
                       playCompleteSound();
                     }
+                    exportDataAsJSON();
                   }}
                   onLongPress={() => {
                     // Default: start drag for reordering
@@ -673,7 +681,10 @@ export default function MyList() {
               data={completedTasks}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <Pressable onPress={() => toggleTask(item.id)}>
+                <Pressable onPress={() => {
+                  toggleTask(item.id);
+                  exportDataAsJSON();
+                }}>
                   <View
                     style={[
                       styles.taskItem,

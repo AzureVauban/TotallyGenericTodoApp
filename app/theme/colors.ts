@@ -9,18 +9,15 @@ export const light = {
   background: "rgb(161 ,161 ,170)",
   purplebutton_background: "rgb(76 ,29 ,149)",
   purplebutton_text_icon: "rgb(221 ,214 ,254)",
-
   bluebutton_background: "rgb(37, 99, 235)",
   bluebutton_text_icon: "rgb(191 ,219 ,254)",
-
   greenbutton_background: "rgb(22 ,163 ,74)",
   greenbutton_text_icon: "rgb(187, 247 ,208)",
-
   yellowbutton_background: "rgb(234,179,8)",
   yellowbutton_text_icon: "rgb(146 ,64 ,14)",
-
   redbutton_background: "rgb(127 ,29, 29)",
   redbutton_text_icon: "rgb(254, 202, 202)",
+  input: "rgb(255, 255, 255)", // ADD THIS LINE
 };
 
 export const dark = {
@@ -41,6 +38,7 @@ export const dark = {
   yellowbutton_text_icon: "rgb(146 ,64 ,14)",
   redbutton_background: "rgb(127 ,29, 29)",
   redbutton_text_icon: "rgb(254, 202, 202)",
+  input: "rgb(32, 32, 32)", // ADD THIS LINE
 };
 
 // zinc

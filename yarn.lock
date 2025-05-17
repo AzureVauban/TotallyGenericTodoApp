@@ -5367,12 +5367,7 @@ expo-asset@~11.1.5:
     "@expo/image-utils" "^0.7.4"
     expo-constants "~17.1.5"
 
-expo-audio@^0.4.5:
-  version "0.4.5"
-  resolved "https://registry.yarnpkg.com/expo-audio/-/expo-audio-0.4.5.tgz#e98de1a09420cab96e1a5cd8b95b7dd480c8915c"
-  integrity sha512-QYJ9yLFAfH+YPYheqolbYL812lZWAsZVuRPrM6LZBsYYocaTTVVLQj+nggXKZwAjrIpQwpvH7jcziJy22I5Xpw==
-
-expo-av@~15.1.4:
+expo-av@^15.1.4:
   version "15.1.4"
   resolved "https://registry.yarnpkg.com/expo-av/-/expo-av-15.1.4.tgz#412b69a17aed2ef903bf6193c58d0f3615a40a9c"
   integrity sha512-p+U5Hl89i8QQN7uATcUX2Fc9wT5FQcQkvuv43Qwbpi6hUSSjLgVWkXxThDMolqOFDOOsKWM/UM6pmex4XP+uSw==
@@ -8892,6 +8887,13 @@ react-native-svg@^15.11.2:
     css-select "^5.1.0"
     css-tree "^1.1.3"
     warn-once "0.1.1"
+
+react-native-url-polyfill@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-url-polyfill/-/react-native-url-polyfill-2.0.0.tgz#db714520a2985cff1d50ab2e66279b9f91ffd589"
+  integrity sha512-My330Do7/DvKnEvwQc0WdcBnFPploYKp9CYlefDXzIdEaA+PAhDYllkvGeEroEzvc4Kzzj2O4yVdz8v6fjRvhA==
+  dependencies:
+    whatwg-url-without-unicode "8.0.0-3"
 
 react-native-web@~0.20.0:
   version "0.20.0"

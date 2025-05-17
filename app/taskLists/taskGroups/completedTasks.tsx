@@ -11,6 +11,7 @@ import Swipeable from "react-native-gesture-handler/Swipeable";
 import { Pressable } from "react-native";
 import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
 import { useTasks } from "../../../backend/storage/TasksContext";
+import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "@theme/colors";
 import { useTheme } from "../../theme/ThemeContext";
 // Local TaskItem shape
@@ -23,10 +24,16 @@ interface TaskItem {
 }
 
 export default function AllTasks() {
-  const { tasks, removeTask } = useTasks();
+  const { tasks, removeTask, exportDataAsJSON } = useTasks();
   const { theme: themeMode } = useTheme();
   const isDark = themeMode === "dark";
   const visibleTasks = tasks.filter((t) => t.completed && !t.recentlyDeleted);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      exportDataAsJSON();
+    }, [themeMode])
+  );
 
   return (
     <View
@@ -79,7 +86,10 @@ export default function AllTasks() {
                     styles.inlineButton,
                     { backgroundColor: colors.dark.primary },
                   ]}
-                  onPress={() => removeTask(item.id)}
+                  onPress={() => {
+                    removeTask(item.id);
+                    exportDataAsJSON();
+                  }}
                 >
                   <FiBrtrash width={20} height={20} fill="#fecaca" />
                 </Pressable>

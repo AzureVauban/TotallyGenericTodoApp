@@ -1,3 +1,4 @@
+import { playInvalidSound } from "../utils/playInvalidSound";
 import { colors } from "@theme/colors";
 import React, { useState, useEffect } from "react";
 import { generateUsername } from "../utils/generateUsername";
@@ -18,13 +19,11 @@ import { PanGestureHandler } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "@theme/ThemeContext";
 import { useFocusEffect } from "@react-navigation/native";
-import { playInvalidSound } from "../utils/playInvalidSound";
 
 const styles = StyleSheet.create({
   screenbackground: {
     flex: 1,
-    backgroundColor: colors.dark.primary,
-    color: colors.dark.primary,
+    // backgroundColor and color will be set via isDark in component
     justifyContent: "center",
     alignItems: "center",
   },
@@ -32,7 +31,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: colors.dark.primary,
+    // backgroundColor will be set via isDark in component
   },
   content: {
     width: "80%",
@@ -42,16 +41,16 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
-    color: colors.dark.text,
+    // color will be set via isDark in component
   },
   subtitle: {
     fontSize: 16,
-    color: colors.light.text,
+    // color will be set via isDark in component
     marginBottom: 20,
     fontWeight: "bold",
   },
   button: {
-    backgroundColor: colors.light.primary,
+    // backgroundColor will be set via isDark in component
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -60,7 +59,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   buttonText: {
-    color: colors.light.text,
+    // color will be set via isDark in component
     fontWeight: "bold",
   },
   buttonSecondary: {
@@ -105,6 +104,8 @@ const styles = StyleSheet.create({
  */
 
 export default function SignUpScreen() {
+  console.log(`Current file name: registerAccount`);
+
   const router = useRouter();
   const navigation = useNavigation();
 
@@ -153,8 +154,8 @@ export default function SignUpScreen() {
           styles.screenbackground,
           {
             backgroundColor: isDark
-              ? colors.dark.background
-              : colors.light.background,
+              ? colors.light.primary
+              : colors.dark.primary,
           },
         ]}
       >
@@ -172,7 +173,7 @@ export default function SignUpScreen() {
             <Text
               style={[
                 styles.title,
-                { color: isDark ? colors.dark.accent : colors.light.accent },
+                { color: isDark ? colors.light.accent : colors.dark.accent },
               ]}
             >
               Register
@@ -180,7 +181,7 @@ export default function SignUpScreen() {
             <Text
               style={[
                 styles.subtitle,
-                { color: isDark ? colors.dark.text : colors.light.text },
+                { color: isDark ? colors.light.text : colors.dark.text },
               ]}
             >
               Create your account
@@ -197,22 +198,22 @@ export default function SignUpScreen() {
                   fontWeight: "700",
                   backgroundColor: usernameValid
                     ? isDark
-                      ? colors.dark.background
-                      : colors.light.background
+                      ? colors.light.primary
+                      : colors.dark.primary
                     : "#450a0a",
                   color:
                     username === initialUsername
                       ? isDark
-                        ? colors.dark.yellowbutton_text_icon
-                        : colors.light.yellowbutton_text_icon
+                        ? colors.light.yellowbutton_text_icon
+                        : colors.dark.yellowbutton_text_icon
                       : isDark
-                      ? colors.dark.text
-                      : colors.light.text,
+                      ? colors.light.text
+                      : colors.dark.text,
                 },
               ]}
               placeholder="Username"
               placeholderTextColor={
-                isDark ? colors.dark.text : colors.light.text
+                isDark ? colors.light.text : colors.dark.text
               }
               value={username}
               onChangeText={(t) => {
@@ -224,8 +225,8 @@ export default function SignUpScreen() {
               style={{
                 height: 1,
                 backgroundColor: isDark
-                  ? colors.dark.tertiary
-                  : colors.light.tertiary,
+                  ? colors.light.tertiary
+                  : colors.dark.tertiary,
               }}
             />
 
@@ -237,15 +238,15 @@ export default function SignUpScreen() {
                   fontWeight: "700",
                   backgroundColor: passwordValid
                     ? isDark
-                      ? colors.dark.background
-                      : colors.light.background
+                      ? colors.light.primary
+                      : colors.dark.primary
                     : "#450a0a",
-                  color: isDark ? colors.dark.primary : colors.dark.text,
+                  color: isDark ? colors.light.text : colors.dark.text,
                 },
               ]}
               placeholder="Password"
               placeholderTextColor={
-                isDark ? colors.dark.text : colors.light.text
+                isDark ? colors.light.text : colors.dark.text
               }
               secureTextEntry
               value={password}
@@ -258,8 +259,8 @@ export default function SignUpScreen() {
               style={{
                 height: 1,
                 backgroundColor: isDark
-                  ? colors.dark.tertiary
-                  : colors.light.tertiary,
+                  ? colors.light.tertiary
+                  : colors.dark.tertiary,
               }}
             />
 
@@ -271,15 +272,15 @@ export default function SignUpScreen() {
                   fontWeight: "700",
                   backgroundColor: emailValid
                     ? isDark
-                      ? colors.dark.background
-                      : colors.light.background
+                      ? colors.light.primary
+                      : colors.dark.primary
                     : "#450a0a",
-                  color: isDark ? colors.dark.primary : colors.dark.text,
+                  color: isDark ? colors.light.text : colors.dark.text,
                 },
               ]}
               placeholder="Email"
               placeholderTextColor={
-                isDark ? colors.dark.text : colors.light.text
+                isDark ? colors.light.text : colors.dark.text
               }
               value={email}
               onChangeText={(t) => {
@@ -292,8 +293,8 @@ export default function SignUpScreen() {
               style={{
                 height: 1,
                 backgroundColor: isDark
-                  ? colors.dark.tertiary
-                  : colors.light.tertiary,
+                  ? colors.light.tertiary
+                  : colors.dark.tertiary,
               }}
             />
 
@@ -305,15 +306,15 @@ export default function SignUpScreen() {
                   fontWeight: "700",
                   backgroundColor: phoneValid
                     ? isDark
-                      ? colors.dark.background
-                      : colors.light.background
+                      ? colors.light.primary
+                      : colors.dark.primary
                     : "#450a0a",
-                  color: isDark ? colors.dark.primary : colors.dark.text,
+                  color: isDark ? colors.light.text : colors.dark.text,
                 },
               ]}
               placeholder="Phone Number"
               placeholderTextColor={
-                isDark ? colors.dark.text : colors.light.text
+                isDark ? colors.light.text : colors.dark.text
               }
               keyboardType="phone-pad"
               value={phone}
@@ -331,8 +332,8 @@ export default function SignUpScreen() {
               sharedButtonStyle as ViewStyle,
               {
                 backgroundColor: isDark
-                  ? colors.dark.purplebutton_background
-                  : colors.light.purplebutton_background,
+                  ? colors.light.purplebutton_background
+                  : colors.dark.purplebutton_background,
                 alignSelf: "center",
                 marginTop: 20,
               },
@@ -354,8 +355,8 @@ export default function SignUpScreen() {
                 isUsernameValid &&
                 isPasswordValid
               ) {
-                console.log("Navigating to verificationMethod");
-                router.replace("/verificationMethod");
+                // Registration logic removed; just show alert for now.
+                alert("Registration failed. Please try again.");
               } else {
                 playInvalidSound();
               }
@@ -364,13 +365,42 @@ export default function SignUpScreen() {
             <Text
               style={{
                 color: isDark
-                  ? colors.dark.purplebutton_text_icon
-                  : colors.light.purplebutton_text_icon,
+                  ? colors.light.purplebutton_text_icon
+                  : colors.dark.purplebutton_text_icon,
                 fontSize: 16,
                 textAlign: "center",
               }}
             >
               Register Account
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              sharedButtonStyle as ViewStyle,
+              {
+                backgroundColor: isDark
+                  ? colors.light.bluebutton_background
+                  : colors.dark.bluebutton_background,
+                alignSelf: "center",
+                marginTop: 10,
+              },
+            ]}
+            onPress={() => {
+              const newGeneratedUsername = generateUsername();
+              setUsername(newGeneratedUsername);
+              setInitialUsername(newGeneratedUsername);
+            }}
+          >
+            <Text
+              style={{
+                color: isDark
+                  ? colors.light.bluebutton_text_icon
+                  : colors.dark.bluebutton_text_icon,
+                fontSize: 16,
+                textAlign: "center",
+              }}
+            >
+              Generate Username
             </Text>
           </TouchableOpacity>
         </ScrollView>

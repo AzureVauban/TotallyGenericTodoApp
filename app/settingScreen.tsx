@@ -91,7 +91,7 @@ export function RedirectToLogin() {
     const timeout = setTimeout(() => {
       if (!isUserLoggedIn) {
         console.log("USER REDIRECTED TO LOGIN FROM SETTINGS");
-        router.replace("/loginScreen");
+        router.replace("/greetScreen");
       } else {
         router.replace("/home");
       }
@@ -244,7 +244,7 @@ export default function SettingsScreen() {
           ]}
           onPress={() => {
             console.log("USER LOGGED OUT");
-            router.push("/loginScreen");
+            router.push("/greetScreen");
           }}
         >
           <FiBrAddressCard

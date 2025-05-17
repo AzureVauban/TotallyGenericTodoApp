@@ -339,7 +339,8 @@ const styles = StyleSheet.create({
 export default function HomeScreen() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const { lists, addList, removeList, renameList } = useTasks();
+  const { lists, addList, removeList, renameList, exportDataAsJSON } =
+    useTasks();
 
   // Add-list modal state
   const [addModalVisible, setAddModalVisible] = useState(false);
@@ -395,6 +396,7 @@ export default function HomeScreen() {
 
   useFocusEffect(
     React.useCallback(() => {
+      exportDataAsJSON();
       hasNavigated.current = false;
       // no-op for theme
     }, [theme])
@@ -418,6 +420,7 @@ export default function HomeScreen() {
           <View style={homeScreenStyles.taskGroupRow}>
             <Link
               href="/taskLists/taskGroups/scheduledTasks"
+              onPress={() => exportDataAsJSON()}
               style={[
                 homeScreenStyles.taskGroupButton,
                 {
@@ -440,6 +443,7 @@ export default function HomeScreen() {
             </Link>
             <Link
               href="/taskLists/taskGroups/allTasks"
+              onPress={() => exportDataAsJSON()}
               style={[
                 homeScreenStyles.taskGroupButton,
                 {
@@ -464,6 +468,7 @@ export default function HomeScreen() {
           <View style={homeScreenStyles.taskGroupRow}>
             <Link
               href="/taskLists/taskGroups/flaggedTasks"
+              onPress={() => exportDataAsJSON()}
               style={[
                 homeScreenStyles.taskGroupButton,
                 {
@@ -486,6 +491,7 @@ export default function HomeScreen() {
             </Link>
             <Link
               href="/taskLists/taskGroups/completedTasks"
+              onPress={() => exportDataAsJSON()}
               style={[
                 homeScreenStyles.taskGroupButton,
                 {
@@ -544,6 +550,7 @@ export default function HomeScreen() {
                               onPress: () => {
                                 removeList(item.id);
                                 playRemoveSound();
+                                exportDataAsJSON();
                               },
                             },
                           ]
@@ -599,9 +606,10 @@ export default function HomeScreen() {
                           : colors.light.primary,
                       },
                     ]}
-                    onPress={() =>
-                      router.push(`/taskLists/${item.name}` as const)
-                    }
+                    onPress={() => {
+                      exportDataAsJSON();
+                      router.push(`/taskLists/${item.name}` as const);
+                    }}
                   >
                     <Text
                       style={[
@@ -675,8 +683,8 @@ export default function HomeScreen() {
                 styles.modalContent,
                 {
                   backgroundColor: isDark
-                    ? colors.dark.bluebutton_background
-                    : colors.light.bluebutton_background,
+                    ? colors.dark.secondary
+                    : colors.dark.secondary,
                 },
               ]}
             >
@@ -711,7 +719,7 @@ export default function HomeScreen() {
               <Pressable
                 style={[
                   styles.modalButton,
-                  { backgroundColor: colors.dark.tertiary },
+                  { backgroundColor: colors.dark.primary },
                 ]}
                 onPress={() => {
                   setAddModalVisible(false);
@@ -726,8 +734,8 @@ export default function HomeScreen() {
                   styles.modalButton,
                   {
                     backgroundColor: isDark
-                      ? colors.dark.purplebutton_background
-                      : colors.light.purplebutton_background,
+                      ? colors.dark.primary
+                      : colors.light.primary,
                   },
                 ]}
                 onPress={() => {
@@ -744,6 +752,7 @@ export default function HomeScreen() {
                   }
                   if (trimmedName) {
                     addList(trimmedName);
+                    exportDataAsJSON();
                     setNewListName("");
                     setDuplicateError(false);
                     setAddModalVisible(false);
@@ -793,8 +802,8 @@ export default function HomeScreen() {
                   styles.modalButton,
                   {
                     backgroundColor: isDark
-                      ? colors.dark.bluebutton_background
-                      : colors.light.bluebutton_background,
+                      ? colors.dark.primary
+                      : colors.light.primary,
                   },
                 ]}
                 onPress={() => {
@@ -822,8 +831,8 @@ export default function HomeScreen() {
                     styles.modalButtonText,
                     {
                       color: isDark
-                        ? colors.dark.bluebutton_text_icon
-                        : colors.light.bluebutton_text_icon,
+                        ? colors.dark.primary
+                        : colors.light.primary,
                     },
                   ]}
                 >

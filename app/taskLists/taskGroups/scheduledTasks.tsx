@@ -28,12 +28,13 @@ interface TaskItem {
 export default function ScheduledTasks() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const { tasks, removeTask, exportDataAsJSON } = useTasks();
   useFocusEffect(
     React.useCallback(() => {
+      exportDataAsJSON();
       // no-op, but ensures re-render on theme change
     }, [theme])
   );
-  const { tasks, removeTask } = useTasks();
   const today = new Date();
   const visibleTasks = tasks.filter((t) => {
     if (t.recentlyDeleted) return false;
@@ -82,7 +83,10 @@ export default function ScheduledTasks() {
                     styles.inlineButton,
                     { backgroundColor: colors.dark.accent },
                   ]}
-                  onPress={() => removeTask(item.id)}
+                  onPress={() => {
+                    removeTask(item.id);
+                    exportDataAsJSON();
+                  }}
                 >
                   <FiBrtrash
                     width={20}

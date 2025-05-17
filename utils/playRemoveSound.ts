@@ -1,5 +1,4 @@
-import { Audio } from "expo-av";
-
+import { Audio, Video } from 'expo-av';
 let soundObject: Audio.Sound | null = null;
 
 export async function playRemoveSound() {
