@@ -13,6 +13,9 @@ import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "@theme/colors";
 
 const InputCodeScreen = () => {
+  //TODO implement supabase code https://supabase.com/docs/guides/auth/quickstarts/react-native (current on step 5)
+
+  console.log(`Current file name: inputCode()`);
   const { theme } = useTheme();
   const isDark = theme === "dark";
   useFocusEffect(React.useCallback(() => {}, [theme]));

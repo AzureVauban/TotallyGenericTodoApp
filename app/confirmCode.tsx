@@ -31,6 +31,7 @@ import { colors } from "@theme/colors";
  * @returns A React‑Native `SafeAreaView` containing the verification UI.
  */
 export default function PhoneAuthScreen() {
+  console.log(`Current file name: confirmCode()`);
   const [code, setCode] = useState("");
   const router = useRouter();
 

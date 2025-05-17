@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
 
 export default function LoginScreen() {
   console.log(`Current file name: loginScreen`);
-  //TODO https://supabase.com/docs/guides/auth/quickstarts/react-native (current on step 5)
+
 
   const { theme } = useTheme();
   const isDark = theme === "dark";

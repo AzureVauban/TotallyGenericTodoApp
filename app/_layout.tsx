@@ -6,6 +6,7 @@ import { TasksProvider } from "../backend/storage/TasksContext";
 import { ThemeProvider } from "@theme/ThemeContext";
 
 export default function RootLayout() {
+  console.log(`Current file name: _layout()`);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Auth>

@@ -40,6 +40,9 @@ import { colors } from "@theme/colors";
  * @returns A scrollable React‑Native form wrapped in `PanGestureHandler`.
  */
 export default function ResetPassword() {
+  //TODO implement supabase code https://supabase.com/docs/guides/auth/quickstarts/react-native (current on step 5)
+
+  console.log(`Current file name: resetPassword()`);
   const { theme } = useTheme();
   const isDark = theme === "dark";
   useFocusEffect(React.useCallback(() => {}, [theme]));

@@ -108,7 +108,6 @@ const styles = StyleSheet.create({
 
 export default function SignUpScreen() {
   console.log(`Current file name: SignUpScreen`);
-  //TODO https://supabase.com/docs/guides/auth/quickstarts/react-native (current on step 5)
 
   const router = useRouter();
   const navigation = useNavigation();

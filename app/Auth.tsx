@@ -20,6 +20,7 @@ export function useAuth(): AuthContextType {
 }
 
 export default function Auth({ children }: { children: React.ReactNode }) {
+  console.log(`Current file name: Auth()`);
   const router = useRouter();
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);

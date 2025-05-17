@@ -64,3 +64,6 @@ assets/soundeffects/
 .env.local
 *.sh
 *.txt
+# Unignore email-templates HTML files
+!email-templates/
+!email-templates/*.html
