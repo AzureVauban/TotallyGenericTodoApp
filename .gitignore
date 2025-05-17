@@ -67,3 +67,4 @@ assets/soundeffects/
 # Unignore email-templates HTML files
 !email-templates/
 !email-templates/*.html
+.gradle

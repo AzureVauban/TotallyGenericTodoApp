@@ -54,6 +54,7 @@
     "react-native-dotenv": "^3.4.11",
     "react-native-draggable-flatlist": "^4.0.3",
     "react-native-gesture-handler": "^2.25.0",
+    "react-native-python": "^0.0.0",
     "react-native-reanimated": "^3.17.5",
     "react-native-safe-area-context": "^5.4.0",
     "react-native-screens": "^4.10.0",

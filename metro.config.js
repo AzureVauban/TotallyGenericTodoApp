@@ -16,3 +16,14 @@ module.exports = (() => {
   return config;
 })();
 // metro.config.js
+
+module.exports = {
+  dependencies: {
+    "react-native-python": {
+      platforms: {
+        ios: null,
+        android: null,
+      },
+    },
+  },
+};
