@@ -358,28 +358,36 @@ export default function SignUpScreen() {
                 isUsernameValid &&
                 isPasswordValid
               ) {
-            // Check username uniqueness
-            (async () => {
-              const { data: existing, error: existingError } = await supabase
-                .from("profiles")
-                .select("id")
-                .eq("username", username)
-                .limit(1)
-                .maybeSingle();
-              if (existing) {
-                console.error("Username already taken. Please choose another.");
-                return;
-              }
-              // Sign up with Supabase
-              const { data, error } = await supabase.auth.signUp({ email, password });
-              if (error) {
-                Alert.alert("Error signing up", error.message);
-                return;
-              }
-              // Insert profile record
-              await supabase.from("profiles").insert({ id: data.user?.id, username, phone });
-              router.replace("/verificationMethod");
-            })();
+                // Check username uniqueness
+                (async () => {
+                  const { data: existing, error: existingError } =
+                    await supabase
+                      .from("profiles")
+                      .select("id")
+                      .eq("username", username)
+                      .limit(1)
+                      .maybeSingle();
+                  if (existing) {
+                    console.error(
+                      "Username already taken. Please choose another."
+                    );
+                    return;
+                  }
+                  // Sign up with Supabase
+                  const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                  });
+                  if (error) {
+                    Alert.alert("Error signing up", error.message);
+                    return;
+                  }
+                  // Insert profile record
+                  await supabase
+                    .from("profiles")
+                    .insert({ id: data.user?.id, username, phone });
+                  router.replace("/verificationMethod");
+                })();
               } else {
                 playInvalidSound();
               }

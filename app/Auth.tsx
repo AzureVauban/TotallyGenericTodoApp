@@ -46,7 +46,7 @@ export default function Auth({ children }: { children: React.ReactNode }) {
       if (event === "SIGNED_IN") {
         router.replace("/home");
       } else if (event === "SIGNED_OUT") {
-        router.replace("/loginScreen");
+        router.replace("/greetScreen");
       }
     });
     return () => subscription.unsubscribe();
