@@ -1,7 +1,6 @@
-Project Directory:
-
 app/
 ├── _layout.tsx
+├── Auth.tsx
 ├── confirmCode.tsx
 ├── confirmPassword.tsx
 ├── EmailAuthScreen.tsx
@@ -26,17 +25,14 @@ app/
 │   ├── samplecolors.log
 │   └── ThemeContext.tsx
 └── verificationMethod.tsx
-
 backend/
 └── storage
     ├── TasksContext.tsx
     ├── tasksStorage.ts
     └── types.ts
-
 lib/
 ├── supabaseClient.ts
 └── utils.ts
-
 utils/
 ├── generateUsername.ts
 ├── playCompleteSound.ts
@@ -46,8 +42,16 @@ utils/
 ├── playRemoveSound.ts
 ├── playRenameSound.ts
 └── playUnflaggedSound.ts
-
 supabase/
 ├── config.toml
 └── migrations
     └── 20250516005607_create_profiles_table.sql
+docs/
+├── application-overview.md
+└── project-structure.md
+email-templates/
+├── change-email-address-template.html
+├── confirm-reauthentication-template.html
+├── confirm-signup-template.html
+├── magic-link-template.html
+└── reset-password-template.html
