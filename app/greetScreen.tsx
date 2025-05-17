@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
 export default function GreetScreen() {
   console.log(`Current file name: GreetScreen`);
 
-  const { theme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const isDark = theme === "dark";
   useFocusEffect(React.useCallback(() => {}, [theme]));
 
@@ -132,6 +132,13 @@ export default function GreetScreen() {
           width={250}
           height={250}
           fill={colors.dark.accent}
+          onPress={() => {
+            if (typeof toggleTheme === "function") {
+              toggleTheme();
+            } else {
+              console.warn("toggleTheme is not defined");
+            }
+          }}
         />
         <Text
           style={[
