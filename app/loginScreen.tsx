@@ -18,40 +18,32 @@ export default function LoginScreen() {
   const router = useRouter();
   const { theme } = useTheme();
 
-  /** Validate username & password against Supabase **/
-  const handleSignIn = async () => {
-    if (!username || !password) {
-      console.warn("Username and password are required");
-      return;
-    }
-    const { data: user, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("username", username)
-      .eq("password", password)
-      .single();
-    if (error || !user) {
-      console.warn("Invalid username or password");
-      return;
-    }
-    router.push("/home");
-  };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, { backgroundColor: colors[theme].background }]}
+    >
       <MemberListIcon width={32} height={32} style={styles.icon} />
-      <Text style={styles.title}>Sign In</Text>
-      <Text style={styles.description}>login to your account</Text>
+      <Text style={[styles.title, { color: colors[theme].text }]}>Sign In</Text>
+      <Text style={[styles.description, { color: colors[theme].text }]}>
+        login to your account
+      </Text>
 
       <TextInput
-        style={[styles.input, { borderColor: colors[theme].tertiary }]}
+        style={[
+          styles.input,
+          { borderColor: colors[theme].tertiary, color: colors[theme].text },
+        ]}
         placeholder="Username"
         placeholderTextColor={colors[theme].secondary}
         value={username}
         onChangeText={setUsername}
       />
       <TextInput
-        style={[styles.input, { borderColor: colors[theme].tertiary }]}
+        style={[
+          styles.input,
+          { borderColor: colors[theme].tertiary, color: colors[theme].text },
+        ]}
         placeholder="Password"
         placeholderTextColor={colors[theme].secondary}
         secureTextEntry
@@ -61,13 +53,46 @@ export default function LoginScreen() {
 
       <TouchableOpacity
         style={[styles.button, { backgroundColor: colors[theme].primary }]}
-        onPress={handleSignIn}
+        onPress={async () => {
+          if (!username || !password) {
+            console.warn("Username and password are required.");
+            return;
+          }
+          // Lookup the email using the username
+          const { data: profile, error: profileError } = await supabase
+            .from("profiles")
+            .select("email")
+            .eq("username", username)
+            .maybeSingle();
+
+          if (profileError || !profile?.email) {
+            console.warn("Invalid username or account not found.");
+            return;
+          }
+
+          // Sign in with the fetched email
+          const { error: authError } = await supabase.auth.signInWithPassword({
+            email: profile.email,
+            password,
+          });
+
+          if (authError) {
+            console.warn("Login failed:", authError.message);
+          } else {
+            console.log("Login successful!");
+            router.replace("/home");
+          }
+        }}
       >
-        <Text style={styles.buttonText}>Sign In</Text>
+        <Text style={[styles.buttonText, { color: colors[theme].text }]}>
+          Sign In
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => router.push("/resetPassword")}>
-        <Text style={[styles.forgot]}>Forgot your password? Reset it here</Text>
+        <Text style={[styles.forgot, { color: colors[theme].accent }]}>
+          Forgot your password? Reset it here
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -101,6 +126,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginBottom: 12,
     color: "#000",
+    letterSpacing: 0,
   },
   button: {
     width: "100%",

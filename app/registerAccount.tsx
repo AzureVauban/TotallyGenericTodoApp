@@ -341,7 +341,7 @@ export default function SignUpScreen() {
                 marginTop: 20,
               },
             ]}
-            onPress={() => {
+            onPress={async () => {
               const isEmailValid = validateEmail(email);
               const isPhoneValid = validatePhone(phone);
               const isUsernameValid = username.trim().length > 0;
@@ -358,36 +358,85 @@ export default function SignUpScreen() {
                 isUsernameValid &&
                 isPasswordValid
               ) {
-                // Check username uniqueness
-                (async () => {
-                  const { data: existing, error: existingError } =
-                    await supabase
-                      .from("profiles")
-                      .select("id")
-                      .eq("username", username)
-                      .limit(1)
-                      .maybeSingle();
-                  if (existing) {
-                    console.error(
-                      "Username already taken. Please choose another."
-                    );
-                    return;
-                  }
-                  // Sign up with Supabase
-                  const { data, error } = await supabase.auth.signUp({
-                    email,
-                    password,
+                // Check if username already exists
+                const { data: existing, error: existingError } = await supabase
+                  .from("profiles")
+                  .select("id")
+                  .eq("username", username)
+                  .maybeSingle();
+
+                if (existing) {
+                  console.error("Username already taken. Please choose another.");
+                  return;
+                }
+
+                // Create user with username and password
+                const { data, error } = await supabase.auth.signUp({
+                  email,
+                  password,
+                });
+
+                if (error) {
+                  Alert.alert("Error signing up", error.message);
+                  return;
+                }
+
+                // Enhanced insert logic for profiles with logging and fallback
+                console.log("Attempting insert with user ID:", data.user?.id);
+
+                // Insert profile record
+                const { error: insertError } = await supabase
+                  .from("profiles")
+                  .insert({
+                    id: data.user?.id,
+                    username,
+                    display_name: username,
+                    phone,
                   });
-                  if (error) {
-                    Alert.alert("Error signing up", error.message);
-                    return;
-                  }
-                  // Insert profile record
-                  await supabase
+
+                if (insertError) {
+                  console.error("Failed to insert into profiles:", insertError.message);
+
+                  // Fallback attempt if the first insert fails
+                  console.warn("Retrying insert into profiles...");
+
+                  const { error: retryError } = await supabase
                     .from("profiles")
-                    .insert({ id: data.user?.id, username, phone });
-                  router.replace("/verificationMethod");
-                })();
+                    .insert({
+                      id: data.user?.id,
+                      username,
+                      display_name: username,
+                      phone,
+                    });
+
+                  if (retryError) {
+                    console.error("Retry failed to insert into profiles:", retryError.message);
+                    console.error("Complete error object:", retryError);
+                    // Additional logging to understand the ID being used
+                    console.warn("Attempted insert with ID:", data.user?.id);
+                    Alert.alert(
+                      "Registration Failed",
+                      "There was an issue creating your profile. Please try again."
+                    );
+                  } else {
+                    console.log("Profile successfully inserted on retry.");
+                  }
+                } else {
+                  console.log("Profile successfully inserted into profiles table");
+                }
+
+                // Log the user in immediately
+                const { error: signInError } = await supabase.auth.signInWithPassword({
+                  email,
+                  password,
+                });
+
+                if (signInError) {
+                  console.warn("Login failed:", signInError.message);
+                } else {
+                  console.log("Registration and Login successful!");
+                  router.replace("/home");
+                }
               } else {
                 playInvalidSound();
               }
