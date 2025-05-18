@@ -149,12 +149,12 @@ export default function SignUpScreen() {
         }
       }
 
-      // Extract the proper tokens
-      const ngrokURL = isNgrok()
+      // Override the site URL for ngrok
+      const redirectURL = isNgrok()
         ? process.env.EXPO_PUBLIC_SITE_URL
         : Linking.createURL("/");
 
-      console.log("🔄 Using ngrok URL for redirect:", ngrokURL);
+      console.log("🔄 Using redirect URL for session setup:", redirectURL);
 
       if (access_token && refresh_token) {
         console.log("🔓 Attempting session setup with tokens...");
