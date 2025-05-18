@@ -6,12 +6,13 @@
     "orientation": "portrait",
     "jsEngine": "hermes", //use EXPO GO INSTEAD
     "icon": "./assets/images/appicon.png",
-    "scheme": "myapp",
+    "scheme": "sussysushi",
+    "platforms": ["ios", "android"],
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.michaelelderazurevauban.DivideNDo",
+      "bundleIdentifier": "com.yourapp.sussySushi",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -21,7 +22,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.michaelelderazurevauban.DivideNDo"
+      "package": "com.yourapp.sussySushi"
     },
     "web": {
       "bundler": "metro",

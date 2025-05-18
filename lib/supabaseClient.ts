@@ -3,8 +3,17 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient } from "@supabase/supabase-js";
 import { AppState } from "react-native";
 
+const isNgrok = (): boolean => {
+  return (
+    process.env.EXPO_PUBLIC_SITE_URL?.includes("ngrok.io") ||
+    process.env.EXPO_PUBLIC_SUPABASE_URL?.includes("ngrok.io")
+  );
+};
+
 export const supabase = createClient(
-  process.env.EXPO_PUBLIC_SUPABASE_URL || "",
+  isNgrok()
+    ? process.env.EXPO_PUBLIC_SITE_URL
+    : process.env.EXPO_PUBLIC_SUPABASE_URL || "",
   process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || "",
   {
     auth: {

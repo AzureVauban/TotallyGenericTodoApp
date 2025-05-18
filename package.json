@@ -12,7 +12,9 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "start:tunnel": "ngrok start --config /Users/michaelelder/Programming/SussySushi/DivideNDo/ngrok.yml dev-tunnel && yarn expo start --tunnel",
+    "poststart": "echo 'Visit the ngrok URL to view your app: $(ngrok url dev-tunnel)'"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",

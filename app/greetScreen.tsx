@@ -4,7 +4,7 @@ import React from "react";
 import { View, TouchableOpacity, Text, Dimensions } from "react-native";
 import { useRouter } from "expo-router";
 import { StyleSheet } from "react-native";
-import FISignatureIcon from "../assets/icons/svg/fi-br-description-alt.svg";
+import FISignatureIcon from "../assets/icons/svg/fi-br-list-check.svg";
 import { colors } from "@theme/colors";
 import { useTheme } from "@theme/ThemeContext";
 import { useFocusEffect } from "@react-navigation/native";

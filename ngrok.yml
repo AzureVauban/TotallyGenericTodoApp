@@ -1,0 +1,7 @@
+version: "2"
+authtoken: 2xFwz9D7ou8Vq1TgWWG9E0lOIMY_2cT1ZVtHvgtX6c3F4XtDB
+tunnels:
+  dev-tunnel:
+    addr: 8081
+    proto: http
+    host_header: "localhost"

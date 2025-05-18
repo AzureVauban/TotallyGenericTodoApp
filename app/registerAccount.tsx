@@ -1,5 +1,12 @@
+const isNgrok = (): boolean => {
+  return (
+    process.env.EXPO_PUBLIC_SITE_URL?.includes("ngrok.io") ||
+    Linking.createURL("/").includes("ngrok.io")
+  );
+};
 import { supabase } from "../lib/supabaseClient";
 import { Alert } from "react-native";
+import * as Linking from "expo-linking";
 import { colors } from "@theme/colors";
 import React, { useState, useEffect } from "react";
 import { generateUsername } from "../utils/generateUsername";
@@ -121,6 +128,67 @@ export default function SignUpScreen() {
       navigation.goBack();
     }
   };
+
+  // Deep link handler for Supabase email verification links
+  useEffect(() => {
+    const handleDeepLink = (event) => {
+      console.log("🔗 Deeplink URL detected:", event.url);
+
+      let { access_token, refresh_token } = Linking.parse(event.url)
+        .queryParams as {
+        access_token?: string;
+        refresh_token?: string;
+      };
+
+      // If running with ngrok, replace exp:// with https://
+      if (isNgrok()) {
+        console.log("🌐 Detected ngrok environment, adjusting URLs...");
+        event.url = event.url.replace("exp://", "https://");
+        if (event.url.includes("ngrok.io")) {
+          console.log("✅ Ngrok URL detected, overriding default behavior.");
+        }
+      }
+
+      // Extract the proper tokens
+      const ngrokURL = isNgrok()
+        ? process.env.EXPO_PUBLIC_SITE_URL
+        : Linking.createURL("/");
+
+      console.log("🔄 Using ngrok URL for redirect:", ngrokURL);
+
+      if (access_token && refresh_token) {
+        console.log("🔓 Attempting session setup with tokens...");
+        supabase.auth
+          .setSession({ access_token, refresh_token })
+          .then(({ error }) => {
+            if (error) {
+              console.error(
+                "❌ Failed to set session from deep link:",
+                error.message
+              );
+            } else {
+              console.log("✅ Session successfully set from deep link.");
+              Alert.alert(
+                "Account Verified",
+                "Your account has been verified. You can now log in."
+              );
+              router.replace("/loginScreen");
+            }
+          });
+      } else {
+        console.warn("⚠️ Missing tokens in deep link:", {
+          access_token,
+          refresh_token,
+        });
+      }
+    };
+
+    const subscription = Linking.addEventListener("url", handleDeepLink);
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   // Shared button style so both buttons have the same width.
   const sharedButtonStyle: TextStyle = {
@@ -366,7 +434,9 @@ export default function SignUpScreen() {
                   .maybeSingle();
 
                 if (existing) {
-                  console.error("Username already taken. Please choose another.");
+                  console.error(
+                    "Username already taken. Please choose another."
+                  );
                   return;
                 }
 
@@ -381,61 +451,43 @@ export default function SignUpScreen() {
                   return;
                 }
 
-                // Enhanced insert logic for profiles with logging and fallback
-                console.log("Attempting insert with user ID:", data.user?.id);
-
-                // Insert profile record
-                const { error: insertError } = await supabase
-                  .from("profiles")
-                  .insert({
-                    id: data.user?.id,
-                    username,
-                    display_name: username,
-                    phone,
-                  });
-
-                if (insertError) {
-                  console.error("Failed to insert into profiles:", insertError.message);
-
-                  // Fallback attempt if the first insert fails
-                  console.warn("Retrying insert into profiles...");
-
-                  const { error: retryError } = await supabase
-                    .from("profiles")
-                    .insert({
-                      id: data.user?.id,
-                      username,
-                      display_name: username,
-                      phone,
-                    });
-
-                  if (retryError) {
-                    console.error("Retry failed to insert into profiles:", retryError.message);
-                    console.error("Complete error object:", retryError);
-                    // Additional logging to understand the ID being used
-                    console.warn("Attempted insert with ID:", data.user?.id);
-                    Alert.alert(
-                      "Registration Failed",
-                      "There was an issue creating your profile. Please try again."
-                    );
-                  } else {
-                    console.log("Profile successfully inserted on retry.");
-                  }
-                } else {
-                  console.log("Profile successfully inserted into profiles table");
+                // Inform the user to check their email for confirmation
+                if (data.user) {
+                  Alert.alert(
+                    "Check your email",
+                    "Please confirm your email address to complete the registration."
+                  );
                 }
 
-                // Log the user in immediately
-                const { error: signInError } = await supabase.auth.signInWithPassword({
-                  email,
-                  password,
-                });
+                // Check for session immediately after sign-up
+                const { data: sessionData, error: sessionError } =
+                  await supabase.auth.getSession();
 
-                if (signInError) {
-                  console.warn("Login failed:", signInError.message);
+                if (!sessionData?.session) {
+                  console.warn(
+                    "⚠️ Session not found. Attempting to re-login..."
+                  );
+
+                  // Force re-login with password to re-establish the session
+                  const { error: loginError } =
+                    await supabase.auth.signInWithPassword({
+                      email,
+                      password,
+                    });
+
+                  if (loginError) {
+                    console.error("❌ Re-login failed:", loginError.message);
+                    Alert.alert(
+                      "Registration Failed",
+                      "Could not authenticate after sign-up. Please confirm your email and try again."
+                    );
+                    return;
+                  } else {
+                    console.log("✅ Re-login successful.");
+                    // Proceed with inserting the profile
+                  }
                 } else {
-                  console.log("Registration and Login successful!");
-                  router.replace("/home");
+                  // Proceed with inserting the profile
                 }
               } else {
                 playInvalidSound();
