@@ -9,6 +9,9 @@ import {
   View,
 } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
+import { useTheme } from "@theme/ThemeContext";
+import { useFocusEffect } from "@react-navigation/native";
+import { colors } from "@theme/colors";
 
 const homeScreenStyles = StyleSheet.create({
   taskListButton: {
@@ -64,13 +67,26 @@ export default function HomeScreen() {
   const [recentlyDeleted, setRecentlyDeleted] = useState([]);
   const router = useRouter();
 
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  useFocusEffect(React.useCallback(() => {}, [theme]));
+
   // Assume saveTasks is defined elsewhere to persist tasks
   const saveTasks = (newTasks) => {
     // Implementation for saving tasks
   };
 
   return (
-    <View style={{ flex: 1, paddingTop: 50, paddingHorizontal: 12 }}>
+    <View
+      style={[
+        { flex: 1, paddingTop: 50, paddingHorizontal: 12 },
+        {
+          backgroundColor: isDark
+            ? colors.dark.background
+            : colors.light.background,
+        },
+      ]}
+    >
       {tasks.map((item) => (
         <Swipeable
           key={item.id}
@@ -85,7 +101,11 @@ export default function HomeScreen() {
               <Pressable
                 style={[
                   homeScreenStyles.inlineButton,
-                  { backgroundColor: "#D9534F" },
+                  {
+                    backgroundColor: isDark
+                      ? colors.dark.accent
+                      : colors.light.accent,
+                  },
                 ]}
                 onPress={() => {
                   Alert.alert(
@@ -116,7 +136,14 @@ export default function HomeScreen() {
                   );
                 }}
               >
-                <Text style={{ color: "white", fontSize: 14 }}>Delete</Text>
+                <Text
+                  style={{
+                    color: isDark ? colors.dark.text : colors.light.text,
+                    fontSize: 14,
+                  }}
+                >
+                  Delete
+                </Text>
               </Pressable>
             </View>
           )}
@@ -134,7 +161,12 @@ export default function HomeScreen() {
       <TouchableOpacity
         style={[
           homeScreenStyles.taskListButton,
-          { backgroundColor: "#27ae60", justifyContent: "center" },
+          {
+            backgroundColor: isDark
+              ? colors.dark.secondary
+              : colors.light.secondary,
+            justifyContent: "center",
+          },
         ]}
         onPress={() => {
           Alert.prompt(
@@ -166,7 +198,13 @@ export default function HomeScreen() {
           );
         }}
       >
-        <Text style={{ color: "white", fontSize: 24, fontWeight: "bold" }}>
+        <Text
+          style={{
+            color: isDark ? colors.dark.text : colors.light.text,
+            fontSize: 24,
+            fontWeight: "bold",
+          }}
+        >
           +
         </Text>
       </TouchableOpacity>

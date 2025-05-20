@@ -57,3 +57,9 @@ npm-shrinkwrap.json
 assets/uicons-bold-rounded-2.6.0
 assets/icons/svg/
 assets/soundeffects/
+
+# other
+674A53ac6gQM8vx.md
+.env
+.env.local
+*.sh

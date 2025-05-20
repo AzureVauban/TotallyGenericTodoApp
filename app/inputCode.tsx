@@ -1,23 +1,23 @@
+import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
   StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
-import { useNavigation } from "@react-navigation/native";
-
-const COLORS = {
-  dark_primary: "#101010",
-  dark_secondary: "#1A1A1A",
-  dark_tertiary: "#373737",
-  dark_accents: "#F26C4F",
-  dark_subaccents: "#C5C5C5",
-};
+import { useTheme } from "@theme/ThemeContext";
+import { useFocusEffect } from "@react-navigation/native";
+import { colors } from "@theme/colors";
 
 const InputCodeScreen = () => {
+  console.log("User navigated to OTP screen");
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  useFocusEffect(React.useCallback(() => {}, [theme]));
+
   const navigation = useNavigation();
   const [code, setCode] = useState("");
 
@@ -37,42 +37,138 @@ const InputCodeScreen = () => {
 
   return (
     <PanGestureHandler onHandlerStateChange={handleSwipe}>
-      <View style={styles.screenbackground}>
-        <Text style={styles.title}>Type in code</Text>
+      <View
+        style={[
+          styles.screenbackground,
+          {
+            backgroundColor: isDark
+              ? colors.dark.background
+              : colors.light.background,
+          },
+        ]}
+      >
+        <Text
+          style={[
+            styles.title,
+            {
+              color: isDark
+                ? colors.dark.purplebutton_background
+                : colors.dark.purplebutton_background,
+            },
+          ]}
+        >
+          Input your OTP
+        </Text>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            {
+              backgroundColor: isDark
+                ? colors.dark.secondary
+                : colors.light.primary,
+              color: isDark ? colors.dark.text : colors.light.text,
+            },
+          ]}
           maxLength={6}
           keyboardType="numeric"
           value={code}
           editable={false} // This prevents keyboard pop-up but allows state update
           placeholder="------"
-          placeholderTextColor={COLORS.dark_subaccents}
+          placeholderTextColor={
+            isDark ? colors.dark.tertiary : colors.light.tertiary
+          }
         />
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Verify and continue →</Text>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            {
+              backgroundColor: isDark
+                ? colors.dark.accent
+                : colors.light.accent,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.buttonText,
+              { color: isDark ? colors.dark.primary : colors.light.primary },
+            ]}
+          >
+            Verify and continue →
+          </Text>
         </TouchableOpacity>
         <View style={styles.numPad}>
           {[7, 8, 9, 4, 5, 6, 1, 2, 3].map((num) => (
             <TouchableOpacity
               key={num}
-              style={styles.numButton}
+              style={[
+                styles.numButton,
+                {
+                  backgroundColor: isDark
+                    ? colors.dark.tertiary
+                    : colors.light.tertiary,
+                },
+              ]}
               onPress={() => handleNumpadPress(num.toString())}
             >
-              <Text style={styles.numButtonText}>{num}</Text>
+              <Text
+                style={[
+                  styles.numButtonText,
+                  {
+                    color: isDark
+                      ? colors.dark.secondary
+                      : colors.light.primary,
+                  },
+                ]}
+              >
+                {num}
+              </Text>
             </TouchableOpacity>
           ))}
           <TouchableOpacity style={[styles.numButton, styles.emptyButton]} />
           <TouchableOpacity
-            style={styles.numButton}
+            style={[
+              styles.numButton,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.tertiary
+                  : colors.light.tertiary,
+              },
+            ]}
             onPress={() => handleNumpadPress("0")}
           >
-            <Text style={styles.numButtonText}>0</Text>
+            <Text
+              style={[
+                styles.numButtonText,
+                {
+                  color: isDark ? colors.dark.secondary : colors.light.primary,
+                },
+              ]}
+            >
+              0
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.numButton}
+            style={[
+              styles.numButton,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.tertiary
+                  : colors.light.tertiary,
+              },
+            ]}
             onPress={() => handleNumpadPress("⌫")}
           >
-            <Text style={styles.numButtonText}>⌫</Text>
+            <Text
+              style={[
+                styles.numButtonText,
+                {
+                  color: isDark ? colors.dark.secondary : colors.light.primary,
+                },
+              ]}
+            >
+              ⌫
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -83,7 +179,6 @@ const InputCodeScreen = () => {
 const styles = StyleSheet.create({
   screenbackground: {
     flex: 1,
-    backgroundColor: COLORS.dark_primary,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 24,
@@ -91,21 +186,17 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    color: COLORS.dark_accents,
     marginBottom: 16,
   },
   input: {
-    backgroundColor: COLORS.dark_secondary,
     borderRadius: 8,
     padding: 12,
-    color: COLORS.dark_subaccents,
     fontSize: 24,
     textAlign: "center",
     letterSpacing: 8,
     marginBottom: 16,
   },
   button: {
-    backgroundColor: COLORS.dark_accents,
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 8,
@@ -114,7 +205,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   buttonText: {
-    color: COLORS.dark_primary,
     fontSize: 18,
     fontWeight: "bold",
   },
@@ -128,13 +218,11 @@ const styles = StyleSheet.create({
   numButton: {
     width: "28%",
     marginVertical: 8,
-    backgroundColor: COLORS.dark_tertiary,
     paddingVertical: 14,
     alignItems: "center",
     borderRadius: 8,
   },
   numButtonText: {
-    color: COLORS.dark_subaccents,
     fontSize: 22,
     fontWeight: "bold",
   },

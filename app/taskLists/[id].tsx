@@ -1,10 +1,19 @@
+import { useTheme } from "@theme/ThemeContext";
+import { useFocusEffect } from "@react-navigation/native";
+import { colors } from "@theme/colors";
+import { playRemoveSound } from "../../utils/playRemoveSound";
+import { playIndentTasksound } from "../../utils/playIndentTaskSound";
+import { playRenameTaskSound } from "../../utils/playRenameSound";
+import { playFlaggedSound } from "../../utils/playFlaggedSound";
+import { playUnflaggedSound } from "../../utils/playUnflaggedSound";
 // Helper to get tomorrow's date at midnight in mm-dd-yyyy format
 import {
   PanGestureHandler,
   State,
   GestureHandlerGestureEvent,
 } from "react-native-gesture-handler";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { playCompleteSound } from "../../utils/playCompleteSound";
+import { playInvalidSound } from "../../utils/playInvalidSound";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useRef, useEffect, useState } from "react";
 import {
@@ -30,7 +39,7 @@ import FiBrArrowRight from "../../assets/icons/svg/fi-br-arrow-alt-right.svg";
 import FiBrArrowLeft from "../../assets/icons/svg/fi-br-arrow-alt-left.svg";
 import { useTasks } from "../../backend/storage/TasksContext";
 import { Task as ContextTask } from "../../backend/storage/TasksContext";
-
+import { Audio, Video } from "expo-av";
 /**
  * **MyList Screen**
  *
@@ -75,139 +84,17 @@ const getTomorrowMidnight = () => {
 //   "Recently Deleted",
 // ];
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#101010",
-    padding: 20,
-  },
-  title: {
-    fontSize: 22,
-    color: "#fff",
-    marginBottom: 10,
-  },
-  taskItem: {
-    backgroundColor: "#1A1A1A",
-    padding: 15,
-    marginBottom: 5,
-    borderRadius: 8,
-  },
-  taskText: {
-    color: "#fff",
-    fontSize: 16,
-  },
-  indentedTask: {
-    marginLeft: 20,
-  },
-  searchBar: {
-    borderWidth: 1,
-    borderColor: "#555",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginHorizontal: 16,
-    marginTop: 18,
-    color: "#fff",
-    backgroundColor: "#1A1A1A",
-    fontSize: 16,
-  },
-  listTitleWrapper: {
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  listTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#4A90E2",
-    marginTop: 25,
-  },
-  scrollContainer: {
-    flex: 1,
-    paddingHorizontal: 10,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#444",
-    marginVertical: 10,
-    width: 300,
-    alignSelf: "center",
-  },
-  addTaskButton: {
-    backgroundColor: "#2563eb",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    marginVertical: 16,
-    marginHorizontal: 16,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  addTaskButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "#1A1A1A",
-    padding: 20,
-    borderRadius: 12,
-    width: "80%",
-  },
-  modalTitle: {
-    color: "#fff",
-    fontSize: 18,
-    marginBottom: 12,
-    fontWeight: "bold",
-  },
-  modalInput: {
-    borderWidth: 1,
-    borderColor: "#555",
-    color: "#fff",
-    padding: 8,
-    borderRadius: 6,
-    marginBottom: 12,
-  },
-  // Inserted color picker styles here
-  colorPickerContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    marginBottom: 12,
-  },
-  colorSwatch: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    margin: 4,
-  },
-  modalButton: {
-    backgroundColor: "#2563eb",
-    padding: 12,
-    borderRadius: 6,
-    marginBottom: 8,
-    alignItems: "center",
-  },
-  modalButtonText: {
-    color: "#fff",
-    fontSize: 16,
-  },
-  inlineButton: {
-    justifyContent: "center",
-    alignItems: "center",
-    width: 50,
-    height: "100%",
-    alignSelf: "stretch",
-    margin: 0,
-    borderRadius: 8,
-  },
-});
+import { styles } from "../theme/styles";
 
 export default function MyList() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  useFocusEffect(
+    React.useCallback(() => {
+      exportDataAsJSON();
+      // no-op, but ensures re-render on theme change
+    }, [theme])
+  );
   const router = useRouter();
   const hasNavigated = useRef(false);
   const { id } = useLocalSearchParams();
@@ -224,6 +111,7 @@ export default function MyList() {
     flagTask,
     indentTask,
     reorderTasks: reorderTask,
+    exportDataAsJSON,
   } = useTasks();
 
   // Handler for flagging a task using context method
@@ -333,7 +221,7 @@ export default function MyList() {
     const translationX = event.nativeEvent.translationX as number;
 
     // Left-swipe (>100px to the left) → Home
-    if (translationX > -100 && !hasNavigated.current) {
+    if (translationX > 100 && !hasNavigated.current) {
       hasNavigated.current = true;
       console.log(`USER: ${listId} <= HOME`);
       router.push("/home");
@@ -356,9 +244,29 @@ export default function MyList() {
 
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent}>
-      <View style={styles.container}>
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor: isDark
+              ? colors.dark.background
+              : colors.light.background,
+          },
+        ]}
+      >
         <View style={styles.listTitleWrapper}>
-          <Text style={styles.listTitle}>{listId}</Text>
+          <Text
+            style={[
+              styles.listTitle,
+              {
+                color: isDark
+                  ? colors.dark.bluebutton_background
+                  : colors.light.bluebutton_background,
+              },
+            ]}
+          >
+            {listId}
+          </Text>
         </View>
 
         <DraggableFlatList
@@ -385,7 +293,11 @@ export default function MyList() {
                     <Pressable
                       style={[
                         styles.inlineButton,
-                        { backgroundColor: "rgb(67,56,202)" },
+                        {
+                          backgroundColor: isDark
+                            ? colors.dark.purplebutton_background
+                            : colors.light.purplebutton_background,
+                        },
                       ]}
                       onPress={() => {
                         setSelectedTask(item);
@@ -395,18 +307,27 @@ export default function MyList() {
                         setDetailColor(item.buttonColor ?? "");
                         setDetailDesc(item.title);
                         setDetailModalVisible(true);
+                        exportDataAsJSON();
                       }}
                     >
                       <FiBrsettings
                         width={20}
                         height={20}
-                        fill="rgb(165,180,252)"
+                        fill={
+                          isDark
+                            ? colors.dark.purplebutton_text_icon
+                            : colors.light.purplebutton_text_icon
+                        }
                       />
                     </Pressable>
                     <Pressable
                       style={[
                         styles.inlineButton,
-                        { backgroundColor: "#7f1d1d" },
+                        {
+                          backgroundColor: isDark
+                            ? colors.dark.redbutton_background
+                            : colors.light.redbutton_background,
+                        },
                       ]}
                       onPress={() => {
                         Alert.alert(
@@ -417,14 +338,25 @@ export default function MyList() {
                             {
                               text: "Delete",
                               style: "destructive",
-                              onPress: () =>
-                                moveToRecentlyDeleted(item.id, listId),
+                              onPress: () => {
+                                playRemoveSound();
+                                moveToRecentlyDeleted(item.id, listId);
+                                exportDataAsJSON();
+                              },
                             },
                           ]
                         );
                       }}
                     >
-                      <FiBrtrash width={20} height={20} fill="#fecaca" />
+                      <FiBrtrash
+                        width={20}
+                        height={20}
+                        fill={
+                          isDark
+                            ? colors.dark.redbutton_text_icon
+                            : colors.light.redbutton_text_icon
+                        }
+                      />
                     </Pressable>
                   </View>
                 )}
@@ -439,49 +371,95 @@ export default function MyList() {
                     <Pressable
                       style={[
                         styles.inlineButton,
-                        { backgroundColor: "#fbbf24" },
+                        {
+                          backgroundColor: isDark
+                            ? colors.dark.yellowbutton_background
+                            : colors.light.yellowbutton_background,
+                        },
                       ]}
-                      onPress={() => handleFlagToggle(item.id)}
+                      onPress={() => {
+                        const wasFlagged = item.flagged;
+                        handleFlagToggle(item.id);
+                        if (!wasFlagged) {
+                          playFlaggedSound();
+                        } else {
+                          playUnflaggedSound();
+                        }
+                        exportDataAsJSON();
+                      }}
                     >
                       <FiBrflagAlt
                         width={20}
                         height={20}
-                        fill={item.flagged ? "#b45309" : "#fde68a"}
+                        fill={
+                          isDark
+                            ? colors.dark.yellowbutton_text_icon
+                            : colors.light.yellowbutton_text_icon
+                        }
                       />
                     </Pressable>
                     <Pressable
                       style={[
                         styles.inlineButton,
-                        { backgroundColor: "#93c5fd" },
+                        {
+                          backgroundColor: isDark
+                            ? colors.dark.bluebutton_background
+                            : colors.light.bluebutton_background,
+                        },
                       ]}
                       onPress={() => {
                         setRenameTaskId(item.id);
                         setRenameText(item.title);
                         setRenameModalVisible(true);
+                        exportDataAsJSON();
                       }}
                     >
-                      <FiBredit width={20} height={20} fill="#2563eb" />
+                      <FiBredit
+                        width={20}
+                        height={20}
+                        fill={
+                          isDark
+                            ? colors.dark.bluebutton_text_icon
+                            : colors.light.bluebutton_text_icon
+                        }
+                      />
                     </Pressable>
                     {/* Indent/Outdent button for non-special lists */}
                     {activeIndex >= 0 && (
                       <Pressable
                         style={[
                           styles.inlineButton,
-                          { backgroundColor: "rgb(16, 185, 129)" },
+                          {
+                            backgroundColor: isDark
+                              ? colors.dark.greenbutton_background
+                              : colors.light.greenbutton_background,
+                          },
                         ]}
-                        onPress={() => handleIndentById(item.id)}
+                        onPress={() => {
+                          playIndentTasksound();
+                          handleIndentById(item.id);
+                          exportDataAsJSON();
+                        }}
                       >
                         {item.indent === 1 ? (
                           <FiBrArrowLeft
                             width={20}
                             height={20}
-                            fill="rgb(167, 243, 208)"
+                            fill={
+                              isDark
+                                ? colors.dark.greenbutton_text_icon
+                                : colors.light.greenbutton_text_icon
+                            }
                           />
                         ) : (
                           <FiBrArrowRight
                             width={20}
                             height={20}
-                            fill="rgb(167, 243, 208)"
+                            fill={
+                              isDark
+                                ? colors.dark.greenbutton_text_icon
+                                : colors.light.greenbutton_text_icon
+                            }
                           />
                         )}
                       </Pressable>
@@ -512,7 +490,12 @@ export default function MyList() {
                         return;
                       }
                     }
+                    const willComplete = !item.completed;
                     toggleTask(item.id);
+                    if (willComplete) {
+                      playCompleteSound();
+                    }
+                    exportDataAsJSON();
                   }}
                   onLongPress={() => {
                     // Default: start drag for reordering
@@ -524,23 +507,32 @@ export default function MyList() {
                       styles.taskItem,
                       item.indent === 1 && styles.indentedTask,
                       item.completed
-                        ? { backgroundColor: "#2d2d2d" }
+                        ? { backgroundColor: colors.dark.secondary }
                         : item.buttonColor
                         ? { backgroundColor: item.buttonColor }
-                        : {},
+                        : {
+                            backgroundColor: isDark
+                              ? colors.dark.primary
+                              : colors.light.accent,
+                          },
                     ]}
                   >
                     <Text
                       style={[
                         styles.taskText,
+                        {
+                          color: isDark
+                            ? colors.dark.text
+                            : colors.dark.primary,
+                        },
                         item.completed && {
                           textDecorationLine: "line-through",
-                          color: "#888",
+                          color: colors.dark.tertiary,
                         },
                         item.indent === 1 &&
                           item.completed && {
                             textDecorationLine: "line-through",
-                            color: "#888",
+                            color: colors.dark.tertiary,
                           },
                       ]}
                     >
@@ -560,18 +552,26 @@ export default function MyList() {
               data={completedTasks}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <Pressable onPress={() => toggleTask(item.id)}>
+                <Pressable
+                  onPress={() => {
+                    toggleTask(item.id);
+                    exportDataAsJSON();
+                  }}
+                >
                   <View
                     style={[
                       styles.taskItem,
                       item.indent === 1 && styles.indentedTask,
-                      { backgroundColor: "#2d2d2d" },
+                      { backgroundColor: colors.dark.secondary },
                     ]}
                   >
                     <Text
                       style={[
                         styles.taskText,
-                        { textDecorationLine: "line-through", color: "#888" },
+                        {
+                          textDecorationLine: "line-through",
+                          color: colors.dark.tertiary,
+                        },
                       ]}
                     >
                       {item.title}
@@ -585,10 +585,28 @@ export default function MyList() {
 
         {/* Only show add task button (always, since only regular lists) */}
         <TouchableOpacity
-          style={styles.addTaskButton}
+          style={[
+            styles.addTaskButton,
+            {
+              backgroundColor: isDark
+                ? colors.dark.bluebutton_background
+                : colors.light.bluebutton_background,
+            },
+          ]}
           onPress={() => setNewTaskModalVisible(true)}
         >
-          <Text style={styles.addTaskButtonText}>+ Add Task</Text>
+          <Text
+            style={[
+              styles.addTaskButtonText,
+              {
+                color: isDark
+                  ? colors.dark.bluebutton_text_icon
+                  : colors.light.bluebutton_text_icon,
+              },
+            ]}
+          >
+            + Add Task
+          </Text>
         </TouchableOpacity>
 
         {/* New Task Modal */}
@@ -600,14 +618,14 @@ export default function MyList() {
                 value={newTaskText}
                 onChangeText={setNewTaskText}
                 placeholder="Task description"
-                placeholderTextColor="#ccc"
+                placeholderTextColor={colors.dark.text}
                 style={[
                   styles.modalInput,
                   newTaskError && { borderColor: "#450a0a" },
                 ]}
               />
               {newTaskError ? (
-                <Text style={{ color: "#450a0a", marginBottom: 8 }}>
+                <Text style={{ color: colors.dark.accent, marginBottom: 8 }}>
                   {newTaskError}
                 </Text>
               ) : null}
@@ -620,6 +638,7 @@ export default function MyList() {
                     return;
                   }
                   if (listTasks.some((t) => t.title.trim() === desc)) {
+                    playInvalidSound();
                     setNewTaskError(
                       "A task with that description already exists."
                     );
@@ -647,7 +666,10 @@ export default function MyList() {
                 <Text style={styles.modalButtonText}>Add</Text>
               </Pressable>
               <Pressable
-                style={[styles.modalButton, { backgroundColor: "#888" }]}
+                style={[
+                  styles.modalButton,
+                  { backgroundColor: colors.dark.tertiary },
+                ]}
                 onPress={() => {
                   setNewTaskText("");
                   setNewTaskError("");
@@ -669,7 +691,7 @@ export default function MyList() {
                 value={renameText}
                 onChangeText={setRenameText}
                 placeholder="Task description"
-                placeholderTextColor="#ccc"
+                placeholderTextColor={colors.dark.text}
                 style={styles.modalInput}
               />
               <Pressable
@@ -680,6 +702,7 @@ export default function MyList() {
                       `Updating task with ID ${renameTaskId} to new text: ${renameText}`
                     );
                     updateTaskText(renameTaskId, renameText);
+                    playRenameTaskSound();
                   }
                   setRenameText("");
                   setRenameTaskId(null);
@@ -689,7 +712,10 @@ export default function MyList() {
                 <Text style={styles.modalButtonText}>Save</Text>
               </Pressable>
               <Pressable
-                style={[styles.modalButton, { backgroundColor: "#888" }]}
+                style={[
+                  styles.modalButton,
+                  { backgroundColor: colors.dark.tertiary },
+                ]}
                 onPress={() => {
                   setRenameText("");
                   setRenameTaskId(null);
@@ -711,7 +737,7 @@ export default function MyList() {
                 value={detailDesc}
                 onChangeText={setDetailDesc}
                 placeholder={selectedTask?.title}
-                placeholderTextColor="rgb(161, 161, 170)"
+                placeholderTextColor={colors.dark.text}
                 style={styles.modalInput}
               />
 
@@ -719,7 +745,7 @@ export default function MyList() {
                 value={detailDate}
                 onChangeText={setDetailDate}
                 placeholder="Scheduled Date"
-                placeholderTextColor="#ccc"
+                placeholderTextColor={colors.dark.text}
                 style={styles.modalInput}
               />
 
@@ -770,7 +796,7 @@ export default function MyList() {
                 value={detailColor}
                 onChangeText={setDetailColor}
                 placeholder="Button Color (hex)"
-                placeholderTextColor="#ccc"
+                placeholderTextColor={colors.dark.text}
                 style={styles.modalInput}
               />
               <Pressable
@@ -791,7 +817,10 @@ export default function MyList() {
                 <Text style={styles.modalButtonText}>Save</Text>
               </Pressable>
               <Pressable
-                style={[styles.modalButton, { backgroundColor: "#888" }]}
+                style={[
+                  styles.modalButton,
+                  { backgroundColor: colors.dark.tertiary },
+                ]}
                 onPress={() => setDetailModalVisible(false)}
               >
                 <Text style={styles.modalButtonText}>Cancel</Text>

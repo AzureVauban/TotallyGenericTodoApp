@@ -5,9 +5,15 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Platform,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useTheme } from "@theme/ThemeContext";
+import { useFocusEffect } from "@react-navigation/native";
+import { colors } from "@theme/colors";
+import { PanGestureHandler, State } from "react-native-gesture-handler";
+import type { PanGestureHandlerGestureEvent } from "react-native-gesture-handler";
 
 /**
  * **VerificationMethod Screen**
@@ -20,8 +26,8 @@ import { useRouter } from "expo-router";
  * * Pressing **Next**:
  *   - If _no_ option is selected, sets an error message (“Please select a
  *     verification method.”) displayed in red beneath the button.
- *   - If **Email** is selected, navigates to `/verifyEmail`.
- *   - If **Phone** is selected, navigates to `/verifyPhone`.
+ *   - If **Email** is selected, navigates to `/EmailAuthScreen`.
+ *   - If **Phone** is selected, navigates to `/PhoneAuthScreen`.
  *
  * ### Visuals
  * * Two rounded boxes show the available methods with icons and sample
@@ -43,70 +49,186 @@ export default function VerificationMethod() {
   >(null);
   const [errorMessage, setErrorMessage] = useState("");
 
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  useFocusEffect(React.useCallback(() => {}, [theme]));
+
+  const onSwipe = ({ nativeEvent }: PanGestureHandlerGestureEvent) => {
+    if (nativeEvent.state === State.END && nativeEvent.translationX > 100) {
+      router.replace("/registerAccount");
+    }
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Verification Method</Text>
-      <Text style={styles.subtitle}>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.
-      </Text>
-
-      <View style={styles.optionsContainer}>
-        <TouchableOpacity
+    <PanGestureHandler onHandlerStateChange={onSwipe}>
+      <SafeAreaView
+        style={[
+          styles.container,
+          {
+            backgroundColor: isDark
+              ? colors.dark.background
+              : colors.light.background,
+          },
+        ]}
+      >
+        <Text
           style={[
-            styles.optionBox,
-            selectedMethod === "email" && {
-              borderColor: "#F26C4F",
-              borderWidth: 2,
+            styles.title,
+            {
+              color: isDark
+                ? colors.dark.purplebutton_background
+                : colors.light.purplebutton_background,
             },
           ]}
-          onPress={() =>
-            setSelectedMethod(selectedMethod === "email" ? null : "email")
-          }
         >
-          <MaterialIcons name="email" size={24} color="#F26C4F" />
-          <Text style={styles.optionTitle}>Email</Text>
-          <Text style={styles.optionInfo}>amanda.samarth@email.com</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.optionBox,
-            selectedMethod === "phone" && {
-              borderColor: "#F26C4F",
-              borderWidth: 2,
-            },
-          ]}
-          onPress={() =>
-            setSelectedMethod(selectedMethod === "phone" ? null : "phone")
-          }
-        >
-          <Ionicons name="call" size={24} color="#F26C4F" />
-          <Text style={styles.optionTitle}>Phone</Text>
-          <Text style={styles.optionInfo}>+62 000-0000-0000</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.footerContainer}>
-        <TouchableOpacity
-          style={styles.nextButton}
-          onPress={() => {
-            if (!selectedMethod) {
-              setErrorMessage("Please select a verification method.");
-            } else {
-              setErrorMessage("");
-              router.replace(
-                selectedMethod === "email" ? "/verifyEmail" : "/verifyPhone"
-              );
-            }
-          }}
-        >
-          <Text style={styles.nextButtonText}>Next</Text>
-        </TouchableOpacity>
-        <Text style={styles.errorMessage}>
-          {errorMessage ? errorMessage : " "}
+          Verification Method
         </Text>
-      </View>
-    </SafeAreaView>
+        <Text
+          style={[
+            styles.subtitle,
+            { color: isDark ? colors.dark.text : colors.light.text },
+          ]}
+        >
+          Choose your desired account verification method
+        </Text>
+
+        <View
+          style={[
+            styles.optionsContainer,
+            Platform.OS === "ios" && { paddingHorizontal: 20 },
+          ]}
+        >
+          <TouchableOpacity
+            style={[
+              styles.optionBox,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.secondary
+                  : colors.dark.secondary,
+              },
+              selectedMethod === "email" && {
+                borderColor: isDark ? colors.dark.accent : colors.light.accent,
+                borderWidth: 2,
+              },
+              Platform.OS === "ios" && { marginBottom: 16 },
+            ]}
+            onPress={() =>
+              setSelectedMethod(selectedMethod === "email" ? null : "email")
+            }
+          >
+            <MaterialIcons
+              name="email"
+              size={24}
+              color={isDark ? colors.dark.accent : colors.light.accent}
+            />
+            <Text
+              style={[
+                styles.optionTitle,
+                { color: isDark ? colors.light.text : colors.light.text },
+              ]}
+            >
+              Email
+            </Text>
+            <Text
+              style={[
+                styles.optionInfo,
+                { color: isDark ? colors.dark.text : colors.light.text },
+              ]}
+            >
+              amanda.samarth@email.com
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.optionBox,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.secondary
+                  : colors.dark.secondary,
+              },
+              selectedMethod === "phone" && {
+                borderColor: isDark ? colors.dark.accent : colors.light.accent,
+                borderWidth: 2,
+              },
+              Platform.OS === "ios" && { marginBottom: 16 },
+            ]}
+            onPress={() =>
+              setSelectedMethod(selectedMethod === "phone" ? null : "phone")
+            }
+          >
+            <Ionicons
+              name="call"
+              size={24}
+              color={isDark ? colors.dark.accent : colors.light.accent}
+            />
+            <Text
+              style={[
+                styles.optionTitle,
+                { color: isDark ? colors.dark.text : colors.light.text },
+              ]}
+            >
+              Phone
+            </Text>
+            <Text
+              style={[
+                styles.optionInfo,
+                { color: isDark ? colors.dark.text : colors.light.text },
+              ]}
+            >
+              +62 000-0000-0000
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.footerContainer}>
+          <TouchableOpacity
+            style={[
+              styles.nextButton,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.purplebutton_background
+                  : colors.light.purplebutton_background,
+              },
+              Platform.OS === "ios" && { marginTop: 24 },
+            ]}
+            onPress={() => {
+              if (!selectedMethod) {
+                setErrorMessage("Please select a verification method.");
+              } else {
+                setErrorMessage("");
+                router.replace(
+                  selectedMethod === "email"
+                    ? "/EmailAuthScreen"
+                    : "/PhoneAuthScreen"
+                );
+              }
+            }}
+          >
+            <Text
+              style={[
+                styles.nextButtonText,
+                {
+                  color: isDark
+                    ? colors.dark.purplebutton_text_icon
+                    : colors.light.purplebutton_text_icon,
+                },
+              ]}
+            >
+              Next
+            </Text>
+          </TouchableOpacity>
+          <Text
+            style={[
+              styles.errorMessage,
+              { color: isDark ? colors.dark.accent : colors.light.accent },
+            ]}
+          >
+            {errorMessage ? errorMessage : " "}
+          </Text>
+        </View>
+      </SafeAreaView>
+    </PanGestureHandler>
   );
 }
 
@@ -122,12 +244,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#fff",
     marginTop: 40,
+    textAlign: "center",
   },
   subtitle: {
     color: "#ccc",
     fontSize: 14,
     marginTop: 10,
     marginBottom: 30,
+    textAlign: "center",
   },
   optionsContainer: {
     flexDirection: "row",

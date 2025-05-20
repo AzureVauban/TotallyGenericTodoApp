@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
 import { useRouter } from "expo-router";
+import { useEffect } from "react";
 /**
  * **IndexRedirect Component**
  *
@@ -27,7 +27,7 @@ export default function IndexRedirect() {
     // Defer navigation to the next tick to ensure layout is mounted
     const timeout = setTimeout(() => {
       if (!isUserLoggedIn) {
-        router.replace("/login");
+        router.replace("/greetScreen");
       } else {
         router.replace("/home");
       }

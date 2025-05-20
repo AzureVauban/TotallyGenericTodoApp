@@ -1,3 +1,6 @@
+import { colors } from "@theme/colors";
+import { useTheme } from "@theme/ThemeContext";
+import { useFocusEffect } from "@react-navigation/native";
 /**
  * Scheduled Screen
  *
@@ -13,6 +16,8 @@ import {
   useTasks,
   Task as ContextTask,
 } from "../../../backend/storage/TasksContext";
+import { styles } from "../../theme/styles";
+
 // Local TaskItem shape
 interface TaskItem {
   id: string;
@@ -23,7 +28,15 @@ interface TaskItem {
 }
 
 export default function ScheduledTasks() {
-  const { tasks, removeTask } = useTasks();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const { tasks, removeTask, exportDataAsJSON } = useTasks();
+  useFocusEffect(
+    React.useCallback(() => {
+      exportDataAsJSON();
+      // no-op, but ensures re-render on theme change
+    }, [theme])
+  );
   const today = new Date();
   const visibleTasks = tasks.filter((t) => {
     if (t.recentlyDeleted) return false;
@@ -37,9 +50,39 @@ export default function ScheduledTasks() {
   });
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Scheduled Tasks</Text>
-      <View style={styles.divider} />
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark
+            ? colors.dark.background
+            : colors.light.background,
+        },
+      ]}
+    >
+      <Text
+        style={[
+          styles.listTitle,
+          {
+            color: isDark
+              ? colors.dark.bluebutton_background
+              : colors.light.bluebutton_background,
+            textAlign: "center",
+          },
+        ]}
+      >
+        {"Scheduled Tasks"}
+      </Text>
+      <View
+        style={[
+          styles.divider,
+          {
+            backgroundColor: isDark
+              ? colors.dark.tertiary
+              : colors.light.tertiary,
+          },
+        ]}
+      />
       <FlatList
         data={visibleTasks}
         keyExtractor={(t) => t.id}
@@ -49,62 +92,53 @@ export default function ScheduledTasks() {
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Pressable
                   style={[styles.inlineButton, { backgroundColor: "#7f1d1d" }]}
-                  onPress={() => removeTask(item.id)}
+                  onPress={() => {
+                    removeTask(item.id);
+                    exportDataAsJSON();
+                  }}
                 >
                   <FiBrtrash width={20} height={20} fill="#fecaca" />
                 </Pressable>
               </View>
             )}
           >
-            <View style={styles.item}>
+            <View
+              style={[
+                styles.taskItem,
+                item.indent === 1 && styles.indentedTask,
+                // Use only styles from styles.ts for taskItem, indentedTask
+                item.completed
+                  ? { backgroundColor: colors.dark.secondary }
+                  : item.buttonColor
+                  ? { backgroundColor: item.buttonColor }
+                  : {
+                      backgroundColor: isDark
+                        ? colors.dark.primary
+                        : colors.light.accent,
+                    },
+              ]}
+            >
               <Text
-                style={[styles.text, item.completed && styles.completedText]}
+                style={[
+                  styles.taskText,
+                  item.completed
+                    ? styles.completedText
+                    : {
+                        color: isDark ? colors.dark.text : colors.dark.primary,
+                      },
+                ]}
               >
                 {item.title}
               </Text>
             </View>
           </Swipeable>
         )}
-        contentContainerStyle={{ backgroundColor: "#101010" }}
+        contentContainerStyle={{
+          backgroundColor: isDark
+            ? colors.dark.background
+            : colors.light.background,
+        }}
       />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#101010" },
-  title: {
-    fontSize: 24,
-    color: "#4A90E2",
-    marginBottom: 10,
-    marginTop: 20,
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  item: {
-    backgroundColor: "#1A1A1A",
-    padding: 15,
-    marginBottom: 6,
-    borderRadius: 8,
-  },
-  text: { color: "#fff", fontSize: 16 },
-  completedText: {
-    color: "#888",
-    textDecorationLine: "line-through",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#444",
-    marginVertical: 10,
-    width: "100%",
-  },
-  inlineButton: {
-    justifyContent: "center",
-    alignItems: "center",
-    width: 50,
-    alignSelf: "stretch",
-    paddingVertical: 15,
-    marginBottom: 6,
-    borderRadius: 8,
-  },
-});
