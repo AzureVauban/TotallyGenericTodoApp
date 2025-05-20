@@ -1,3 +1,4 @@
+<<<<<<< HEAD:app/Lists/[id].tsx
 /**
  * MyList Screen
  *
@@ -22,14 +23,29 @@ import { playIndentTasksound } from "../utils/sounds/playIndentTaskSound";
 import { playRenameTaskSound } from "../utils/sounds/playRenameSound";
 import { playFlaggedSound } from "../utils/sounds/playFlaggedSound";
 import { playUnflaggedSound } from "../utils/sounds/playUnflaggedSound";
+=======
+import { useTheme } from "@theme/ThemeContext";
+import { useFocusEffect } from "@react-navigation/native";
+import { colors } from "@theme/colors";
+import { playRemoveSound } from "../../utils/playRemoveSound";
+import { playIndentTasksound } from "../../utils/playIndentTaskSound";
+import { playRenameTaskSound } from "../../utils/playRenameSound";
+import { playFlaggedSound } from "../../utils/playFlaggedSound";
+import { playUnflaggedSound } from "../../utils/playUnflaggedSound";
+>>>>>>> bcef344 (Squashed commit of the following:):app/taskLists/[id].tsx
 // Helper to get tomorrow's date at midnight in mm-dd-yyyy format
 import {
   PanGestureHandler,
   State,
   GestureHandlerGestureEvent,
 } from "react-native-gesture-handler";
+<<<<<<< HEAD:app/Lists/[id].tsx
 import { playCompleteSound } from "../utils/sounds/playCompleteSound";
 import { playInvalidSound } from "../utils/sounds/playInvalidSound";
+=======
+import { playCompleteSound } from "../../utils/playCompleteSound";
+import { playInvalidSound } from "../../utils/playInvalidSound";
+>>>>>>> bcef344 (Squashed commit of the following:):app/taskLists/[id].tsx
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useRef, useEffect, useState } from "react";
 import {

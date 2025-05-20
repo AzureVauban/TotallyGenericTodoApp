@@ -62,5 +62,9 @@ assets/soundeffects/
 674A53ac6gQM8vx.md
 .env
 .env.local
+<<<<<<< HEAD
 *.sh
 clean.py
+=======
+*.sh
+>>>>>>> bcef344 (Squashed commit of the following:)
