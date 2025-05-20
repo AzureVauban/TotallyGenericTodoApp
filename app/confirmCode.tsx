@@ -10,6 +10,7 @@ import {
 import { useTheme } from "@theme/ThemeContext";
 import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "@theme/colors";
+import { styles } from "../app/theme/styles";
 /**
  * **PhoneAuthScreen Screen**
  *
@@ -212,72 +213,3 @@ export default function PhoneAuthScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#101010",
-    padding: 24,
-    justifyContent: "flex-start",
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#fff",
-    marginTop: 40,
-  },
-  subtitle: {
-    color: "#ccc",
-    fontSize: 14,
-    marginVertical: 12,
-  },
-  codeContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: 24,
-  },
-  codeBox: {
-    width: 60,
-    height: 60,
-    borderRadius: 10,
-    backgroundColor: "#1A1A1A",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  codeText: {
-    color: "#fff",
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  verifyButton: {
-    backgroundColor: "#F26C4F",
-    paddingVertical: 14,
-    borderRadius: 10,
-    alignItems: "center",
-    marginBottom: 30,
-  },
-  verifyButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  keypad: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  key: {
-    width: "30%",
-    marginVertical: 10,
-    aspectRatio: 1,
-    backgroundColor: "#1A1A1A",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-  },
-  keyText: {
-    color: "#fff",
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-});

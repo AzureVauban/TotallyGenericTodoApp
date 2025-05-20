@@ -1,5 +1,6 @@
 import { useTheme } from "@theme/ThemeContext";
 import { colors } from "@theme/colors";
+import { styles } from "../app/theme/styles";
 import { Link, useFocusEffect, useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
@@ -7,7 +8,6 @@ import {
   Modal,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -29,290 +29,6 @@ import { playRemoveSound } from "../utils/playRemoveSound";
 
 // Task group buttons (green)
 // Additional styles for new UI elements
-const homeScreenStyles = StyleSheet.create({
-  divider: {
-    height: 1,
-    backgroundColor: colors.dark.tertiary,
-    marginVertical: 10,
-    width: 300,
-    alignSelf: "center",
-  },
-  taskGroupRow: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 2,
-    width: "100%",
-  },
-  taskGroupButtonText: {
-    color: colors.light.primary,
-    fontWeight: "bold",
-    fontSize: 15,
-  },
-  taskListButton: {
-    backgroundColor: colors.light.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    height: 45,
-    width: 300,
-    alignSelf: "center",
-    shadowColor: colors.dark.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  inlineButton: {
-    justifyContent: "center",
-    alignItems: "center",
-    width: 50,
-    height: 45,
-    margin: 0,
-    borderRadius: 8,
-  },
-  taskListButtonText: {
-    color: colors.light.accent,
-    fontWeight: "500",
-    fontSize: 16,
-  },
-  recentlyDeletedButton: {
-    backgroundColor: colors.dark.secondary,
-    borderRadius: 12,
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-    margin: 2,
-    width: "45%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  deleteButton: {
-    backgroundColor: colors.dark.accent,
-    justifyContent: "center",
-    alignItems: "center",
-    width: 70,
-    height: "100%",
-  },
-  renameButton: {
-    backgroundColor: colors.light.secondary,
-    justifyContent: "center",
-    alignItems: "center",
-    width: 70,
-    height: "100%",
-  },
-  recentlyDeletedText: {
-    color: colors.light.text,
-    fontWeight: "500",
-    fontSize: 15,
-  },
-  scrollRegion: {
-    backgroundColor: colors.light.secondary,
-    borderRadius: 16,
-    padding: 10,
-    marginHorizontal: 12,
-    marginTop: 18,
-    marginBottom: 10,
-    maxHeight: 350,
-    minHeight: 200,
-  },
-  taskGroupButton: {
-    backgroundColor: colors.dark.secondary,
-    borderRadius: 12,
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-    margin: 2,
-    width: "45%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  taskGroupsWrapper: {
-    marginTop: 60,
-    marginHorizontal: 10,
-    marginBottom: 20,
-    alignItems: "flex-start",
-    marginLeft: 12,
-    width: "100%",
-  },
-  addTaskListButton: {
-    backgroundColor: colors.light.secondary,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    width: "78.0%",
-  },
-  addTaskListButtonText: {
-    color: colors.light.text,
-    fontSize: 16,
-    fontWeight: "500",
-  },
-});
-
-const styles = StyleSheet.create({
-  leftAction: {
-    justifyContent: "center",
-    alignItems: "center",
-    width: 80,
-    height: "100%",
-    borderRadius: 12,
-  },
-  screenbackground: {
-    flex: 1,
-    backgroundColor: colors.dark.primary,
-    color: colors.dark.primary,
-    justifyContent: "flex-start",
-    alignItems: "center",
-  },
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: colors.dark.primary,
-  },
-  content: {
-    width: "80%",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: colors.dark.accent,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.dark.accent,
-    marginTop: 10,
-    fontWeight: "bold",
-    paddingHorizontal: 15,
-    paddingTop: 20,
-    textAlign: "left",
-    width: "100%",
-  },
-  button: {
-    backgroundColor: colors.dark.secondary,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 20,
-  },
-  buttonText: {
-    color: colors.dark.text,
-    fontWeight: "bold",
-  },
-  buttonSecondary: {
-    backgroundColor: colors.dark.secondary,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  icon: {
-    width: 100,
-    height: 100,
-    marginBottom: 20,
-    //color: colors.dark.secondary,
-    //fill: colors.dark.secondary,
-  },
-  addTaskListButton: {
-    backgroundColor: colors.light.secondary,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    marginVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  addTaskListButtonText: {
-    color: colors.light.text,
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  taskRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.dark.tertiary,
-    borderRadius: 12,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    height: 60,
-    width: "100%",
-    justifyContent: "space-between",
-    borderColor: colors.dark.accent,
-  },
-  taskText: {
-    flex: 1,
-    color: colors.dark.text,
-    fontSize: 16,
-  },
-  taskTextDone: {
-    textDecorationLine: "line-through",
-    color: colors.dark.text,
-    opacity: 0.6,
-  },
-  taskDue: {
-    color: colors.dark.accent,
-    fontSize: 14,
-  },
-  modalOverlay: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 2,
-  },
-  modalContent: {
-    width: "80%",
-    borderRadius: 12,
-    padding: 16,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: colors.dark.text,
-    marginBottom: 12,
-  },
-  modalButton: {
-    padding: 12,
-    borderRadius: 6,
-    marginBottom: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  modalButtonText: {
-    color: colors.light.text,
-    fontSize: 16,
-  },
-  modalOption: {
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: colors.dark.tertiary,
-  },
-  showListsButtons: {
-    width: 56,
-    height: 56,
-    borderRadius: 15,
-    backgroundColor: colors.dark.primary,
-    alignItems: "center",
-    position: "absolute",
-    justifyContent: "center",
-    bottom: 24,
-    left: 24,
-    borderColor: colors.dark.accent,
-    borderWidth: 1.5,
-    color: colors.dark.accent,
-  },
-});
 
 /**
  * **HomeScreen**
@@ -337,6 +53,7 @@ const styles = StyleSheet.create({
  */
 
 export default function HomeScreen() {
+  console.log(`Current file name home`);
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const { lists, addList, removeList, renameList, exportDataAsJSON } =
@@ -416,13 +133,13 @@ export default function HomeScreen() {
       >
         {/* Task Groups (Green Buttons) */}
 
-        <View style={homeScreenStyles.taskGroupsWrapper}>
-          <View style={homeScreenStyles.taskGroupRow}>
+        <View style={styles.taskGroupsWrapper}>
+          <View style={styles.taskGroupRow}>
             <Link
               href="/taskLists/taskGroups/scheduledTasks"
               onPress={() => exportDataAsJSON()}
               style={[
-                homeScreenStyles.taskGroupButton,
+                styles.taskGroupButton,
                 {
                   backgroundColor: isDark
                     ? colors.dark.primary
@@ -432,7 +149,7 @@ export default function HomeScreen() {
             >
               <Text
                 style={[
-                  homeScreenStyles.taskGroupButtonText,
+                  styles.taskGroupButtonText,
                   {
                     color: isDark ? colors.light.primary : colors.dark.primary,
                   },
@@ -445,7 +162,7 @@ export default function HomeScreen() {
               href="/taskLists/taskGroups/allTasks"
               onPress={() => exportDataAsJSON()}
               style={[
-                homeScreenStyles.taskGroupButton,
+                styles.taskGroupButton,
                 {
                   backgroundColor: isDark
                     ? colors.dark.primary
@@ -455,7 +172,7 @@ export default function HomeScreen() {
             >
               <Text
                 style={[
-                  homeScreenStyles.taskGroupButtonText,
+                  styles.taskGroupButtonText,
                   {
                     color: isDark ? colors.light.primary : colors.dark.primary,
                   },
@@ -465,12 +182,12 @@ export default function HomeScreen() {
               </Text>
             </Link>
           </View>
-          <View style={homeScreenStyles.taskGroupRow}>
+          <View style={styles.taskGroupRow}>
             <Link
               href="/taskLists/taskGroups/flaggedTasks"
               onPress={() => exportDataAsJSON()}
               style={[
-                homeScreenStyles.taskGroupButton,
+                styles.taskGroupButton,
                 {
                   backgroundColor: isDark
                     ? colors.dark.primary
@@ -480,7 +197,7 @@ export default function HomeScreen() {
             >
               <Text
                 style={[
-                  homeScreenStyles.taskGroupButtonText,
+                  styles.taskGroupButtonText,
                   {
                     color: isDark ? colors.light.primary : colors.dark.primary,
                   },
@@ -493,7 +210,7 @@ export default function HomeScreen() {
               href="/taskLists/taskGroups/completedTasks"
               onPress={() => exportDataAsJSON()}
               style={[
-                homeScreenStyles.taskGroupButton,
+                styles.taskGroupButton,
                 {
                   backgroundColor: isDark
                     ? colors.dark.primary
@@ -503,7 +220,7 @@ export default function HomeScreen() {
             >
               <Text
                 style={[
-                  homeScreenStyles.taskGroupButtonText,
+                  styles.taskGroupButtonText,
                   {
                     color: isDark ? colors.light.primary : colors.dark.primary,
                   },
@@ -513,11 +230,11 @@ export default function HomeScreen() {
               </Text>
             </Link>
           </View>
-          <View style={homeScreenStyles.divider} />
+          <View style={styles.divider} />
         </View>
         {/* User Lists (Blue Scrollable Region) */}
         <View style={{ marginTop: 200 }}>
-          <View style={homeScreenStyles.divider} />
+          <View style={styles.divider} />
           <ScrollView
             style={{ flexGrow: 0, maxHeight: 220 }}
             contentContainerStyle={{ paddingBottom: 10 }}
@@ -531,7 +248,7 @@ export default function HomeScreen() {
                   renderRightActions={() => (
                     <Pressable
                       style={[
-                        homeScreenStyles.inlineButton,
+                        styles.inlineButton,
                         {
                           backgroundColor: isDark
                             ? colors.dark.redbutton_background
@@ -571,7 +288,7 @@ export default function HomeScreen() {
                   renderLeftActions={() => (
                     <Pressable
                       style={[
-                        homeScreenStyles.inlineButton,
+                        styles.inlineButton,
                         {
                           backgroundColor: isDark
                             ? colors.dark.bluebutton_background
@@ -599,7 +316,7 @@ export default function HomeScreen() {
                 >
                   <Pressable
                     style={[
-                      homeScreenStyles.taskListButton,
+                      styles.taskListButton,
                       {
                         backgroundColor: isDark
                           ? colors.dark.secondary
@@ -613,7 +330,7 @@ export default function HomeScreen() {
                   >
                     <Text
                       style={[
-                        homeScreenStyles.taskListButtonText,
+                        styles.taskListButtonText,
                         {
                           color: isDark
                             ? colors.light.primary
@@ -642,16 +359,11 @@ export default function HomeScreen() {
           }}
         >
           {/* Divider just above button */}
-          <View
-            style={[
-              homeScreenStyles.divider,
-              { width: "90%", marginBottom: 8 },
-            ]}
-          />
+          <View style={[styles.divider, { width: "90%", marginBottom: 8 }]} />
           {/* Centered Add-Task-List button */}
           <TouchableOpacity
             style={[
-              homeScreenStyles.addTaskListButton,
+              styles.addTaskListButton,
               {
                 width: 300,
                 backgroundColor: isDark
@@ -663,7 +375,7 @@ export default function HomeScreen() {
           >
             <Text
               style={[
-                homeScreenStyles.addTaskListButtonText,
+                styles.addTaskListButtonText,
                 {
                   color: isDark
                     ? colors.dark.bluebutton_text_icon
@@ -671,7 +383,7 @@ export default function HomeScreen() {
                 },
               ]}
             >
-              + Add Task List
+              New List
             </Text>
           </TouchableOpacity>
         </View>

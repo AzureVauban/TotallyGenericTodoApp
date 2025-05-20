@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { generateUsername } from "../utils/generateUsername";
 import {
   View,
-  Image,
   TouchableOpacity,
   Text,
   ViewStyle,
@@ -14,70 +13,11 @@ import {
   ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { StyleSheet } from "react-native";
 import { PanGestureHandler } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "@theme/ThemeContext";
 import { useFocusEffect } from "@react-navigation/native";
-
-const styles = StyleSheet.create({
-  screenbackground: {
-    flex: 1,
-    // backgroundColor and color will be set via isDark in component
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    // backgroundColor will be set via isDark in component
-  },
-  content: {
-    width: "80%",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    // color will be set via isDark in component
-  },
-  subtitle: {
-    fontSize: 16,
-    // color will be set via isDark in component
-    marginBottom: 20,
-    fontWeight: "bold",
-  },
-  button: {
-    // backgroundColor will be set via isDark in component
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 20,
-  },
-  buttonText: {
-    // color will be set via isDark in component
-    fontWeight: "bold",
-  },
-  buttonSecondary: {
-    backgroundColor: colors.dark.secondary,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  icon: {
-    width: 100,
-    height: 100,
-    marginBottom: 20,
-    color: colors.dark.secondary,
-    backgroundColor: colors.dark.secondary,
-  },
-});
+import { styles } from "@theme/styles";
 
 /**
  * **SignUpScreen**
@@ -171,18 +111,22 @@ export default function SignUpScreen() {
             style={{ alignItems: "center", marginTop: 150, marginBottom: 32 }}
           >
             <Text
-              style={[
-                styles.title,
-                { color: isDark ? colors.light.accent : colors.dark.accent },
-              ]}
+              style={{
+                fontSize: 24,
+                fontWeight: "bold",
+                marginBottom: 20,
+                color: isDark ? colors.light.accent : colors.dark.accent,
+              }}
             >
               Register
             </Text>
             <Text
-              style={[
-                styles.subtitle,
-                { color: isDark ? colors.light.text : colors.dark.text },
-              ]}
+              style={{
+                fontSize: 16,
+                marginBottom: 20,
+                fontWeight: "bold",
+                color: isDark ? colors.light.text : colors.dark.text,
+              }}
             >
               Create your account
             </Text>

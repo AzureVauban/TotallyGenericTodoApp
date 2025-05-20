@@ -1,13 +1,6 @@
 // SETTINGS.tsx
 import React, { useRef, useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  Switch,
-  StyleSheet,
-} from "react-native";
+import { View, Text, TouchableOpacity, Switch } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import {
   PanGestureHandler,
@@ -17,53 +10,7 @@ import {
 import FiBrAddressCard from "../assets/icons/svg/fi-br-address-card.svg";
 import { colors } from "@theme/colors";
 import { useTheme } from "@theme/ThemeContext";
-
-const settingsStyles = StyleSheet.create({
-  screenbackground: {
-    flex: 1,
-    backgroundColor: colors.dark.primary,
-    paddingTop: 40,
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontWeight: "bold",
-    fontSize: 24,
-    marginBottom: 20,
-    color: colors.dark.accent,
-  },
-  optionRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  optionText: {
-    color: colors.dark.text,
-    fontSize: 16,
-  },
-  logoutButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    width: 300,
-    alignSelf: "center",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: "auto",
-    marginBottom: 20,
-  },
-  logoutButtonText: {
-    fontWeight: "bold",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.dark.tertiary,
-    marginVertical: 10,
-    width: "90%",
-    alignSelf: "center",
-  },
-});
+import { styles } from "@theme/styles";
 
 /**
  * **SettingsScreen**
@@ -151,7 +98,7 @@ export default function SettingsScreen() {
     <PanGestureHandler onGestureEvent={onGestureEvent}>
       <View
         style={[
-          settingsStyles.screenbackground,
+          styles.screenbackground,
           {
             backgroundColor: isDark
               ? colors.dark.background
@@ -161,7 +108,7 @@ export default function SettingsScreen() {
       >
         <Text
           style={[
-            settingsStyles.title,
+            styles.title,
             { color: isDark ? colors.dark.accent : colors.light.accent },
           ]}
         >
@@ -169,7 +116,7 @@ export default function SettingsScreen() {
         </Text>
         <View
           style={[
-            settingsStyles.divider,
+            styles.divider,
             {
               backgroundColor: isDark
                 ? colors.dark.tertiary
@@ -178,10 +125,10 @@ export default function SettingsScreen() {
           ]}
         />
         <View style={{ marginTop: 30 }}>
-          <View style={settingsStyles.optionRow}>
+          <View style={styles.optionRow}>
             <Text
               style={[
-                settingsStyles.optionText,
+                styles.optionText,
                 { color: isDark ? colors.dark.text : colors.light.text },
               ]}
             >
@@ -197,7 +144,7 @@ export default function SettingsScreen() {
           </View>
           <View
             style={[
-              settingsStyles.divider,
+              styles.divider,
               {
                 backgroundColor: isDark
                   ? colors.dark.tertiary
@@ -205,10 +152,10 @@ export default function SettingsScreen() {
               },
             ]}
           />
-          <View style={settingsStyles.optionRow}>
+          <View style={styles.optionRow}>
             <Text
               style={[
-                settingsStyles.optionText,
+                styles.optionText,
                 { color: isDark ? colors.dark.text : colors.light.text },
               ]}
             >
@@ -225,7 +172,7 @@ export default function SettingsScreen() {
         </View>
         <View
           style={[
-            settingsStyles.divider,
+            styles.divider,
             {
               backgroundColor: isDark
                 ? colors.dark.tertiary
@@ -235,7 +182,7 @@ export default function SettingsScreen() {
         />
         <TouchableOpacity
           style={[
-            settingsStyles.logoutButton,
+            styles.logoutButton,
             {
               backgroundColor: isDark
                 ? colors.dark.redbutton_background
@@ -259,7 +206,7 @@ export default function SettingsScreen() {
           />
           <Text
             style={[
-              settingsStyles.logoutButtonText,
+              styles.logoutButtonText,
               {
                 color: isDark
                   ? colors.dark.redbutton_text_icon

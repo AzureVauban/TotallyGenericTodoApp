@@ -2,77 +2,13 @@ import "react-native-url-polyfill/auto";
 import React from "react";
 import { View, TouchableOpacity, Text, Dimensions } from "react-native";
 import { useRouter } from "expo-router";
-import { StyleSheet } from "react-native";
 import FISignatureIcon from "../assets/icons/svg/fi-br-list-check.svg";
 import { colors } from "@theme/colors";
 import { useTheme } from "@theme/ThemeContext";
 import { useFocusEffect } from "@react-navigation/native";
+import { styles } from "@theme/styles";
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const BUTTON_WIDTH = SCREEN_WIDTH * 0.7;
-
-const styles = StyleSheet.create({
-  screenbackground: {
-    flex: 1,
-    backgroundColor: colors.dark.primary,
-    color: colors.dark.text,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#104C64",
-  },
-  content: {
-    width: "80%",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: colors.dark.text,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.dark.text,
-    marginBottom: 20,
-  },
-  linktext: {
-    fontSize: 16,
-    color: colors.dark.text,
-    marginBottom: 20,
-    fontWeight: "bold",
-  },
-  button: {
-    backgroundColor: colors.dark.accent,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 20,
-    // width removed
-  },
-  buttonText: {
-    color: colors.dark.secondary,
-    fontWeight: "bold",
-  },
-  buttonSecondary: {
-    backgroundColor: "#104C64",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  icon: {
-    width: 100,
-    height: 100,
-    marginBottom: 20,
-  },
-});
 
 /**
  * **LoginScreen**
@@ -141,7 +77,12 @@ export default function GreetScreen() {
         <Text
           style={[
             styles.title,
-            { color: isDark ? colors.dark.accent : colors.light.accent },
+            {
+              color: isDark ? colors.dark.accent : colors.light.accent,
+              fontSize: 24,
+              fontWeight: "bold",
+              marginBottom: 20,
+            },
           ]}
         >
           {" "}
@@ -152,6 +93,8 @@ export default function GreetScreen() {
             styles.subtitle,
             {
               paddingBottom: 50,
+              fontSize: 18,
+              marginBottom: 20,
               color: isDark ? colors.dark.text : colors.light.text,
             },
           ]}
@@ -192,6 +135,11 @@ export default function GreetScreen() {
             styles.buttonSecondary,
             {
               flexDirection: "row",
+              paddingVertical: 12,
+              paddingHorizontal: 20,
+              borderRadius: 5,
+              alignItems: "center",
+              justifyContent: "center",
               width: BUTTON_WIDTH,
               marginBottom: 20,
               backgroundColor: isDark
@@ -200,7 +148,6 @@ export default function GreetScreen() {
             },
           ]}
           onPress={() => {
-            console.log("User pressed reset password");
             router.push("/resetPassword");
           }}
         >
@@ -220,8 +167,8 @@ export default function GreetScreen() {
           <View
             style={{
               flexDirection: "row",
-              alignItems: "center",
-              marginBottom: 8,
+              alignItems: "baseline",
+              marginVertical: -15,
             }}
           >
             <Text
@@ -239,14 +186,15 @@ export default function GreetScreen() {
             </Text>
             <TouchableOpacity
               onPress={() => {
-                console.log("User went to account register page");
                 router.push("/registerAccount");
               }}
             >
               <Text
                 style={[
-                  styles.linktext,
+                  styles.link,
                   {
+                    fontSize: 16,
+                    fontWeight: "bold",
                     color: isDark
                       ? colors.dark.bluebutton_text_icon
                       : colors.light.bluebutton_text_icon,
@@ -260,8 +208,8 @@ export default function GreetScreen() {
           <View
             style={{
               flexDirection: "row",
-              alignItems: "center",
-              marginTop: -15,
+              alignItems: "baseline",
+              marginVertical: 0,
             }}
           >
             <Text
@@ -279,17 +227,17 @@ export default function GreetScreen() {
             </Text>
             <TouchableOpacity
               onPress={() => {
-                console.log("User went to login page");
                 router.push("/loginScreen");
               }}
             >
               <Text
                 style={[
-                  styles.linktext,
+                  styles.link,
                   {
                     color: isDark
                       ? colors.dark.bluebutton_text_icon
                       : colors.light.bluebutton_text_icon,
+                    lineHeight: 22,
                   },
                 ]}
               >

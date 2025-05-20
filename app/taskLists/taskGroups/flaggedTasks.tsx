@@ -4,14 +4,18 @@
  * Shows every task that has been marked “flagged” and not deleted.
  */
 import React from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { View, Text, FlatList, Pressable } from "react-native";
 import { useTasks } from "../../../backend/storage/TasksContext";
 import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "@theme/colors";
 import { useTheme } from "../../theme/ThemeContext";
+import { styles } from "../../theme/styles";
+import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+
 // …
 export default function FlaggedTasks() {
-  const { tasks, exportDataAsJSON } = useTasks();
+  const { tasks, removeTask, exportDataAsJSON } = useTasks();
   const { theme: themeMode } = useTheme();
   const isDark = themeMode === "dark";
   useFocusEffect(
@@ -34,84 +38,83 @@ export default function FlaggedTasks() {
     >
       <Text
         style={[
-          styles.title,
+          styles.listTitle,
           {
             color: isDark
               ? colors.dark.bluebutton_background
               : colors.light.bluebutton_background,
+            textAlign: "center",
           },
         ]}
       >
-        Flagged
+        {"Flagged Tasks"}
       </Text>
+      <View
+        style={[
+          styles.divider,
+          {
+            backgroundColor: isDark
+              ? colors.dark.tertiary
+              : colors.light.tertiary,
+          },
+        ]}
+      />
       <FlatList
         data={flaggedTasks}
         keyExtractor={(t) => t.id}
+        renderItem={({ item }) => (
+          <Swipeable
+            renderRightActions={() => (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Pressable
+                  style={[styles.inlineButton, { backgroundColor: "#7f1d1d" }]}
+                  onPress={() => {
+                    removeTask(item.id);
+                    exportDataAsJSON();
+                  }}
+                >
+                  <FiBrtrash width={20} height={20} fill="#fecaca" />
+                </Pressable>
+              </View>
+            )}
+          >
+            <View
+              style={[
+                styles.taskItem,
+                item.indent === 1 && styles.indentedTask,
+                // Use only styles from styles.ts for taskItem, indentedTask
+                item.completed
+                  ? { backgroundColor: colors.dark.secondary }
+                  : item.buttonColor
+                  ? { backgroundColor: item.buttonColor }
+                  : {
+                      backgroundColor: isDark
+                        ? colors.dark.primary
+                        : colors.light.accent,
+                    },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.taskText,
+                  item.completed
+                    ? styles.completedText
+                    : {
+                        color: isDark ? colors.dark.text : colors.dark.primary,
+                      },
+                ]}
+              >
+                {item.title}
+              </Text>
+            </View>
+          </Swipeable>
+        )}
         contentContainerStyle={{
           backgroundColor: isDark
             ? colors.dark.background
             : colors.light.background,
         }}
-        renderItem={({ item }) => (
-          <View
-            style={[
-              styles.item,
-              {
-                backgroundColor: isDark
-                  ? colors.dark.accent
-                  : colors.light.accent,
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.text,
-                { color: isDark ? colors.dark.text : colors.light.text },
-              ]}
-            >
-              {item.title}
-            </Text>
-          </View>
-        )}
       />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: colors.dark.primary },
-  title: {
-    fontSize: 24,
-    color: colors.light.accent,
-    marginBottom: 10,
-    marginTop: 20,
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  item: {
-    backgroundColor: colors.dark.secondary,
-    padding: 15,
-    marginBottom: 6,
-    borderRadius: 8,
-  },
-  text: { color: colors.dark.text, fontSize: 16 },
-  completedText: {
-    color: colors.dark.tertiary,
-    textDecorationLine: "line-through",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.dark.tertiary,
-    marginVertical: 10,
-    width: "100%",
-  },
-  inlineButton: {
-    justifyContent: "center",
-    alignItems: "center",
-    width: 50,
-    alignSelf: "stretch",
-    paddingVertical: 15,
-    marginBottom: 6,
-    borderRadius: 8,
-  },
-});

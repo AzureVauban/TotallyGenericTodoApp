@@ -6,7 +6,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { PanGestureHandler } from "react-native-gesture-handler";
@@ -14,7 +13,7 @@ import { playInvalidSound } from "../utils/playInvalidSound";
 import { useTheme } from "@theme/ThemeContext";
 import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "@theme/colors";
-
+import { styles } from "@theme/styles";
 /**
  * **ResetPassword Screen**
  *
@@ -23,57 +22,62 @@ import { colors } from "@theme/colors";
  * 1. **User Input**
  *    * **Username / Email** – plain text field (not currently validated).
  *    * **Password** – secure entry, stored in local `pwd` state.
- *    * **Confirm password** – secure entry, must match `pwd`.
  * 2. **Validation**
  *    * Any empty field sets an error flag that highlights the input with `#450a0a`.
- *    * Mismatched passwords also flag an error on the confirm box.
  * 3. **Next →**
  *    * If validation passes, navigates to `/verificationMethod` via Expo Router.
  * 4. **Swipe‑to‑go‑back**
  *    * A rightward PanGesture (> 50 px) sends the user to `/login`.
  *
  * ### State
- * * `username`, `pwd`, `confirm` – user‑entered strings.
+ * * `username`, `email`, `password` – user‑entered strings.
  * * `*_Error` booleans – input‑level validation flags.
  * * `isNavigating` – debounce so the swipe handler doesn’t fire twice.
  *
  * @returns A scrollable React‑Native form wrapped in `PanGestureHandler`.
  */
 export default function ResetPassword() {
+  console.log("Current file name: ResetPassword");
   const { theme } = useTheme();
   const isDark = theme === "dark";
   useFocusEffect(React.useCallback(() => {}, [theme]));
 
   const router = useRouter();
   const [username, setUsername] = useState("");
-  const [usernameError, setUsernameError] = useState(false);
-  const [pwd, setPwd] = useState("");
-  const [pwdError, setPwdError] = useState(false);
-  const [confirm, setConfirm] = useState("");
-  const [confirmError, setConfirmError] = useState(false);
+  const [usernameValid, setUsernameValid] = useState(true);
+  const [email, setEmail] = useState("");
+  const [emailValid, setEmailValid] = useState(true);
+  const [password, setPassword] = useState("");
+  const [passwordValid, setPasswordValid] = useState(true);
+
+  // Simple email validation regex
+  const validateEmail = (emailToValidate) => {
+    const re = /\S+@\S+\.\S+/;
+    return re.test(emailToValidate);
+  };
 
   const handleNext = () => {
     let hasError = false;
 
-    if (!username) {
-      setUsernameError(true);
+    if (!username.trim()) {
+      setUsernameValid(false);
       hasError = true;
     } else {
-      setUsernameError(false);
+      setUsernameValid(true);
     }
 
-    if (!pwd) {
-      setPwdError(true);
+    if (!password.trim()) {
+      setPasswordValid(false);
       hasError = true;
     } else {
-      setPwdError(false);
+      setPasswordValid(true);
     }
 
-    if (!confirm || confirm !== pwd) {
-      setConfirmError(true);
+    if (!email.trim() || !validateEmail(email)) {
+      setEmailValid(false);
       hasError = true;
     } else {
-      setConfirmError(false);
+      setEmailValid(true);
     }
 
     if (hasError) {
@@ -96,139 +100,187 @@ export default function ResetPassword() {
   };
 
   return (
-    <PanGestureHandler onGestureEvent={handleSwipe}>
+    <PanGestureHandler onHandlerStateChange={handleSwipe}>
       <SafeAreaView
         style={[
-          s.screen,
+          styles.screenbackground,
           {
             backgroundColor: isDark
-              ? colors.dark.background
-              : colors.light.background,
+              ? colors.light.primary
+              : colors.dark.primary,
           },
         ]}
       >
         <ScrollView
-          contentContainerStyle={s.content}
-          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingHorizontal: 32,
+            paddingVertical: 48,
+          }}
         >
-          {/* ---------- header ---------- */}
-          <View style={s.headerBlock}>
+          {/* Header + Logo */}
+          <View style={{ alignItems: "center", marginTop: 150 }}>
             <Text
-              style={[
-                s.title,
-                { color: isDark ? colors.dark.accent : colors.light.primary },
-              ]}
+              style={{
+                fontSize: 24,
+                fontWeight: "bold",
+                marginBottom: 20,
+                color: isDark ? colors.light.accent : colors.dark.accent,
+              }}
             >
-              Reset{"\n"}Password
+              Reset password
             </Text>
             <Text
               style={[
-                s.subtitle,
-                { color: isDark ? colors.dark.text : colors.light.text },
+                styles.subtitle,
+                { color: isDark ? colors.light.text : colors.dark.text },
               ]}
             >
-              input your username, phone number, or email
+              reset your account's password
             </Text>
           </View>
 
-          {/* ---------- form ---------- */}
-          <View style={s.form}>
+          {/* Form */}
+          <View style={{ gap: 16 }}>
+            {/* Username */}
             <TextInput
               style={[
-                s.input,
-                usernameError && s.inputBackgroundError,
                 {
-                  backgroundColor: isDark
-                    ? colors.light.primary
-                    : colors.dark.primary,
-                  color: isDark ? colors.dark.text : colors.light.text,
+                  fontWeight: "700",
+                  borderRadius: 8,
+                  paddingVertical: 12,
+                  paddingHorizontal: 16,
+                },
+                {
+                  backgroundColor: usernameValid
+                    ? isDark
+                      ? colors.light.primary
+                      : colors.dark.primary
+                    : "#450a0a",
+                  color: isDark ? colors.light.text : colors.dark.text,
+                  marginBottom: 4,
                 },
               ]}
-              placeholder="Username or Email"
+              placeholder="Username"
               placeholderTextColor={
-                isDark ? colors.dark.tertiary : colors.light.tertiary
+                isDark ? colors.light.text : colors.dark.text
               }
-              autoCapitalize="none"
-              keyboardType="email-address"
               value={username}
-              onChangeText={(text) => {
-                setUsername(text);
-                if (text) setUsernameError(false);
+              onChangeText={(t) => {
+                setUsername(t);
+                setUsernameValid(true);
               }}
             />
-
             <View
               style={{
                 height: 1,
+                width: "100%",
                 backgroundColor: isDark
-                  ? colors.dark.tertiary
-                  : colors.light.tertiary,
-                marginVertical: 0,
+                  ? colors.dark.secondary
+                  : colors.light.secondary,
+                marginTop: 4,
               }}
             />
 
+            {/* Email */}
             <TextInput
+              style={[
+                {
+                  fontWeight: "700",
+                  borderRadius: 8,
+                  paddingVertical: 12,
+                  paddingHorizontal: 16,
+                },
+                {
+                  backgroundColor: emailValid
+                    ? isDark
+                      ? colors.light.primary
+                      : colors.dark.primary
+                    : "#450a0a",
+                  color: isDark ? colors.light.text : colors.dark.text,
+                  marginBottom: 4,
+                },
+              ]}
+              placeholder="Email"
+              placeholderTextColor={
+                isDark ? colors.light.text : colors.dark.text
+              }
+              value={email}
+              onChangeText={(t) => {
+                setEmail(t);
+                setEmailValid(true);
+              }}
+              onBlur={() => setEmailValid(validateEmail(email))}
+            />
+            <View
+              style={{
+                height: 1,
+                width: "100%",
+                backgroundColor: isDark
+                  ? colors.dark.secondary
+                  : colors.light.secondary,
+                marginTop: 4,
+              }}
+            />
+
+            {/* Password */}
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  width: "100%",
+                  paddingVertical: 14,
+                  paddingHorizontal: 16,
+
+                  fontSize: 16,
+                  marginBottom: 4,
+                  color: isDark ? colors.dark.text : colors.light.text,
+                  backgroundColor: isDark
+                    ? colors.dark.background
+                    : colors.light.background,
+                },
+              ]}
               placeholder="Password"
               placeholderTextColor={
-                isDark ? colors.dark.tertiary : colors.light.tertiary
+                isDark ? colors.dark.icon : colors.light.icon
               }
               secureTextEntry
-              value={pwd}
-              onChangeText={(text) => {
-                setPwd(text);
-                if (text) setPwdError(false);
-              }}
-              style={[s.input, pwdError ? s.inputBackgroundError : null]}
-            />
-
-            <View
-              style={{
-                height: 1,
-                backgroundColor: isDark
-                  ? colors.dark.tertiary
-                  : colors.light.tertiary,
-                marginVertical: 0,
-              }}
-            />
-
-            <TextInput
-              placeholder="Confirm password"
-              placeholderTextColor={
-                isDark ? colors.dark.tertiary : colors.light.tertiary
-              }
-              secureTextEntry
-              value={confirm}
-              onChangeText={(text) => {
-                setConfirm(text);
-                if (text === pwd) setConfirmError(false);
-              }}
-              style={[s.input, confirmError ? s.inputBackgroundError : null]}
+              value={password}
+              onChangeText={setPassword}
             />
           </View>
 
-          {/* ---------- CTA ---------- */}
           <TouchableOpacity
             style={[
-              s.nextBtn,
+              styles.button,
               {
+                width: "100%",
+                paddingVertical: 16,
+
+                alignItems: "center",
+                marginTop: 12,
+                marginBottom: 4,
                 backgroundColor: isDark
                   ? colors.dark.purplebutton_background
                   : colors.light.purplebutton_background,
               },
             ]}
-            onPress={handleNext}
+            onPress={() => handleNext}
           >
             <Text
               style={[
-                s.nextTxt,
+                styles.buttonText,
                 {
+                  fontSize: 18,
+                  fontWeight: "500",
+                  letterSpacing: 0.5,
                   color: isDark
                     ? colors.dark.purplebutton_text_icon
                     : colors.light.purplebutton_text_icon,
                 },
               ]}
             >
-              Next ›
+              Reset Password
             </Text>
           </TouchableOpacity>
         </ScrollView>
@@ -236,57 +288,3 @@ export default function ResetPassword() {
     </PanGestureHandler>
   );
 }
-
-/* ---------- Styles ---------- */
-const s = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
-
-  content: {
-    flexGrow: 1,
-    paddingHorizontal: 32,
-    paddingVertical: 48,
-    justifyContent: "space-between",
-  },
-
-  headerBlock: { gap: 16 },
-
-  title: {
-    fontSize: 32,
-    lineHeight: 38,
-    fontWeight: "bold",
-  },
-
-  subtitle: {
-    fontSize: 14,
-  },
-
-  form: {
-    gap: 16,
-  },
-
-  input: {
-    borderRadius: 8,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    fontSize: 16,
-  },
-
-  inputBackgroundError: {
-    backgroundColor: "#450a0a", // Darker shade of red (Firebrick)
-  },
-
-  nextBtn: {
-    alignSelf: "center",
-    borderRadius: 12,
-    paddingHorizontal: 64,
-    paddingVertical: 14,
-    marginTop: 24,
-  },
-
-  nextTxt: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});
