@@ -7,7 +7,7 @@ export async function playRenameTaskSound() {
   try {
     if (!soundObject) {
       const { sound } = await Audio.Sound.createAsync(
-        require("../../assets/sfx/button-pressed-38129.mp3"),
+         require("assets/sfx/" + sound_file_name),
       );
       soundObject = sound;
     }
