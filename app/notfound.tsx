@@ -1,3 +1,8 @@
+/**
+ * NotFoundScreen displays a themed 404 error screen.
+ * Shows a "Go Back" button that returns the user to the previous screen.
+ * Styles adapt based on light or dark mode using the system color scheme.
+ */
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";

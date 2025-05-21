@@ -1,11 +1,11 @@
-import { colors } from "@theme/colors";
-import { useTheme } from "@theme/ThemeContext";
-import { useFocusEffect } from "@react-navigation/native";
 /**
  * Scheduled Screen
  *
  * Shows all non-deleted tasks that have any `scheduleDate` set.
  */
+import { colors } from "@theme/colors";
+import { useTheme } from "@theme/ThemeContext";
+import { useFocusEffect } from "@react-navigation/native";
 
 import React from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";

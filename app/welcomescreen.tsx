@@ -1,3 +1,8 @@
+/**
+ * GreetScreen displays a welcome interface with theme toggling and navigation.
+ * Provides access to the home screen, forgot password screen, and sign up/sign in links.
+ * Layout and button colors respond dynamically to light/dark theme selection.
+ */
 import "react-native-url-polyfill/auto";
 import React from "react";
 import { View, TouchableOpacity, Text, Dimensions } from "react-native";
@@ -9,27 +14,6 @@ import { useFocusEffect } from "@react-navigation/native";
 import { styles } from "@theme/styles";
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const BUTTON_WIDTH = SCREEN_WIDTH * 0.7;
-
-/**
- * **LoginScreen**
- *
- * Presents the root login interface where a user may:
- *  • Tap **“Login with Email”** – sets `isUserLoggedIn` and redirects to `/homeScreen`.
- *  • Tap **“Forgot Password?”** – pushes the `/resetPassword` route.
- *  • Tap **“Sign Up”** – pushes the `/notfound` route.
- *
- * ### Visuals
- * * Displays the Divide&Do signature SVG in brand colours.
- * * Shows the app welcome title with the accent colour’s complementary hue computed at runtime.
- *
- * ### State / Hooks
- * * `isUserLoggedIn` – local `useState` boolean; when `true`, a `useEffect` redirects with
- *   `router.replace("/homeScreen")`.
- * * `getComplement(hex)` – helper that returns the complementary colour of a hex string.
- * * `useRouter` from **expo-router** handles navigation.
- *
- * @returns A centred React‑Native view containing the login buttons and links.
- */
 
 export default function GreetScreen() {
   const { theme, toggleTheme } = useTheme();

@@ -1,3 +1,19 @@
+/**
+ * MyList Screen
+ *
+ * This screen renders a task list for a given ID (from the route parameter).
+ * It supports displaying and managing both user-created task lists and system-defined
+ * virtual task categories (like "Today", "Completed", etc.).
+ *
+ * Features:
+ * - Shows tasks grouped into active and completed sections
+ * - Handles swipe actions to flag, rename, delete, or indent tasks
+ * - Supports gesture-based navigation (e.g., swipe right to return home)
+ * - Includes modals for adding, renaming, and editing task details
+ * - Applies theme-aware styling and supports light/dark modes
+ *
+ * Task operations are fully integrated with context (`useTasks`).
+ */
 import { useTheme } from "@theme/ThemeContext";
 import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "@theme/colors";
