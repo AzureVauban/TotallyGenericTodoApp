@@ -115,7 +115,7 @@ export default function HomeScreen() {
         <View style={styles.taskGroupsWrapper}>
           <View style={styles.taskGroupRow}>
             <Link
-              href="/taskLists/taskGroups/scheduledTasks"
+              href="/taskLists/taskGroups/scheduled"
               onPress={() => exportDataAsJSON()}
               style={[
                 styles.taskGroupButton,
@@ -138,7 +138,7 @@ export default function HomeScreen() {
               </Text>
             </Link>
             <Link
-              href="/taskLists/taskGroups/allTasks"
+              href="/taskLists/taskGroups/all"
               onPress={() => exportDataAsJSON()}
               style={[
                 styles.taskGroupButton,
@@ -163,7 +163,7 @@ export default function HomeScreen() {
           </View>
           <View style={styles.taskGroupRow}>
             <Link
-              href="/taskLists/taskGroups/flaggedTasks"
+              href="/taskLists/taskGroups/flagged"
               onPress={() => exportDataAsJSON()}
               style={[
                 styles.taskGroupButton,
@@ -186,7 +186,7 @@ export default function HomeScreen() {
               </Text>
             </Link>
             <Link
-              href="/taskLists/taskGroups/completedTasks"
+              href="/taskLists/taskGroups/completed"
               onPress={() => exportDataAsJSON()}
               style={[
                 styles.taskGroupButton,
