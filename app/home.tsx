@@ -1,3 +1,9 @@
+/**
+ * Home screen of the application.
+ * Displays grouped task categories and user-defined task lists.
+ * Supports swipe gestures to navigate to the settings screen and manage lists.
+ * Includes modals for adding and renaming task lists.
+ */
 import { useTheme } from "@theme/ThemeContext";
 import { colors } from "@theme/colors";
 import { styles } from "../app/theme/styles";
@@ -26,31 +32,6 @@ import FiBrtrash from "../assets/icons/svg/fi-br-trash.svg";
 import { useTasks } from "../backend/storage/TasksContext";
 import { playInvalidSound } from "../app/utils/playInvalidSound";
 import { playRemoveSound } from "../app/utils/playRemoveSound";
-
-// Task group buttons (green)
-// Additional styles for new UI elements
-
-/**
- * **HomeScreen**
- *
- * Displays the list‑of‑lists “home” view where the user can:
- *  • Swipe **right‑to‑left** on a list button to reveal a red **Delete** action.
- *    Confirming the alert removes the list, pushes it to the *recentlyDeleted* state array,
- *    and persists the change via `saveTasks`.
- *  • Tap a list button to navigate to `/taskLists/<id>` using Expo Router.
- *  • Tap the big green “+” button to create a new list. An `Alert.prompt` collects the
- *    name, validates it, persists the new list, and immediately routes to its detail screen.
- *
- * **State**
- *  * `tasks` – active task‑lists shown on screen.
- *  * `doneTasks` / `recentlyDeleted` – supporting arrays used by other views.
- *
- * **Side‑effects**
- *  Persists all list mutations through the local `saveTasks` helper (implementation
- *  provided elsewhere in the project).
- *
- * @returns A fully‑interactive React Native view wrapped in `Swipeable` components.
- */
 
 export default function HomeScreen() {
   const { theme } = useTheme();
