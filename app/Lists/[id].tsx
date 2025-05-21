@@ -1,19 +1,35 @@
+/**
+ * MyList Screen
+ *
+ * This screen renders a task list for a given ID (from the route parameter).
+ * It supports displaying and managing both user-created task lists and system-defined
+ * virtual task categories (like "Today", "Completed", etc.).
+ *
+ * Features:
+ * - Shows tasks grouped into active and completed sections
+ * - Handles swipe actions to flag, rename, delete, or indent tasks
+ * - Supports gesture-based navigation (e.g., swipe right to return home)
+ * - Includes modals for adding, renaming, and editing task details
+ * - Applies theme-aware styling and supports light/dark modes
+ *
+ * Task operations are fully integrated with context (`useTasks`).
+ */
 import { useTheme } from "@theme/ThemeContext";
 import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "@theme/colors";
-import { playRemoveSound } from "../../utils/playRemoveSound";
-import { playIndentTasksound } from "../../utils/playIndentTaskSound";
-import { playRenameTaskSound } from "../../utils/playRenameSound";
-import { playFlaggedSound } from "../../utils/playFlaggedSound";
-import { playUnflaggedSound } from "../../utils/playUnflaggedSound";
+import { playRemoveSound } from "../utils/sounds/playRemoveSound";
+import { playIndentTasksound } from "../utils/sounds/playIndentTaskSound";
+import { playRenameTaskSound } from "../utils/sounds/playRenameSound";
+import { playFlaggedSound } from "../utils/sounds/playFlaggedSound";
+import { playUnflaggedSound } from "../utils/sounds/playUnflaggedSound";
 // Helper to get tomorrow's date at midnight in mm-dd-yyyy format
 import {
   PanGestureHandler,
   State,
   GestureHandlerGestureEvent,
 } from "react-native-gesture-handler";
-import { playCompleteSound } from "../../utils/playCompleteSound";
-import { playInvalidSound } from "../../utils/playInvalidSound";
+import { playCompleteSound } from "../utils/sounds/playCompleteSound";
+import { playInvalidSound } from "../utils/sounds/playInvalidSound";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useRef, useEffect, useState } from "react";
 import {

@@ -1,34 +1,23 @@
 /**
- * Completed Screen
+ * All Screen
  *
- * Shows every task marked done (and not deleted).
+ * Shows every non-deleted task, regardless of state.
  */
-import React from "react";
-import { View, Text, FlatList } from "react-native";
-// import { useTasks } from "../../../backend/storage/TasksContext";
-
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import { Pressable } from "react-native";
-import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
-import { useTasks } from "../../../backend/storage/TasksContext";
-import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "@theme/colors";
 import { useTheme } from "../../theme/ThemeContext";
+import React from "react";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+import { useFocusEffect } from "@react-navigation/native";
+import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
+import { useTasks } from "../../../backend/storage/TasksContext";
 import { styles } from "../../theme/styles";
-// Local TaskItem shape
-interface TaskItem {
-  id: string;
-  text: string;
-  completed: boolean;
-  recentlyDeleted?: boolean;
-  listName: string;
-}
 
 export default function AllTasks() {
   const { tasks, removeTask, exportDataAsJSON } = useTasks();
   const { theme: themeMode } = useTheme();
   const isDark = themeMode === "dark";
-  const visibleTasks = tasks.filter((t) => t.completed && !t.recentlyDeleted);
+  const visibleTasks = tasks.filter((t) => !t.recentlyDeleted);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -58,7 +47,7 @@ export default function AllTasks() {
           },
         ]}
       >
-        {"Completed Tasks"}
+        {"All Tasks"}
       </Text>
       <View
         style={[
@@ -92,7 +81,6 @@ export default function AllTasks() {
             <View
               style={[
                 styles.taskItem,
-                item.indent === 1 && styles.indentedTask,
                 // Use only styles from styles.ts for taskItem, indentedTask
                 item.completed
                   ? { backgroundColor: colors.dark.secondary }
