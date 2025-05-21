@@ -16,7 +16,7 @@ const BUTTON_WIDTH = SCREEN_WIDTH * 0.7;
  * Presents the root login interface where a user may:
  *  • Tap **“Login with Email”** – sets `isUserLoggedIn` and redirects to `/homeScreen`.
  *  • Tap **“Forgot Password?”** – pushes the `/resetPassword` route.
- *  • Tap **“Sign Up”** – pushes the `/registerAccount` route.
+ *  • Tap **“Sign Up”** – pushes the `/notfound` route.
  *
  * ### Visuals
  * * Displays the Divide&Do signature SVG in brand colours.
@@ -32,12 +32,9 @@ const BUTTON_WIDTH = SCREEN_WIDTH * 0.7;
  */
 
 export default function GreetScreen() {
-  console.log(`Current file name: GreetScreen`);
-
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === "dark";
   useFocusEffect(React.useCallback(() => {}, [theme]));
-
   const router = useRouter();
 
   // Shared button style so both buttons have the same width.
@@ -148,7 +145,7 @@ export default function GreetScreen() {
             },
           ]}
           onPress={() => {
-            router.push("/resetPassword");
+            router.push("/notfound");
           }}
         >
           <Text
@@ -186,7 +183,7 @@ export default function GreetScreen() {
             </Text>
             <TouchableOpacity
               onPress={() => {
-                router.push("/registerAccount");
+                router.push("/notfound");
               }}
             >
               <Text
@@ -227,7 +224,7 @@ export default function GreetScreen() {
             </Text>
             <TouchableOpacity
               onPress={() => {
-                router.push("/loginScreen");
+                router.push("/notfound");
               }}
             >
               <Text

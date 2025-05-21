@@ -24,8 +24,8 @@ import {
 import FiBredit from "../assets/icons/svg/fi-br-text-box-edit.svg";
 import FiBrtrash from "../assets/icons/svg/fi-br-trash.svg";
 import { useTasks } from "../backend/storage/TasksContext";
-import { playInvalidSound } from "../utils/playInvalidSound";
-import { playRemoveSound } from "../utils/playRemoveSound";
+import { playInvalidSound } from "../app/utils/playInvalidSound";
+import { playRemoveSound } from "../app/utils/playRemoveSound";
 
 // Task group buttons (green)
 // Additional styles for new UI elements
@@ -53,7 +53,6 @@ import { playRemoveSound } from "../utils/playRemoveSound";
  */
 
 export default function HomeScreen() {
-  console.log(`Current file name home`);
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const { lists, addList, removeList, renameList, exportDataAsJSON } =
@@ -88,8 +87,7 @@ export default function HomeScreen() {
 
     if (translationX < -100 && !hasNavigated.current) {
       hasNavigated.current = true;
-      console.log("USER: HOME <= SETTINGS");
-      router.push("/settingScreen");
+      router.push("/settingscreen");
     }
     /*  if (translationX > 100 && !hasNavigated.current) {
       hasNavigated.current = true;

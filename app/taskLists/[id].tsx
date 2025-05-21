@@ -1,19 +1,19 @@
 import { useTheme } from "@theme/ThemeContext";
 import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "@theme/colors";
-import { playRemoveSound } from "../../utils/playRemoveSound";
-import { playIndentTasksound } from "../../utils/playIndentTaskSound";
-import { playRenameTaskSound } from "../../utils/playRenameSound";
-import { playFlaggedSound } from "../../utils/playFlaggedSound";
-import { playUnflaggedSound } from "../../utils/playUnflaggedSound";
+import { playRemoveSound } from "../utils/playRemoveSound";
+import { playIndentTasksound } from "../utils/playIndentTaskSound";
+import { playRenameTaskSound } from "../utils/playRenameSound";
+import { playFlaggedSound } from "../utils/playFlaggedSound";
+import { playUnflaggedSound } from "../utils/playUnflaggedSound";
 // Helper to get tomorrow's date at midnight in mm-dd-yyyy format
 import {
   PanGestureHandler,
   State,
   GestureHandlerGestureEvent,
 } from "react-native-gesture-handler";
-import { playCompleteSound } from "../../utils/playCompleteSound";
-import { playInvalidSound } from "../../utils/playInvalidSound";
+import { playCompleteSound } from "../utils/playCompleteSound";
+import { playInvalidSound } from "../utils/playInvalidSound";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useRef, useEffect, useState } from "react";
 import {

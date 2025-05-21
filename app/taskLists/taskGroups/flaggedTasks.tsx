@@ -81,8 +81,6 @@ export default function FlaggedTasks() {
             <View
               style={[
                 styles.taskItem,
-                item.indent === 1 && styles.indentedTask,
-                // Use only styles from styles.ts for taskItem, indentedTask
                 item.completed
                   ? { backgroundColor: colors.dark.secondary }
                   : item.buttonColor
