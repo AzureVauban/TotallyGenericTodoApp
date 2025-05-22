@@ -1,9 +1,8 @@
-// utils/generateUsername.ts
 import {
-  uniqueNamesGenerator,
   adjectives,
-  colors,
   animals,
+  colors,
+  uniqueNamesGenerator,
 } from "unique-names-generator";
 
 export function generateUsername() {

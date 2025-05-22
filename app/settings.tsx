@@ -1,13 +1,10 @@
-// SETTINGS.tsx
+/**
+ * SettingsScreen provides user controls for theme and sound preferences.
+ * Includes gesture navigation (right swipe to return to home).
+ * Features logout, theme toggle, and sound enable switches.
+ */
 import React, { useRef, useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  Switch,
-  StyleSheet,
-} from "react-native";
+import { View, Text, TouchableOpacity, Switch } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import {
   PanGestureHandler,
@@ -17,72 +14,8 @@ import {
 import FiBrAddressCard from "../assets/icons/svg/fi-br-address-card.svg";
 import { colors } from "@theme/colors";
 import { useTheme } from "@theme/ThemeContext";
+import { styles } from "@theme/styles";
 
-const settingsStyles = StyleSheet.create({
-  screenbackground: {
-    flex: 1,
-    backgroundColor: colors.dark.primary,
-    paddingTop: 40,
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontWeight: "bold",
-    fontSize: 24,
-    marginBottom: 20,
-    color: colors.dark.accent,
-  },
-  optionRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  optionText: {
-    color: colors.dark.text,
-    fontSize: 16,
-  },
-  logoutButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    width: 300,
-    alignSelf: "center",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: "auto",
-    marginBottom: 20,
-  },
-  logoutButtonText: {
-    fontWeight: "bold",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.dark.tertiary,
-    marginVertical: 10,
-    width: "90%",
-    alignSelf: "center",
-  },
-});
-
-/**
- * **SettingsScreen**
- *
- * Displays the Settings page with a swipe‑gesture background‑color transition and
- * a “Log Out” button.  The component supports two key gestures:
- *
- * ### Hooks & State
- * * `bgColor` – current background colour (updated every `onGestureEvent` frame).
- * * `hasNavigated` (ref) – debounce so gesture navigation triggers only once.
- * * `useFocusEffect` – resets colour & debounce whenever the screen regains focus.
- *
- * ### Components
- * * **PanGestureHandler** from *react‑native‑gesture‑handler* wraps the entire screen.
- * * **Image** – centred app logo.
- * * **TouchableOpacity** – red “Log Out” button that routes to `/login`.
- *
- * @returns A full‑screen `View` wrapped in a `PanGestureHandler`.
- */
 export function RedirectToLogin() {
   const router = useRouter();
   const isUserLoggedIn: boolean = false; // Replace with your actual login check
@@ -91,7 +24,11 @@ export function RedirectToLogin() {
     const timeout = setTimeout(() => {
       if (!isUserLoggedIn) {
         console.log("USER REDIRECTED TO LOGIN FROM SETTINGS");
+<<<<<<< HEAD:app/settingScreen.tsx
         router.replace("/greetScreen");
+=======
+        router.replace("/welcome");
+>>>>>>> develop:app/settings.tsx
       } else {
         router.replace("/home");
       }
@@ -151,7 +88,7 @@ export default function SettingsScreen() {
     <PanGestureHandler onGestureEvent={onGestureEvent}>
       <View
         style={[
-          settingsStyles.screenbackground,
+          styles.screenbackground,
           {
             backgroundColor: isDark
               ? colors.dark.background
@@ -161,7 +98,7 @@ export default function SettingsScreen() {
       >
         <Text
           style={[
-            settingsStyles.title,
+            styles.title,
             { color: isDark ? colors.dark.accent : colors.light.accent },
           ]}
         >
@@ -169,7 +106,7 @@ export default function SettingsScreen() {
         </Text>
         <View
           style={[
-            settingsStyles.divider,
+            styles.divider,
             {
               backgroundColor: isDark
                 ? colors.dark.tertiary
@@ -178,20 +115,26 @@ export default function SettingsScreen() {
           ]}
         />
         <View style={{ marginTop: 30 }}>
-          <View style={settingsStyles.optionRow}>
+          <View style={styles.optionRow}>
             <Text
               style={[
-                settingsStyles.optionText,
+                styles.optionText,
                 { color: isDark ? colors.dark.text : colors.light.text },
               ]}
             >
               Enable Sound Effects
             </Text>
-            <Switch value={soundEnabled} onValueChange={setSoundEnabled} />
+            <Switch
+              value={soundEnabled}
+              onValueChange={(value) => {
+                console.log("Sound Effects toggled:", value);
+                setSoundEnabled(value);
+              }}
+            />
           </View>
           <View
             style={[
-              settingsStyles.divider,
+              styles.divider,
               {
                 backgroundColor: isDark
                   ? colors.dark.tertiary
@@ -199,21 +142,27 @@ export default function SettingsScreen() {
               },
             ]}
           />
-          <View style={settingsStyles.optionRow}>
+          <View style={styles.optionRow}>
             <Text
               style={[
-                settingsStyles.optionText,
+                styles.optionText,
                 { color: isDark ? colors.dark.text : colors.light.text },
               ]}
             >
               Light/Dark Theme
             </Text>
-            <Switch value={isDark} onValueChange={toggleTheme} />
+            <Switch
+              value={isDark}
+              onValueChange={(value) => {
+                console.log("Theme toggled, now dark:", value);
+                toggleTheme();
+              }}
+            />
           </View>
         </View>
         <View
           style={[
-            settingsStyles.divider,
+            styles.divider,
             {
               backgroundColor: isDark
                 ? colors.dark.tertiary
@@ -223,7 +172,7 @@ export default function SettingsScreen() {
         />
         <TouchableOpacity
           style={[
-            settingsStyles.logoutButton,
+            styles.logoutButton,
             {
               backgroundColor: isDark
                 ? colors.dark.redbutton_background
@@ -232,7 +181,11 @@ export default function SettingsScreen() {
           ]}
           onPress={() => {
             console.log("USER LOGGED OUT");
+<<<<<<< HEAD:app/settingScreen.tsx
             router.push("/greetScreen");
+=======
+            router.push("/welcome");
+>>>>>>> develop:app/settings.tsx
           }}
         >
           <FiBrAddressCard
@@ -247,7 +200,7 @@ export default function SettingsScreen() {
           />
           <Text
             style={[
-              settingsStyles.logoutButtonText,
+              styles.logoutButtonText,
               {
                 color: isDark
                   ? colors.dark.redbutton_text_icon

@@ -1,4 +1,12 @@
+<<<<<<< HEAD
 import Auth from "./Auth";
+=======
+/**
+ * Root layout of the application.
+ * Wraps the app in required providers: GestureHandler, Theme, and Tasks context.
+ * Uses a Stack navigator with gesture-based horizontal screen transitions.
+ */
+>>>>>>> develop
 import React from "react";
 import { Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";

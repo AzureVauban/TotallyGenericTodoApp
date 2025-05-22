@@ -1,19 +1,35 @@
+/**
+ * MyList Screen
+ *
+ * This screen renders a task list for a given ID (from the route parameter).
+ * It supports displaying and managing both user-created task lists and system-defined
+ * virtual task categories (like "Today", "Completed", etc.).
+ *
+ * Features:
+ * - Shows tasks grouped into active and completed sections
+ * - Handles swipe actions to flag, rename, delete, or indent tasks
+ * - Supports gesture-based navigation (e.g., swipe right to return home)
+ * - Includes modals for adding, renaming, and editing task details
+ * - Applies theme-aware styling and supports light/dark modes
+ *
+ * Task operations are fully integrated with context (`useTasks`).
+ */
 import { useTheme } from "@theme/ThemeContext";
 import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "@theme/colors";
-import { playRemoveSound } from "../../utils/playRemoveSound";
-import { playIndentTasksound } from "../../utils/playIndentTaskSound";
-import { playRenameTaskSound } from "../../utils/playRenameSound";
-import { playFlaggedSound } from "../../utils/playFlaggedSound";
-import { playUnflaggedSound } from "../../utils/playUnflaggedSound";
+import { playRemoveSound } from "../utils/sounds/playRemoveSound";
+import { playIndentTasksound } from "../utils/sounds/playIndentTaskSound";
+import { playRenameTaskSound } from "../utils/sounds/playRenameSound";
+import { playFlaggedSound } from "../utils/sounds/playFlaggedSound";
+import { playUnflaggedSound } from "../utils/sounds/playUnflaggedSound";
 // Helper to get tomorrow's date at midnight in mm-dd-yyyy format
 import {
   PanGestureHandler,
   State,
   GestureHandlerGestureEvent,
 } from "react-native-gesture-handler";
-import { playCompleteSound } from "../../utils/playCompleteSound";
-import { playInvalidSound } from "../../utils/playInvalidSound";
+import { playCompleteSound } from "../utils/sounds/playCompleteSound";
+import { playInvalidSound } from "../utils/sounds/playInvalidSound";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useRef, useEffect, useState } from "react";
 import {
@@ -39,7 +55,7 @@ import FiBrArrowRight from "../../assets/icons/svg/fi-br-arrow-alt-right.svg";
 import FiBrArrowLeft from "../../assets/icons/svg/fi-br-arrow-alt-left.svg";
 import { useTasks } from "../../backend/storage/TasksContext";
 import { Task as ContextTask } from "../../backend/storage/TasksContext";
-import { Audio } from "expo-av";
+import { Audio, Video } from "expo-av";
 /**
  * **MyList Screen**
  *
@@ -84,142 +100,14 @@ const getTomorrowMidnight = () => {
 //   "Recently Deleted",
 // ];
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.dark.primary,
-    padding: 20,
-  },
-  title: {
-    fontSize: 22,
-    color: colors.dark.primary,
-    marginBottom: 10,
-  },
-  taskItem: {
-    backgroundColor: colors.dark.secondary,
-    padding: 15,
-    marginBottom: 5,
-    borderRadius: 8,
-  },
-  taskText: {
-    color: colors.dark.text,
-    fontSize: 16,
-  },
-  indentedTask: {
-    marginLeft: 20,
-  },
-  searchBar: {
-    borderWidth: 1,
-    borderColor: colors.dark.tertiary,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginHorizontal: 16,
-    marginTop: 18,
-    color: colors.dark.text,
-    backgroundColor: colors.dark.secondary,
-    fontSize: 16,
-  },
-  listTitleWrapper: {
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  listTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: colors.light.accent,
-    marginTop: 25,
-  },
-  scrollContainer: {
-    flex: 1,
-    paddingHorizontal: 10,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.dark.tertiary,
-    marginVertical: 10,
-    width: 300,
-    alignSelf: "center",
-  },
-  addTaskButton: {
-    backgroundColor: colors.light.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    marginVertical: 16,
-    marginHorizontal: 16,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  addTaskButtonText: {
-    color: colors.light.text,
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: colors.dark.secondary,
-    padding: 20,
-    borderRadius: 12,
-    width: "80%",
-  },
-  modalTitle: {
-    color: colors.dark.text,
-    fontSize: 18,
-    marginBottom: 12,
-    fontWeight: "bold",
-  },
-  modalInput: {
-    borderWidth: 1,
-    borderColor: colors.dark.tertiary,
-    color: colors.dark.text,
-    padding: 8,
-    borderRadius: 6,
-    marginBottom: 12,
-  },
-  colorPickerContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    marginBottom: 12,
-  },
-  colorSwatch: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    margin: 4,
-  },
-  modalButton: {
-    backgroundColor: colors.light.primary,
-    padding: 12,
-    borderRadius: 6,
-    marginBottom: 8,
-    alignItems: "center",
-  },
-  modalButtonText: {
-    color: colors.light.text,
-    fontSize: 16,
-  },
-  inlineButton: {
-    justifyContent: "center",
-    alignItems: "center",
-    width: 50,
-    height: "100%",
-    alignSelf: "stretch",
-    margin: 0,
-    borderRadius: 8,
-  },
-});
+import { styles } from "../theme/styles";
 
 export default function MyList() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   useFocusEffect(
     React.useCallback(() => {
+      exportDataAsJSON();
       // no-op, but ensures re-render on theme change
     }, [theme])
   );
@@ -239,6 +127,7 @@ export default function MyList() {
     flagTask,
     indentTask,
     reorderTasks: reorderTask,
+    exportDataAsJSON,
   } = useTasks();
 
   // Handler for flagging a task using context method
@@ -434,6 +323,7 @@ export default function MyList() {
                         setDetailColor(item.buttonColor ?? "");
                         setDetailDesc(item.title);
                         setDetailModalVisible(true);
+                        exportDataAsJSON();
                       }}
                     >
                       <FiBrsettings
@@ -467,6 +357,7 @@ export default function MyList() {
                               onPress: () => {
                                 playRemoveSound();
                                 moveToRecentlyDeleted(item.id, listId);
+                                exportDataAsJSON();
                               },
                             },
                           ]
@@ -510,6 +401,7 @@ export default function MyList() {
                         } else {
                           playUnflaggedSound();
                         }
+                        exportDataAsJSON();
                       }}
                     >
                       <FiBrflagAlt
@@ -535,6 +427,7 @@ export default function MyList() {
                         setRenameTaskId(item.id);
                         setRenameText(item.title);
                         setRenameModalVisible(true);
+                        exportDataAsJSON();
                       }}
                     >
                       <FiBredit
@@ -561,6 +454,7 @@ export default function MyList() {
                         onPress={() => {
                           playIndentTasksound();
                           handleIndentById(item.id);
+                          exportDataAsJSON();
                         }}
                       >
                         {item.indent === 1 ? (
@@ -617,6 +511,7 @@ export default function MyList() {
                     if (willComplete) {
                       playCompleteSound();
                     }
+                    exportDataAsJSON();
                   }}
                   onLongPress={() => {
                     // Default: start drag for reordering
@@ -673,7 +568,12 @@ export default function MyList() {
               data={completedTasks}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <Pressable onPress={() => toggleTask(item.id)}>
+                <Pressable
+                  onPress={() => {
+                    toggleTask(item.id);
+                    exportDataAsJSON();
+                  }}
+                >
                   <View
                     style={[
                       styles.taskItem,

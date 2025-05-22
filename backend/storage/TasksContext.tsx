@@ -1,8 +1,61 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { View, Text } from "react-native";
+import * as FileSystem from "expo-file-system";
 const TASKS_STORAGE_KEY = "TASKS_STORAGE_KEY";
 const LISTS_STORAGE_KEY = "LISTS_STORAGE_KEY";
+
+export const exportDataAsJSON = async () => {
+  try {
+    // Load stored data
+    const tasksJson = await AsyncStorage.getItem(TASKS_STORAGE_KEY);
+    const listsJson = await AsyncStorage.getItem(LISTS_STORAGE_KEY);
+
+    const tasks = tasksJson ? JSON.parse(tasksJson) : [];
+    const lists = listsJson ? JSON.parse(listsJson) : [];
+
+    const exportData = { lists, tasks };
+
+    // Ensure save directory exists
+    const dirUri = FileSystem.documentDirectory + "backend/save";
+    await FileSystem.makeDirectoryAsync(dirUri, { intermediates: true });
+
+    // Write JSON file
+    const fileUri = `${dirUri}/savadata.json`;
+    await FileSystem.writeAsStringAsync(
+      fileUri,
+      JSON.stringify(exportData, null, 2)
+    );
+
+    console.log(`📦 Saved JSON data to ${fileUri}`);
+  } catch (error) {
+    console.warn("Error exporting data as JSON to file:", error);
+  }
+};
+
+export const readDataFromJSON = async () => {
+  try {
+    const dirUri = FileSystem.documentDirectory + "backend/save";
+    const fileUri = `${dirUri}/savadata.json`;
+
+    const fileExists = await FileSystem.getInfoAsync(fileUri);
+
+    if (!fileExists.exists) {
+      console.warn(`File not found at path: ${fileUri}`);
+      return null;
+    }
+
+    const data = await FileSystem.readAsStringAsync(fileUri);
+    const parsedData = JSON.parse(data);
+
+    console.log("📂 Loaded JSON Data:\n", parsedData);
+
+    return parsedData;
+  } catch (error) {
+    console.warn("Error reading data from JSON file:", error);
+    return null;
+  }
+};
 
 export interface Task {
   id: string;
@@ -35,6 +88,8 @@ export interface TasksContextValue {
   indentTask: (id: string, indentLevel: number) => void;
   reorderTasks: (listName: string, newOrder: Task[]) => void;
   flagTask: (id: string, isFlagged: boolean) => void;
+  exportDataAsJSON: () => Promise<void>;
+  readDataFromJSON: () => Promise<any>; // Added to match the context provider
 }
 
 // Hook to consume TasksContext
@@ -57,6 +112,8 @@ export const TasksContext = createContext<TasksContextValue>({
   indentTask: () => {},
   reorderTasks: () => {},
   flagTask: () => {},
+  exportDataAsJSON: async () => {},
+  readDataFromJSON: async () => {}, // <-- Added here
 });
 
 export function TasksProvider({ children }: { children: React.ReactNode }) {
@@ -69,7 +126,7 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
       AsyncStorage.getItem(TASKS_STORAGE_KEY),
       AsyncStorage.getItem(LISTS_STORAGE_KEY),
     ])
-      .then(([tasksJson, listsJson]) => {
+      .then(async ([tasksJson, listsJson]) => {
         if (tasksJson) {
           try {
             setTasks(JSON.parse(tasksJson));
@@ -83,6 +140,42 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
           } catch {
             console.warn("Failed to parse lists JSON");
           }
+        }
+
+        // Load from savadata.json if it exists
+        const savedData = await readDataFromJSON();
+        if (savedData) {
+          if (savedData.tasks) {
+            setTasks(savedData.tasks);
+            await AsyncStorage.setItem(
+              TASKS_STORAGE_KEY,
+              JSON.stringify(savedData.tasks)
+            );
+          }
+          if (savedData.lists) {
+            setLists(savedData.lists);
+            await AsyncStorage.setItem(
+              LISTS_STORAGE_KEY,
+              JSON.stringify(savedData.lists)
+            );
+          }
+
+          // 🔄 Force-refresh UI after load
+          AsyncStorage.getItem(TASKS_STORAGE_KEY).then((data) => {
+            if (data) {
+              const parsed = JSON.parse(data);
+              setTasks(parsed);
+            }
+          });
+
+          AsyncStorage.getItem(LISTS_STORAGE_KEY).then((data) => {
+            if (data) {
+              const parsed = JSON.parse(data);
+              setLists(parsed);
+            }
+          });
+
+          console.log("✅ Loaded data from savadata.json and UI refreshed.");
         }
       })
       .finally(() => setHydrated(true));
@@ -115,6 +208,9 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
     );
     await AsyncStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(uniqueTasks));
 
+    // Auto-save to JSON
+    exportDataAsJSON();
+
     // Force-refresh to verify it's persisted
     await new Promise((resolve) => setTimeout(resolve, 500)); // Give it time to sync
     const refreshedTasks = await AsyncStorage.getItem(TASKS_STORAGE_KEY);
@@ -135,6 +231,9 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
         x.id === id ? { ...x, completed: !x.completed } : x
       );
       AsyncStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(updated));
+
+      // Auto-save to JSON
+      exportDataAsJSON();
       return updated;
     });
   };
@@ -144,6 +243,9 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
     setTasks((old) => {
       const updated = old.filter((x) => x.id !== id);
       AsyncStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(updated));
+
+      // Auto-save to JSON
+      exportDataAsJSON();
       return updated;
     });
   };
@@ -154,6 +256,9 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
       const newList = { id: Date.now().toString(), name };
       const updated = [...old, newList];
       AsyncStorage.setItem(LISTS_STORAGE_KEY, JSON.stringify(updated));
+
+      // Auto-save to JSON
+      exportDataAsJSON();
       return updated;
     });
   };
@@ -166,6 +271,9 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
     setLists((old) => {
       const updated = old.filter((x) => x.id !== id);
       AsyncStorage.setItem(LISTS_STORAGE_KEY, JSON.stringify(updated));
+
+      // Auto-save to JSON
+      exportDataAsJSON();
       return updated;
     });
   };
@@ -211,6 +319,9 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
         task.id === id ? { ...task, title: newText } : task
       );
       AsyncStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(updated));
+
+      // Auto-save to JSON
+      exportDataAsJSON();
       return updated;
     });
 
@@ -297,6 +408,8 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
         indentTask,
         reorderTasks: reorderTasks,
         flagTask,
+        exportDataAsJSON,
+        readDataFromJSON,
       }}
     >
       {children}

@@ -62,8 +62,17 @@ assets/soundeffects/
 674A53ac6gQM8vx.md
 .env
 .env.local
+<<<<<<< HEAD
 *.sh
 *.txt
 # Unignore email-templates HTML files
 !email-templates/
 !email-templates/*.html
+=======
+<<<<<<< HEAD
+*.sh
+clean.py
+=======
+*.sh
+clean.py
+>>>>>>> develop

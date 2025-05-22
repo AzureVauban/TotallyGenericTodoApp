@@ -13,7 +13,11 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "lint": "expo lint",
+<<<<<<< HEAD
     "start:tunnel": "concurrently \"ngrok start --config /Users/michaelelder/Programming/SussySushi/DivideNDo/ngrok.yml dev-tunnel\" \"yarn expo start --tunnel\"",
+=======
+    "start:tunnel": "ngrok start --config /Users/michaelelder/Programming/SussySushi/DivideNDo/ngrok.yml dev-tunnel && yarn expo start --tunnel",
+>>>>>>> develop
     "poststart": "echo 'Visit the ngrok URL to view your app: $(ngrok url dev-tunnel)'"
   },
   "dependencies": {
@@ -29,7 +33,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "expo": "^53.0.5",
-    "expo-av": "~15.1.4",
+    "expo-av": "^15.1.4",
     "expo-blur": "~14.1.4",
     "expo-build-properties": "^0.14.6",
     "expo-constants": "~17.1.5",
