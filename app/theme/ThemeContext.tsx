@@ -11,30 +11,32 @@ type Theme = "light" | "dark";
 interface ThemeContextValue {
   theme: Theme;
   toggleTheme: () => void;
+  isDark: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
   theme: "light",
   toggleTheme: () => {},
+  isDark: false,
 });
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  // Initialize to system preference
-  const colorScheme = Appearance.getColorScheme() as Theme;
-  const [theme, setTheme] = useState<Theme>(colorScheme || "light");
-
-  // Listen for system changes
+  // Always default to dark theme
+  const [theme, setTheme] = useState<Theme>("dark");
   useEffect(() => {
     const sub = Appearance.addChangeListener(({ colorScheme }) => {
-      setTheme(colorScheme as Theme);
+      // Comment out or remove the next line to ignore system changes:
+      // setTheme(colorScheme as Theme);
     });
     return () => sub.remove();
   }, []);
 
   const toggleTheme = () => setTheme((t) => (t === "light" ? "dark" : "light"));
 
+  const isDark = theme === "dark";
+
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, isDark }}>
       {children}
     </ThemeContext.Provider>
   );

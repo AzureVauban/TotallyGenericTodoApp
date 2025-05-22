@@ -1,3 +1,11 @@
+/*
+TODO FUTURE ADDITIONS
+- display avatar of logged in user
+- show UID (via a toggle)
+- display user's display-name (via a toggle)
+- add a run-time debug screen (toggle via password)
+*/
+
 /**
  * SettingsScreen provides user controls for theme and sound preferences.
  * Includes gesture navigation (right swipe to return to home).
@@ -15,6 +23,7 @@ import FiBrAddressCard from "../assets/icons/svg/fi-br-address-card.svg";
 import { colors } from "@theme/colors";
 import { useTheme } from "@theme/ThemeContext";
 import { styles } from "@theme/styles";
+import { supabase } from "../lib/supabaseClient";
 
 export function RedirectToLogin() {
   const router = useRouter();
@@ -24,11 +33,7 @@ export function RedirectToLogin() {
     const timeout = setTimeout(() => {
       if (!isUserLoggedIn) {
         console.log("USER REDIRECTED TO LOGIN FROM SETTINGS");
-<<<<<<< HEAD:app/settingScreen.tsx
-        router.replace("/greetScreen");
-=======
         router.replace("/welcome");
->>>>>>> develop:app/settings.tsx
       } else {
         router.replace("/home");
       }
@@ -179,13 +184,10 @@ export default function SettingsScreen() {
                 : colors.light.redbutton_background,
             },
           ]}
-          onPress={() => {
+          onPress={async () => {
             console.log("USER LOGGED OUT");
-<<<<<<< HEAD:app/settingScreen.tsx
-            router.push("/greetScreen");
-=======
+            await supabase.auth.signOut();
             router.push("/welcome");
->>>>>>> develop:app/settings.tsx
           }}
         >
           <FiBrAddressCard

@@ -1,7 +1,4 @@
 {
-  "resolutions": {
-    "@expo/cli": "0.24.10"
-  },
   "name": "dividendo",
   "main": "expo-router/entry",
   "version": "1.0.0",
@@ -10,14 +7,10 @@
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web",
+    "scheme": "SussySushi",
     "test": "jest --watchAll",
     "lint": "expo lint",
-<<<<<<< HEAD
-    "start:tunnel": "concurrently \"ngrok start --config /Users/michaelelder/Programming/SussySushi/DivideNDo/ngrok.yml dev-tunnel\" \"yarn expo start --tunnel\"",
-=======
     "start:tunnel": "ngrok start --config /Users/michaelelder/Programming/SussySushi/DivideNDo/ngrok.yml dev-tunnel && yarn expo start --tunnel",
->>>>>>> develop
     "poststart": "echo 'Visit the ngrok URL to view your app: $(ngrok url dev-tunnel)'"
   },
   "dependencies": {
@@ -95,5 +88,9 @@
   },
   "private": true,
   "author": "Michael Elder <niv14@txstate.edu>",
-  "license": "MIT"
+  "license": "MIT",
+  "resolutions": {
+    "@expo/cli": "0.24.10",
+    "@supabase/auth-js": "0.0.0"
+  }
 }

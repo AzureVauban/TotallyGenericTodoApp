@@ -14,11 +14,7 @@ export default function IndexRedirect() {
     // Defer navigation to the next tick to ensure layout is mounted
     const timeout = setTimeout(() => {
       if (!isUserLoggedIn) {
-<<<<<<< HEAD
-        router.replace("/greetScreen");
-=======
         router.replace("/welcome");
->>>>>>> develop
       } else {
         router.replace("/home");
       }

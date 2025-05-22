@@ -5,23 +5,42 @@
  */
 import "react-native-url-polyfill/auto";
 import React from "react";
-import { View, TouchableOpacity, Text, Dimensions } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  Dimensions,
+  Platform,
+} from "react-native";
 import { useRouter } from "expo-router";
 import FISignatureIcon from "../assets/icons/svg/fi-br-list-check.svg";
 import { colors } from "@theme/colors";
 import { useTheme } from "@theme/ThemeContext";
 import { useFocusEffect } from "@react-navigation/native";
 import { styles } from "@theme/styles";
+import { supabase } from "../lib/supabaseClient";
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const BUTTON_WIDTH = SCREEN_WIDTH * 0.7;
 
-export default function GreetScreen() {
+export default function WelcomeScreen() {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === "dark";
   useFocusEffect(React.useCallback(() => {}, [theme]));
   const router = useRouter();
 
-  // Shared button style so both buttons have the same width.
+  const handleContinue = async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) {
+      // Show warning if not authenticated
+      alert(
+        "You must sign in and validate your account before continuing to the home screen."
+      );
+      return;
+    }
+    router.push("/home");
+  };
 
   return (
     <View
@@ -31,6 +50,7 @@ export default function GreetScreen() {
           backgroundColor: isDark
             ? colors.dark.background
             : colors.light.background,
+          // paddingTop: Platform.OS === "android" ? 32 : 0, // Add padding for Android
         },
       ]}
     >
@@ -39,7 +59,7 @@ export default function GreetScreen() {
           flex: 1,
           justifyContent: "flex-end",
           alignItems: "center",
-          marginBottom: 150,
+          marginBottom: 75,
         }}
       >
         <TouchableOpacity
@@ -93,9 +113,7 @@ export default function GreetScreen() {
                 : colors.light.bluebutton_background,
             },
           ]}
-          onPress={() => {
-            router.push("/home");
-          }}
+          onPress={handleContinue}
         >
           <Text
             style={[
@@ -167,7 +185,7 @@ export default function GreetScreen() {
             </Text>
             <TouchableOpacity
               onPress={() => {
-                router.push("/notfound");
+                router.push("/authentication/register");
               }}
             >
               <Text
@@ -208,7 +226,7 @@ export default function GreetScreen() {
             </Text>
             <TouchableOpacity
               onPress={() => {
-                router.push("/notfound");
+                router.push("/authentication/login"); //! REPLACE WITH /login when ready
               }}
             >
               <Text
@@ -226,6 +244,12 @@ export default function GreetScreen() {
               </Text>
             </TouchableOpacity>
           </View>
+
+          <TouchableOpacity onPress={() => router.push("/home")}>
+            <Text style={[styles.forgot, { color: colors[theme].accent }]}>
+              Continue without signing in
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
