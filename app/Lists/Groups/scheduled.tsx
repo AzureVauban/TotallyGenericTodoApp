@@ -1,29 +1,53 @@
 /**
- * Flagged Screen
+ * Scheduled Screen
  *
- * Shows every task that has been marked “flagged” and not deleted.
+ * Shows all non-deleted tasks that have any `scheduleDate` set.
  */
-import React from "react";
-import { View, Text, FlatList, Pressable } from "react-native";
-import { useTasks } from "../../../backend/storage/TasksContext";
-import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "@theme/colors";
-import { useTheme } from "../../theme/ThemeContext";
-import { styles } from "../../theme/styles";
-import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
-import Swipeable from "react-native-gesture-handler/Swipeable";
+import { useTheme } from "@theme/ThemeContext";
+import { useFocusEffect } from "@react-navigation/native";
 
-// …
-export default function FlaggedTasks() {
+import React from "react";
+import { View, Text, StyleSheet, FlatList } from "react-native";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+import { Pressable } from "react-native";
+import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
+import {
+  useTasks,
+  Task as ContextTask,
+} from "../../../backend/storage/TasksContext";
+import { styles } from "../../theme/styles";
+
+// Local TaskItem shape
+interface TaskItem {
+  id: string;
+  text: string;
+  scheduleDate?: string;
+  recentlyDeleted?: boolean;
+  listName: string;
+}
+
+export default function ScheduledTasks() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const { tasks, removeTask, exportDataAsJSON } = useTasks();
-  const { theme: themeMode } = useTheme();
-  const isDark = themeMode === "dark";
   useFocusEffect(
     React.useCallback(() => {
       exportDataAsJSON();
-    }, [themeMode])
+      // no-op, but ensures re-render on theme change
+    }, [theme])
   );
-  const flaggedTasks = tasks.filter((t) => !!t.flagged);
+  const today = new Date();
+  const visibleTasks = tasks.filter((t) => {
+    if (t.recentlyDeleted) return false;
+    if (!t.scheduleDate) return false;
+    const sd = new Date(t.scheduleDate);
+    return (
+      sd.getFullYear() === today.getFullYear() &&
+      sd.getMonth() === today.getMonth() &&
+      sd.getDate() === today.getDate()
+    );
+  });
 
   return (
     <View
@@ -47,7 +71,7 @@ export default function FlaggedTasks() {
           },
         ]}
       >
-        {"Flagged Tasks"}
+        {"Scheduled Tasks"}
       </Text>
       <View
         style={[
@@ -60,7 +84,7 @@ export default function FlaggedTasks() {
         ]}
       />
       <FlatList
-        data={flaggedTasks}
+        data={visibleTasks}
         keyExtractor={(t) => t.id}
         renderItem={({ item }) => (
           <Swipeable
@@ -81,7 +105,6 @@ export default function FlaggedTasks() {
             <View
               style={[
                 styles.taskItem,
-                item.indent === 1 && styles.indentedTask,
                 // Use only styles from styles.ts for taskItem, indentedTask
                 item.completed
                   ? { backgroundColor: colors.dark.secondary }

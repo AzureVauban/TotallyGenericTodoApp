@@ -1,3 +1,9 @@
+/**
+ * Home screen of the application.
+ * Displays grouped task categories and user-defined task lists.
+ * Supports swipe gestures to navigate to the settings screen and manage lists.
+ * Includes modals for adding and renaming task lists.
+ */
 import { useTheme } from "@theme/ThemeContext";
 import { colors } from "@theme/colors";
 import { styles } from "../app/theme/styles";
@@ -24,36 +30,10 @@ import {
 import FiBredit from "../assets/icons/svg/fi-br-text-box-edit.svg";
 import FiBrtrash from "../assets/icons/svg/fi-br-trash.svg";
 import { useTasks } from "../backend/storage/TasksContext";
-import { playInvalidSound } from "../utils/playInvalidSound";
-import { playRemoveSound } from "../utils/playRemoveSound";
-
-// Task group buttons (green)
-// Additional styles for new UI elements
-
-/**
- * **HomeScreen**
- *
- * Displays the list‑of‑lists “home” view where the user can:
- *  • Swipe **right‑to‑left** on a list button to reveal a red **Delete** action.
- *    Confirming the alert removes the list, pushes it to the *recentlyDeleted* state array,
- *    and persists the change via `saveTasks`.
- *  • Tap a list button to navigate to `/taskLists/<id>` using Expo Router.
- *  • Tap the big green “+” button to create a new list. An `Alert.prompt` collects the
- *    name, validates it, persists the new list, and immediately routes to its detail screen.
- *
- * **State**
- *  * `tasks` – active task‑lists shown on screen.
- *  * `doneTasks` / `recentlyDeleted` – supporting arrays used by other views.
- *
- * **Side‑effects**
- *  Persists all list mutations through the local `saveTasks` helper (implementation
- *  provided elsewhere in the project).
- *
- * @returns A fully‑interactive React Native view wrapped in `Swipeable` components.
- */
+import { playInvalidSound } from "./utils/sounds/playInvalidSound";
+import { playRemoveSound } from "./utils/sounds/playRemoveSound";
 
 export default function HomeScreen() {
-  console.log(`Current file name home`);
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const { lists, addList, removeList, renameList, exportDataAsJSON } =
@@ -88,14 +68,8 @@ export default function HomeScreen() {
 
     if (translationX < -100 && !hasNavigated.current) {
       hasNavigated.current = true;
-      console.log("USER: HOME <= SETTINGS");
-      router.push("/settingScreen");
+      router.push("/settings");
     }
-    /*  if (translationX > 100 && !hasNavigated.current) {
-      hasNavigated.current = true;
-      console.log("USER: HOME => LEADERBOARD");
-      router.push("/leaderboard");
-    } */
 
     if (
       event.nativeEvent.state === State.END ||
@@ -136,7 +110,7 @@ export default function HomeScreen() {
         <View style={styles.taskGroupsWrapper}>
           <View style={styles.taskGroupRow}>
             <Link
-              href="/taskLists/taskGroups/scheduledTasks"
+              href="/Lists/Groups/scheduled"
               onPress={() => exportDataAsJSON()}
               style={[
                 styles.taskGroupButton,
@@ -159,7 +133,7 @@ export default function HomeScreen() {
               </Text>
             </Link>
             <Link
-              href="/taskLists/taskGroups/allTasks"
+              href="/Lists/Groups/all"
               onPress={() => exportDataAsJSON()}
               style={[
                 styles.taskGroupButton,
@@ -184,7 +158,7 @@ export default function HomeScreen() {
           </View>
           <View style={styles.taskGroupRow}>
             <Link
-              href="/taskLists/taskGroups/flaggedTasks"
+              href="/Lists/Groups/flagged"
               onPress={() => exportDataAsJSON()}
               style={[
                 styles.taskGroupButton,
@@ -207,7 +181,7 @@ export default function HomeScreen() {
               </Text>
             </Link>
             <Link
-              href="/taskLists/taskGroups/completedTasks"
+              href="/Lists/Groups/completed"
               onPress={() => exportDataAsJSON()}
               style={[
                 styles.taskGroupButton,
@@ -325,7 +299,7 @@ export default function HomeScreen() {
                     ]}
                     onPress={() => {
                       exportDataAsJSON();
-                      router.push(`/taskLists/${item.name}` as const);
+                      router.push(`/Lists/${item.name}` as const);
                     }}
                   >
                     <Text
@@ -534,7 +508,7 @@ export default function HomeScreen() {
                   // Call context renameList to update storage and state
                   renameList(renameTarget.id, trimmedName);
                   // Navigate to the renamed list screen
-                  router.replace(`/taskLists/${trimmedName}`);
+                  router.replace(`/Lists/${trimmedName}`);
                   setRenameModalVisible(false);
                 }}
               >

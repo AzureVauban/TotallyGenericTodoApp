@@ -1,53 +1,40 @@
-import { colors } from "@theme/colors";
-import { useTheme } from "@theme/ThemeContext";
-import { useFocusEffect } from "@react-navigation/native";
 /**
- * Scheduled Screen
+ * Completed Screen
  *
- * Shows all non-deleted tasks that have any `scheduleDate` set.
+ * Shows every task marked done (and not deleted).
  */
-
 import React from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { View, Text, FlatList } from "react-native";
+// import { useTasks } from "../../../backend/storage/TasksContext";
+
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { Pressable } from "react-native";
 import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
-import {
-  useTasks,
-  Task as ContextTask,
-} from "../../../backend/storage/TasksContext";
+import { useTasks } from "../../../backend/storage/TasksContext";
+import { useFocusEffect } from "@react-navigation/native";
+import { colors } from "@theme/colors";
+import { useTheme } from "../../theme/ThemeContext";
 import { styles } from "../../theme/styles";
-
 // Local TaskItem shape
 interface TaskItem {
   id: string;
   text: string;
-  scheduleDate?: string;
+  completed: boolean;
   recentlyDeleted?: boolean;
   listName: string;
 }
 
-export default function ScheduledTasks() {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
+export default function AllTasks() {
   const { tasks, removeTask, exportDataAsJSON } = useTasks();
+  const { theme: themeMode } = useTheme();
+  const isDark = themeMode === "dark";
+  const visibleTasks = tasks.filter((t) => t.completed && !t.recentlyDeleted);
+
   useFocusEffect(
     React.useCallback(() => {
       exportDataAsJSON();
-      // no-op, but ensures re-render on theme change
-    }, [theme])
+    }, [themeMode])
   );
-  const today = new Date();
-  const visibleTasks = tasks.filter((t) => {
-    if (t.recentlyDeleted) return false;
-    if (!t.scheduleDate) return false;
-    const sd = new Date(t.scheduleDate);
-    return (
-      sd.getFullYear() === today.getFullYear() &&
-      sd.getMonth() === today.getMonth() &&
-      sd.getDate() === today.getDate()
-    );
-  });
 
   return (
     <View
@@ -71,7 +58,7 @@ export default function ScheduledTasks() {
           },
         ]}
       >
-        {"Scheduled Tasks"}
+        {"Completed Tasks"}
       </Text>
       <View
         style={[
@@ -105,7 +92,6 @@ export default function ScheduledTasks() {
             <View
               style={[
                 styles.taskItem,
-                item.indent === 1 && styles.indentedTask,
                 // Use only styles from styles.ts for taskItem, indentedTask
                 item.completed
                   ? { backgroundColor: colors.dark.secondary }

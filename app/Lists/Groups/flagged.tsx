@@ -1,29 +1,29 @@
 /**
- * All Screen
+ * Flagged Screen
  *
- * Shows every non-deleted task, regardless of state.
+ * Shows every task that has been marked “flagged” and not deleted.
  */
+import React from "react";
+import { View, Text, FlatList, Pressable } from "react-native";
+import { useTasks } from "../../../backend/storage/TasksContext";
+import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "@theme/colors";
 import { useTheme } from "../../theme/ThemeContext";
-import React from "react";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import { useFocusEffect } from "@react-navigation/native";
-import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
-import { useTasks } from "../../../backend/storage/TasksContext";
 import { styles } from "../../theme/styles";
+import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
+import Swipeable from "react-native-gesture-handler/Swipeable";
 
-export default function AllTasks() {
+// …
+export default function FlaggedTasks() {
   const { tasks, removeTask, exportDataAsJSON } = useTasks();
   const { theme: themeMode } = useTheme();
   const isDark = themeMode === "dark";
-  const visibleTasks = tasks.filter((t) => !t.recentlyDeleted);
-
   useFocusEffect(
     React.useCallback(() => {
       exportDataAsJSON();
     }, [themeMode])
   );
+  const flaggedTasks = tasks.filter((t) => !!t.flagged);
 
   return (
     <View
@@ -47,7 +47,7 @@ export default function AllTasks() {
           },
         ]}
       >
-        {"All Tasks"}
+        {"Flagged Tasks"}
       </Text>
       <View
         style={[
@@ -60,7 +60,7 @@ export default function AllTasks() {
         ]}
       />
       <FlatList
-        data={visibleTasks}
+        data={flaggedTasks}
         keyExtractor={(t) => t.id}
         renderItem={({ item }) => (
           <Swipeable
@@ -81,8 +81,6 @@ export default function AllTasks() {
             <View
               style={[
                 styles.taskItem,
-                item.indent === 1 && styles.indentedTask,
-                // Use only styles from styles.ts for taskItem, indentedTask
                 item.completed
                   ? { backgroundColor: colors.dark.secondary }
                   : item.buttonColor
