@@ -30,8 +30,8 @@ import {
 import FiBredit from "../assets/icons/svg/fi-br-text-box-edit.svg";
 import FiBrtrash from "../assets/icons/svg/fi-br-trash.svg";
 import { useTasks } from "../backend/storage/TasksContext";
-import { playInvalidSound } from "../app/utils/playInvalidSound";
-import { playRemoveSound } from "../app/utils/playRemoveSound";
+import { playInvalidSound } from "./utils/sounds/playInvalidSound";
+import { playRemoveSound } from "./utils/sounds/playRemoveSound";
 
 export default function HomeScreen() {
   const { theme } = useTheme();
@@ -68,13 +68,8 @@ export default function HomeScreen() {
 
     if (translationX < -100 && !hasNavigated.current) {
       hasNavigated.current = true;
-      router.push("/settingscreen");
+      router.push("/settings");
     }
-    /*  if (translationX > 100 && !hasNavigated.current) {
-      hasNavigated.current = true;
-      console.log("USER: HOME => LEADERBOARD");
-      router.push("/leaderboard");
-    } */
 
     if (
       event.nativeEvent.state === State.END ||
@@ -115,7 +110,7 @@ export default function HomeScreen() {
         <View style={styles.taskGroupsWrapper}>
           <View style={styles.taskGroupRow}>
             <Link
-              href="/taskLists/taskGroups/scheduled"
+              href="/Lists/Groups/scheduled"
               onPress={() => exportDataAsJSON()}
               style={[
                 styles.taskGroupButton,
@@ -138,7 +133,7 @@ export default function HomeScreen() {
               </Text>
             </Link>
             <Link
-              href="/taskLists/taskGroups/all"
+              href="/Lists/Groups/all"
               onPress={() => exportDataAsJSON()}
               style={[
                 styles.taskGroupButton,
@@ -163,7 +158,7 @@ export default function HomeScreen() {
           </View>
           <View style={styles.taskGroupRow}>
             <Link
-              href="/taskLists/taskGroups/flagged"
+              href="/Lists/Groups/flagged"
               onPress={() => exportDataAsJSON()}
               style={[
                 styles.taskGroupButton,
@@ -186,7 +181,7 @@ export default function HomeScreen() {
               </Text>
             </Link>
             <Link
-              href="/taskLists/taskGroups/completed"
+              href="/Lists/Groups/completed"
               onPress={() => exportDataAsJSON()}
               style={[
                 styles.taskGroupButton,
@@ -304,7 +299,7 @@ export default function HomeScreen() {
                     ]}
                     onPress={() => {
                       exportDataAsJSON();
-                      router.push(`/taskLists/${item.name}` as const);
+                      router.push(`/Lists/${item.name}` as const);
                     }}
                   >
                     <Text
@@ -513,7 +508,7 @@ export default function HomeScreen() {
                   // Call context renameList to update storage and state
                   renameList(renameTarget.id, trimmedName);
                   // Navigate to the renamed list screen
-                  router.replace(`/taskLists/${trimmedName}`);
+                  router.replace(`/Lists/${trimmedName}`);
                   setRenameModalVisible(false);
                 }}
               >
