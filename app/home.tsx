@@ -30,8 +30,8 @@ import {
 import FiBredit from "../assets/icons/svg/fi-br-text-box-edit.svg";
 import FiBrtrash from "../assets/icons/svg/fi-br-trash.svg";
 import { useTasks } from "../backend/storage/TasksContext";
-import { playInvalidSound } from "./utils/sounds/playInvalidSound";
-import { playRemoveSound } from "./utils/sounds/playRemoveSound";
+import { playInvalidSound } from "../app/utils/sounds/playInvalidSound";
+import { playRemoveSound } from "../app/utils/sounds/playRemoveSound";
 
 export default function HomeScreen() {
   const { theme } = useTheme();
@@ -68,7 +68,7 @@ export default function HomeScreen() {
 
     if (translationX < -100 && !hasNavigated.current) {
       hasNavigated.current = true;
-      router.push("/settings");
+      router.push("/notfound"); //! REPLACE THIS WITH SETTINGS
     }
 
     if (
