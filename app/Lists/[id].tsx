@@ -1,3 +1,8 @@
+/*
+TODO FUTURE ADDITIONS
+- dynmaic List title text color contrasting (revising this description)
+*/
+
 /**
  * MyList Screen
  *
@@ -14,22 +19,22 @@
  *
  * Task operations are fully integrated with context (`useTasks`).
  */
-import { useTheme } from "@theme/ThemeContext";
+import { useTheme } from "lib/ThemeContext";
 import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "@theme/colors";
-import { playRemoveSound } from "../utils/sounds/playRemoveSound";
-import { playIndentTasksound } from "../utils/sounds/playIndentTaskSound";
-import { playRenameTaskSound } from "../utils/sounds/playRenameSound";
-import { playFlaggedSound } from "../utils/sounds/playFlaggedSound";
-import { playUnflaggedSound } from "../utils/sounds/playUnflaggedSound";
+import { playRemoveSound } from "../../utils/sounds/trash";
+import { playIndentTasksound } from "../../utils/sounds/indent";
+import { playRenameTaskSound } from "../../utils/sounds/remove";
+import { playFlaggedSound } from "../../utils/sounds/flag";
+import { playUnflaggedSound } from "../../utils/sounds/unflag";
 // Helper to get tomorrow's date at midnight in mm-dd-yyyy format
 import {
   PanGestureHandler,
   State,
   GestureHandlerGestureEvent,
 } from "react-native-gesture-handler";
-import { playCompleteSound } from "../utils/sounds/playCompleteSound";
-import { playInvalidSound } from "../utils/sounds/playInvalidSound";
+import { playCompleteSound } from "../../utils/sounds/completed";
+import { playInvalidSound } from "../../utils/sounds/invalid";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useRef, useEffect, useState } from "react";
 import {

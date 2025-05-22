@@ -4,7 +4,7 @@
  * Shows every non-deleted task, regardless of state.
  */
 import { colors } from "@theme/colors";
-import { useTheme } from "../../theme/ThemeContext";
+import { useTheme } from "../../../lib/ThemeContext";
 import React from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
