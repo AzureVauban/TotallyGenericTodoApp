@@ -1,4 +1,16 @@
-// SETTINGS.tsx
+/*
+TODO FUTURE ADDITIONS
+- display avatar of logged in user
+- show UID (via a toggle)
+- display user's display-name (via a toggle)
+- add a run-time debug screen (toggle via password)
+*/
+
+/**
+ * SettingsScreen provides user controls for theme and sound preferences.
+ * Includes gesture navigation (right swipe to return to home).
+ * Features logout, theme toggle, and sound enable switches.
+ */
 import React, { useRef, useState } from "react";
 import { View, Text, TouchableOpacity, Switch } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
@@ -11,25 +23,8 @@ import FiBrAddressCard from "../assets/icons/svg/fi-br-address-card.svg";
 import { colors } from "@theme/colors";
 import { useTheme } from "@theme/ThemeContext";
 import { styles } from "@theme/styles";
+import { supabase } from "../lib/supabaseClient";
 
-/**
- * **SettingsScreen**
- *
- * Displays the Settings page with a swipe‑gesture background‑color transition and
- * a “Log Out” button.  The component supports two key gestures:
- *
- * ### Hooks & State
- * * `bgColor` – current background colour (updated every `onGestureEvent` frame).
- * * `hasNavigated` (ref) – debounce so gesture navigation triggers only once.
- * * `useFocusEffect` – resets colour & debounce whenever the screen regains focus.
- *
- * ### Components
- * * **PanGestureHandler** from *react‑native‑gesture‑handler* wraps the entire screen.
- * * **Image** – centred app logo.
- * * **TouchableOpacity** – red “Log Out” button that routes to `/login`.
- *
- * @returns A full‑screen `View` wrapped in a `PanGestureHandler`.
- */
 export function RedirectToLogin() {
   const router = useRouter();
   const isUserLoggedIn: boolean = false; // Replace with your actual login check
@@ -38,7 +33,7 @@ export function RedirectToLogin() {
     const timeout = setTimeout(() => {
       if (!isUserLoggedIn) {
         console.log("USER REDIRECTED TO LOGIN FROM SETTINGS");
-        router.replace("/greetScreen");
+        router.replace("/welcome");
       } else {
         router.replace("/home");
       }
@@ -189,9 +184,10 @@ export default function SettingsScreen() {
                 : colors.light.redbutton_background,
             },
           ]}
-          onPress={() => {
+          onPress={async () => {
             console.log("USER LOGGED OUT");
-            router.push("/greetScreen");
+            await supabase.auth.signOut();
+            router.push("/welcome");
           }}
         >
           <FiBrAddressCard

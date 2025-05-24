@@ -6,13 +6,13 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
-import { useColorScheme } from "react-native";
+import { useTheme } from "@theme/ThemeContext";
 import { colors } from "@theme/colors";
 
 export default function NotFoundScreen() {
   const router = useRouter();
-  const isDark = useColorScheme() === "dark";
-  const themeColors = isDark ? colors.dark : colors.light;
+  const { theme } = useTheme();
+  const themeColors = theme === "dark" ? colors.dark : colors.light;
 
   return (
     <View

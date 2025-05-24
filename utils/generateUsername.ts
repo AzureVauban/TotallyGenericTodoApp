@@ -1,4 +1,3 @@
-// utils/generateUsername.ts
 import {
   adjectives,
   animals,

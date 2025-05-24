@@ -63,3 +63,5 @@ assets/soundeffects/
 .env
 .env.local
 *.sh
+clean.py
+app/authentication/touchablebutton_registerscree.txt
