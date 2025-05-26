@@ -10,10 +10,16 @@ const isNgrok = (): boolean => {
   );
 };
 
+const SUPABASE_URL = isNgrok()
+  ? process.env.EXPO_PUBLIC_SITE_URL
+  : process.env.EXPO_PUBLIC_SUPABASE_URL;
+
+if (!SUPABASE_URL) {
+  throw new Error("Supabase URL is not defined in environment variables.");
+}
+
 export const supabase = createClient(
-  isNgrok()
-    ? process.env.EXPO_PUBLIC_SITE_URL
-    : process.env.EXPO_PUBLIC_SUPABASE_URL || "",
+  SUPABASE_URL,
   process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || "",
   {
     auth: {
@@ -23,18 +29,18 @@ export const supabase = createClient(
       detectSessionInUrl: false,
     },
     realtime: { enabled: false } as any,
-    global: { fetch },
+    global: { fetch: fetch.bind(globalThis) },
   }
 );
-// Tells Supabase Auth to continuously refresh the session automatically
-// if the app is in the foreground. When this is added, you will continue
-// to receive `onAuthStateChange` events with the `TOKEN_REFRESHED` or
-// `SIGNED_OUT` event if the user's session is terminated. This should
-// only be registered once.
-AppState.addEventListener("change", (state) => {
-  if (state === "active") {
-    supabase.auth.startAutoRefresh();
-  } else {
-    supabase.auth.stopAutoRefresh();
-  }
-});
+
+let appStateListener: any;
+
+if (!appStateListener) {
+  appStateListener = AppState.addEventListener("change", (state) => {
+    if (state === "active") {
+      supabase.auth.startAutoRefresh();
+    } else {
+      supabase.auth.stopAutoRefresh();
+    }
+  });
+}

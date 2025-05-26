@@ -19,7 +19,7 @@ TODO FUTURE ADDITIONS
  *
  * Task operations are fully integrated with context (`useTasks`).
  */
-import { useTheme } from "@theme/ThemeContext";
+import { useTheme } from "lib/ThemeContext";
 import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "@theme/colors";
 import { playRemoveSound } from "../../utils/sounds/trash";

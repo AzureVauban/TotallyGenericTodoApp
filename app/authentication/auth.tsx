@@ -66,10 +66,34 @@ export default function Auth({ children }: { children: React.ReactNode }) {
           .select("display_name")
           .eq("email", session.user.email)
           .maybeSingle();
-        if (profile?.display_name) {
-          console.log(`Welcome back ${profile.display_name}`);
+
+        // If no profile, insert one using display_name from user_metadata
+        if (!profile) {
+          const displayName =
+            session.user.user_metadata?.display_name ||
+            session.user.user_metadata?.username ||
+            session.user.email;
+          await supabase.from("profiles").insert([
+            {
+              email: session.user.email,
+              display_name: displayName,
+              username: displayName,
+            },
+          ]);
+          console.log(`Created profile for ${displayName}`);
+        } else if (!profile.display_name) {
+          // If profile exists but missing display_name, update it
+          const displayName =
+            session.user.user_metadata?.display_name ||
+            session.user.user_metadata?.username ||
+            session.user.email;
+          await supabase
+            .from("profiles")
+            .update({ display_name: displayName, username: displayName })
+            .eq("email", session.user.email);
+          console.log(`Updated profile for ${displayName}`);
         } else {
-          console.log("Welcome back!");
+          console.log(`Welcome back ${profile.display_name}`);
         }
       }
     };

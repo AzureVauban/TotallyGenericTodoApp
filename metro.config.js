@@ -9,7 +9,10 @@ module.exports = (() => {
   config.resolver.assetExts = config.resolver.assetExts.filter(
     (ext) => ext !== "svg"
   );
+  // Disable strict package exports so Metro will default to the JS/browser builds
+  config.resolver.unstable_enablePackageExports = false;
   config.resolver.sourceExts.push("svg");
 
   return config;
 })();
+// metro.config.js

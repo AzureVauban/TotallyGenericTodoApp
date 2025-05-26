@@ -5,7 +5,7 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
-import { Appearance } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type Theme = "light" | "dark";
 interface ThemeContextValue {
@@ -21,17 +21,24 @@ const ThemeContext = createContext<ThemeContextValue>({
 });
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  // Initialize to system preference
-  const colorScheme = Appearance.getColorScheme() as Theme;
-  const [theme, setTheme] = useState<Theme>(colorScheme || "dark"); // Default to "dark"
+  const [theme, setTheme] = useState<Theme>("dark");
 
-  // Listen for system changes
+  // Hydrate theme from AsyncStorage on mount
   useEffect(() => {
-    const sub = Appearance.addChangeListener(({ colorScheme }) => {
-      setTheme(colorScheme as Theme);
-    });
-    return () => sub.remove();
+    (async () => {
+      try {
+        const stored = await AsyncStorage.getItem("theme");
+        if (stored === "light" || stored === "dark") {
+          setTheme(stored);
+        }
+      } catch {}
+    })();
   }, []);
+
+  // Persist theme to AsyncStorage on change
+  useEffect(() => {
+    AsyncStorage.setItem("theme", theme).catch(() => {});
+  }, [theme]);
 
   const toggleTheme = () => setTheme((t) => (t === "light" ? "dark" : "light"));
 

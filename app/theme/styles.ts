@@ -469,3 +469,6 @@ export const styles = StyleSheet.create({
     backgroundColor: "#450a0a",
   },
 });
+
+export const getNavibarIconActiveColor = (isDark: boolean) =>
+  isDark ? "#22d3ee" : "#0ea5e9";

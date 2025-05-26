@@ -8,7 +8,7 @@ export async function playFlaggedSound() {
   try {
     if (!soundObject) {
       const { sound } = await Audio.Sound.createAsync(
-        require("../../assets/sfx/" + sound_file_name),
+        require("assets/sfx/" + sound_file_name)
         // toggle-button-off.mp3
       );
       soundObject = sound;

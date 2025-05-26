@@ -11,14 +11,16 @@ import MemberListIcon from "../../assets/icons/svg/fi-br-member-list.svg";
 import { supabase } from "../../lib/supabaseClient";
 import { useRouter } from "expo-router";
 import { colors } from "@theme/colors";
-import { useTheme } from "@theme/ThemeContext";
+import { useTheme } from "lib/ThemeContext";
 import { playInvalidSound } from "utils/sounds/invalid";
+import { getAuthErrorMessage } from "../../lib/auth-exceptions";
 
 export default function LoginScreen() {
-  const [username, setUsername] = useState("");
+  const [identifier, setIdentifier] = useState(""); // replaces username
   const [password, setPassword] = useState("");
   const [usernameError, setUsernameError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
   const { theme } = useTheme();
 
@@ -75,8 +77,15 @@ export default function LoginScreen() {
       <Text style={[styles.description, { color: colors[theme].text }]}>
         login to your account
       </Text>
+      {errorMessage ? (
+        <Text
+          style={{ color: "#dc2626", textAlign: "center", marginBottom: 8 }}
+        >
+          {errorMessage}
+        </Text>
+      ) : null}
 
-      {/* Username Field with Animated Background */}
+      {/* Username/Email Field with Animated Background */}
       <Animated.View
         style={{
           borderRadius: 6,
@@ -93,10 +102,10 @@ export default function LoginScreen() {
               backgroundColor: "transparent",
             },
           ]}
-          placeholder="Username"
+          placeholder="Username or Email"
           placeholderTextColor={colors[theme].secondary}
-          value={username}
-          onChangeText={setUsername}
+          value={identifier}
+          onChangeText={setIdentifier}
         />
       </Animated.View>
       {/* Password Field with Animated Background */}
@@ -128,7 +137,8 @@ export default function LoginScreen() {
         style={[styles.button, { backgroundColor: colors[theme].primary }]}
         onPress={async () => {
           let hasError = false;
-          if (!username) {
+          setErrorMessage(null);
+          if (!identifier) {
             setUsernameError(true);
             hasError = true;
           } else {
@@ -143,30 +153,48 @@ export default function LoginScreen() {
           if (hasError) {
             return;
           }
-          // Lookup the email using the username
-          const { data: profile, error: profileError } = await supabase
-            .from("profiles")
-            .select("email")
-            .eq("username", username)
-            .maybeSingle();
+          try {
+            // Determine if identifier is email or username
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            let emailToUse = identifier;
+            if (!emailRegex.test(identifier)) {
+              // Lookup the email using the username
+              const { data: profile, error: profileError } = await supabase
+                .from("profiles")
+                .select("email")
+                .eq("username", identifier)
+                .maybeSingle();
 
-          if (profileError || !profile?.email) {
-            setUsernameError(true);
-            return;
-          }
+              if (profileError || !profile?.email) {
+                setUsernameError(true);
+                setErrorMessage(
+                  getAuthErrorMessage(
+                    profileError || { message: "user not found" }
+                  )
+                );
+                return;
+              }
+              emailToUse = profile.email;
+            }
+            // Sign in with the email
+            const { error: authError } = await supabase.auth.signInWithPassword(
+              {
+                email: emailToUse,
+                password,
+              }
+            );
 
-          // Sign in with the fetched email
-          const { error: authError } = await supabase.auth.signInWithPassword({
-            email: profile.email,
-            password,
-          });
-
-          if (authError) {
-            setPasswordError(true);
-            console.warn("Login failed:", authError.message);
-          } else {
-            console.log("Login successful!");
-            router.replace("/home");
+            if (authError) {
+              setPasswordError(true);
+              setErrorMessage(getAuthErrorMessage(authError));
+              console.warn("Login failed:", authError.message);
+            } else {
+              setErrorMessage(null);
+              console.log("Login successful!");
+              router.replace("/home");
+            }
+          } catch (err: any) {
+            setErrorMessage(getAuthErrorMessage(err));
           }
         }}
       >

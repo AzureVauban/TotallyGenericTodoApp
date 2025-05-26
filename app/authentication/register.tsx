@@ -20,11 +20,12 @@ import MemberListIcon from "../../assets/icons/svg/fi-br-member-list.svg";
 import { supabase } from "../../lib/supabaseClient";
 import { useRouter } from "expo-router";
 import { colors } from "@theme/colors";
-import { useTheme } from "@theme/ThemeContext";
+import { useTheme } from "lib/ThemeContext";
 import { styles } from "@theme/styles";
 import { generateUsername } from "utils/generateUsername";
 import { playFlaggedSound } from "utils/sounds/flag";
 import { playInvalidSound } from "utils/sounds/invalid";
+import { getAuthErrorMessage } from "../../lib/auth-exceptions";
 
 export default function LoginScreen() {
   const [initialUsername, setInitialUsername] = useState(generateUsername());
@@ -36,6 +37,7 @@ export default function LoginScreen() {
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [confirmPasswordError, setConfirmPasswordError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
   const { theme, isDark } = useTheme();
   const isGeneratedUsername = username.trim() === initialUsername;
@@ -119,6 +121,14 @@ export default function LoginScreen() {
       >
         Sign up to the totally generic todo app!
       </Text>
+
+      {errorMessage ? (
+        <Text
+          style={{ color: "#dc2626", textAlign: "center", marginBottom: 8 }}
+        >
+          {errorMessage}
+        </Text>
+      ) : null}
 
       {/* Username Field with Animated Background */}
       <Animated.View
@@ -242,6 +252,7 @@ export default function LoginScreen() {
           setEmailError(!isEmailValid);
           setPasswordError(!isPasswordValid);
           setConfirmPasswordError(!isConfirmPasswordValid);
+          setErrorMessage(null);
 
           // Always trigger animation and sound if invalid, even if already in error state
           if (!isUsernameValid && !isGeneratedUsername) {
@@ -271,22 +282,26 @@ export default function LoginScreen() {
             return;
           }
 
-          // Pass values to auth-choice screen
-          router.push({
-            pathname: "/authentication/auth-choice",
-            params: {
-              username,
-              email,
-              password,
-            },
-          });
+          try {
+            // Pass values to auth-choice screen
+            router.push({
+              pathname: "/authentication/auth-choice",
+              params: {
+                username,
+                email,
+                password,
+              },
+            });
 
-          // After successful registration and email is known:
-          await supabase.from("profiles").upsert({
-            email,
-            username,
-            display_name: username,
-          });
+            // After successful registration and email is known:
+            await supabase.from("profiles").upsert({
+              email,
+              username,
+              display_name: username,
+            });
+          } catch (err: any) {
+            setErrorMessage(getAuthErrorMessage(err));
+          }
         }}
       >
         <Text

@@ -8,7 +8,7 @@ export async function playIndentTasksound() {
   try {
     if (!soundObject) {
       const { sound } = await Audio.Sound.createAsync(
-        require("../../assets/sfx/" + sound_file_name),
+        require("assets/sfx/" + sound_file_name)
       );
       soundObject = sound;
     }
