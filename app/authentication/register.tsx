@@ -20,7 +20,7 @@ import MemberListIcon from "../../assets/icons/svg/fi-br-member-list.svg";
 import { supabase } from "../../lib/supabaseClient";
 import { useRouter } from "expo-router";
 import { colors } from "@theme/colors";
-import { useTheme } from "@theme/ThemeContext";
+import { useTheme } from "lib/ThemeContext";
 import { styles } from "@theme/styles";
 import { generateUsername } from "utils/generateUsername";
 import { playFlaggedSound } from "utils/sounds/flag";

@@ -13,7 +13,7 @@ import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
 import { useTasks } from "../../../backend/storage/TasksContext";
 import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "@theme/colors";
-import { useTheme } from "../../theme/ThemeContext";
+import { useTheme } from "../../../lib/ThemeContext";
 import { styles } from "../../theme/styles";
 // Local TaskItem shape
 interface TaskItem {

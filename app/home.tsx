@@ -9,9 +9,9 @@ TODO FUTURE ADDITIONS
  * Supports swipe gestures to navigate to the settings screen and manage lists.
  * Includes modals for adding and renaming task lists.
  */
-import { useTheme } from "@theme/ThemeContext";
+import { useTheme } from "lib/ThemeContext";
 import { colors } from "@theme/colors";
-import { styles } from "../app/theme/styles";
+import { styles, getNavibarIconActiveColor } from "../app/theme/styles";
 import { Link, useFocusEffect, useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
@@ -34,15 +34,20 @@ import {
 } from "react-native-gesture-handler";
 import FiBredit from "../assets/icons/svg/fi-br-text-box-edit.svg";
 import FiBrtrash from "../assets/icons/svg/fi-br-trash.svg";
+import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
+import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
+import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
 import { useTasks } from "../backend/storage/TasksContext";
 import { playInvalidSound } from "../utils/sounds/invalid";
 import { playRemoveSound } from "../utils/sounds/trash";
+import { useSettings } from "../lib/SettingsContext";
 
 export default function HomeScreen() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const { lists, addList, removeList, renameList, exportDataAsJSON } =
     useTasks();
+  const { showNavibar } = useSettings();
 
   // Add-list modal state
   const [addModalVisible, setAddModalVisible] = useState(false);
@@ -71,11 +76,13 @@ export default function HomeScreen() {
       event.nativeEvent as unknown as PanGestureHandlerEventPayload
     ).translationX;
 
+    // Swipe left: go to profile
     if (translationX < -100 && !hasNavigated.current) {
       hasNavigated.current = true;
-      router.push("/settings");
+      router.push("/profile");
     }
 
+    // Swipe right: go to settings
     if (translationX > 100 && !hasNavigated.current) {
       hasNavigated.current = true;
       router.push("/settings");
@@ -336,7 +343,7 @@ export default function HomeScreen() {
         <View
           style={{
             position: "absolute",
-            bottom: 48, // moved it higher
+            bottom: showNavibar ? 88 : 48, // push up for navibar if shown
             left: 0,
             right: 0,
             alignItems: "center",
@@ -551,6 +558,90 @@ export default function HomeScreen() {
             </View>
           </View>
         </Modal>
+        {/* Bottom Navibar */}
+        {showNavibar && (
+          <View
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: 64,
+              flexDirection: "row",
+              backgroundColor: isDark
+                ? colors.dark.secondary
+                : colors.light.secondary,
+              borderTopWidth: 1,
+              borderTopColor: isDark
+                ? colors.dark.tertiary
+                : colors.light.tertiary,
+              justifyContent: "space-around",
+              alignItems: "center",
+              zIndex: 100,
+            }}
+          >
+            {/* Home Icon */}
+            <TouchableOpacity
+              onPress={() => router.replace("/home")}
+              style={{ alignItems: "center", flex: 1 }}
+            >
+              <FiBrListCheck
+                width={32}
+                height={32}
+                fill={getNavibarIconActiveColor(isDark)}
+              />
+              <Text
+                style={{
+                  color: getNavibarIconActiveColor(isDark),
+                  fontSize: 12,
+                  marginTop: 2,
+                }}
+              >
+                Home
+              </Text>
+            </TouchableOpacity>
+            {/* Settings Icon */}
+            <TouchableOpacity
+              onPress={() => router.replace("/settings")}
+              style={{ alignItems: "center", flex: 1 }}
+            >
+              <FiBrSettings
+                width={32}
+                height={32}
+                fill={isDark ? colors.dark.icon : colors.light.icon}
+              />
+              <Text
+                style={{
+                  color: isDark ? colors.dark.icon : colors.light.icon,
+                  fontSize: 12,
+                  marginTop: 2,
+                }}
+              >
+                Settings
+              </Text>
+            </TouchableOpacity>
+            {/* Profile Icon */}
+            <TouchableOpacity
+              onPress={() => router.replace("/profile")}
+              style={{ alignItems: "center", flex: 1 }}
+            >
+              <FiBrMemberList
+                width={32}
+                height={32}
+                fill={isDark ? colors.dark.icon : colors.light.icon}
+              />
+              <Text
+                style={{
+                  color: isDark ? colors.dark.icon : colors.light.icon,
+                  fontSize: 12,
+                  marginTop: 2,
+                }}
+              >
+                Profile
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </PanGestureHandler>
   );

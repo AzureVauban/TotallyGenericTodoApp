@@ -4,7 +4,7 @@
  * Shows all non-deleted tasks that have any `scheduleDate` set.
  */
 import { colors } from "@theme/colors";
-import { useTheme } from "@theme/ThemeContext";
+import { useTheme } from "lib/ThemeContext";
 import { useFocusEffect } from "@react-navigation/native";
 
 import React from "react";

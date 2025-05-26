@@ -15,7 +15,7 @@ import {
 import { useRouter } from "expo-router";
 import FISignatureIcon from "../assets/icons/svg/fi-br-list-check.svg";
 import { colors } from "@theme/colors";
-import { useTheme } from "@theme/ThemeContext";
+import { useTheme } from "lib/ThemeContext";
 import { useFocusEffect } from "@react-navigation/native";
 import { styles } from "@theme/styles";
 import { supabase } from "../lib/supabaseClient";
