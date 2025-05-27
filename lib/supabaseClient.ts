@@ -3,6 +3,18 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient } from "@supabase/supabase-js";
 import { AppState } from "react-native";
 
+// Helper to validate URLs and prevent incomplete/invalid URLs
+function isValidUrl(url?: string): boolean {
+  if (!url) return false;
+  try {
+    // Allow only https for Supabase API
+    const parsed = new URL(url, "https://dummy.base");
+    return parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 const isNgrok = (): boolean => {
   return (
     process.env.EXPO_PUBLIC_SITE_URL?.includes("ngrok.io") ||
@@ -14,12 +26,14 @@ const SUPABASE_URL = isNgrok()
   ? process.env.EXPO_PUBLIC_SITE_URL
   : process.env.EXPO_PUBLIC_SUPABASE_URL;
 
-if (!SUPABASE_URL) {
-  throw new Error("Supabase URL is not defined in environment variables.");
+if (!isValidUrl(SUPABASE_URL)) {
+  throw new Error(
+    "Supabase URL is not valid or defined in environment variables."
+  );
 }
 
 export const supabase = createClient(
-  SUPABASE_URL,
+  SUPABASE_URL!,
   process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || "",
   {
     auth: {

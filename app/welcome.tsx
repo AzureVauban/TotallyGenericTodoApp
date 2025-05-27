@@ -32,13 +32,7 @@ export default function WelcomeScreen() {
     const {
       data: { session },
     } = await supabase.auth.getSession();
-    if (!session) {
-      // Show warning if not authenticated
-      alert(
-        "You must sign in and validate your account before continuing to the home screen."
-      );
-      return;
-    }
+    // Allow navigation to home even if not authenticated
     router.push("/home");
   };
 
@@ -59,7 +53,8 @@ export default function WelcomeScreen() {
           flex: 1,
           justifyContent: "flex-end",
           alignItems: "center",
-          marginBottom: 75,
+          marginBottom: 150,
+          marginTop: 10, // decreased from default or previous value to 10
         }}
       >
         <TouchableOpacity
@@ -129,6 +124,7 @@ export default function WelcomeScreen() {
           </Text>
         </TouchableOpacity>
         {/* Reset password button */}
+        {/* 
         <TouchableOpacity
           style={[
             styles.buttonSecondary,
@@ -162,6 +158,7 @@ export default function WelcomeScreen() {
             Forgot Password?
           </Text>
         </TouchableOpacity>
+        */}
         <View style={{ alignItems: "center" }}>
           <View
             style={{
@@ -204,52 +201,7 @@ export default function WelcomeScreen() {
               </Text>
             </TouchableOpacity>
           </View>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "baseline",
-              marginVertical: 0,
-            }}
-          >
-            <Text
-              style={[
-                styles.subtitle,
-                {
-                  fontWeight: "500",
-                  color: isDark
-                    ? colors.dark.secondary
-                    : colors.light.secondary,
-                },
-              ]}
-            >
-              Have an account already?{" "}
-            </Text>
-            <TouchableOpacity
-              onPress={() => {
-                router.push("/authentication/login"); //! REPLACE WITH /login when ready
-              }}
-            >
-              <Text
-                style={[
-                  styles.link,
-                  {
-                    color: isDark
-                      ? colors.dark.bluebutton_text_icon
-                      : colors.light.bluebutton_text_icon,
-                    lineHeight: 22,
-                  },
-                ]}
-              >
-                Sign In
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity onPress={() => router.push("/home")}>
-            <Text style={[styles.forgot, { color: colors[theme].accent }]}>
-              Continue without signing in
-            </Text>
-          </TouchableOpacity>
+          {/* Removed "Have an account already? Sign in" and "Continue without signing in" */}
         </View>
       </View>
     </View>
