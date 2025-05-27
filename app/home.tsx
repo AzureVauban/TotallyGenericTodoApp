@@ -13,7 +13,7 @@ import { useTheme } from "lib/ThemeContext";
 import { colors } from "@theme/colors";
 import { styles, getNavibarIconActiveColor } from "../app/theme/styles";
 import { Link, useFocusEffect, useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Modal,
@@ -41,6 +41,8 @@ import { useTasks } from "../backend/storage/TasksContext";
 import { playInvalidSound } from "../utils/sounds/invalid";
 import { playRemoveSound } from "../utils/sounds/trash";
 import { useSettings } from "../lib/SettingsContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
 
 export default function HomeScreen() {
   const { theme } = useTheme();
@@ -48,6 +50,17 @@ export default function HomeScreen() {
   const { lists, addList, removeList, renameList, exportDataAsJSON } =
     useTasks();
   const { showNavibar } = useSettings();
+  const [showDebug, setShowDebug] = useState(false);
+
+  // Hydrate debug toggle from AsyncStorage on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const value = await AsyncStorage.getItem("showDebug");
+        setShowDebug(value === "true");
+      } catch {}
+    })();
+  }, []);
 
   // Add-list modal state
   const [addModalVisible, setAddModalVisible] = useState(false);
@@ -76,10 +89,14 @@ export default function HomeScreen() {
       event.nativeEvent as unknown as PanGestureHandlerEventPayload
     ).translationX;
 
-    // Swipe left: go to profile
+    // Swipe left: go to debug if enabled, else profile
     if (translationX < -100 && !hasNavigated.current) {
       hasNavigated.current = true;
-      router.push("/profile");
+      if (showDebug) {
+        router.push("/runtime-debug");
+      } else {
+        router.push("/profile");
+      }
     }
 
     // Swipe right: go to settings
@@ -109,6 +126,16 @@ export default function HomeScreen() {
       // no-op for theme
     }, [theme])
   );
+
+  // Add this to get the current route path for navibar highlighting
+  const [currentRoute, setCurrentRoute] = useState<string>("/home");
+  useEffect(() => {
+    // Expo Router: get the current route from the router object
+    // router.asPath is not available, so use window.location.pathname if in web, or fallback
+    // For Expo Router, you can use router.route or router.getState() if available
+    // We'll use a fallback for now:
+    setCurrentRoute("/home");
+  }, []);
 
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent}>
@@ -563,38 +590,56 @@ export default function HomeScreen() {
           <View
             style={{
               position: "absolute",
-              left: 0,
-              right: 0,
-              bottom: 0,
-              height: 64,
+              left: 16,
+              right: 16,
+              bottom: 16,
+              paddingVertical: 10,
               flexDirection: "row",
-              backgroundColor: isDark
-                ? colors.dark.secondary
-                : colors.light.secondary,
-              borderTopWidth: 1,
-              borderTopColor: isDark
-                ? colors.dark.tertiary
-                : colors.light.tertiary,
+              backgroundColor:
+                (isDark ? colors.dark.secondary : colors.light.secondary) +
+                "80", // 50% opacity
+              borderTopWidth: 0,
               justifyContent: "space-around",
               alignItems: "center",
               zIndex: 100,
+              borderRadius: 16,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.18,
+              shadowRadius: 8,
+              elevation: 8,
+              overflow: "hidden",
             }}
           >
             {/* Home Icon */}
             <TouchableOpacity
-              onPress={() => router.replace("/home")}
+              onPress={() => {
+                setCurrentRoute("/home");
+                router.replace("/home");
+              }}
               style={{ alignItems: "center", flex: 1 }}
             >
               <FiBrListCheck
                 width={32}
                 height={32}
-                fill={getNavibarIconActiveColor(isDark)}
+                fill={
+                  currentRoute === "/home"
+                    ? getNavibarIconActiveColor(isDark)
+                    : isDark
+                    ? colors.dark.icon
+                    : colors.light.icon
+                }
               />
               <Text
                 style={{
-                  color: getNavibarIconActiveColor(isDark),
+                  color:
+                    currentRoute === "/home"
+                      ? getNavibarIconActiveColor(isDark)
+                      : isDark
+                      ? colors.dark.icon
+                      : colors.light.icon,
                   fontSize: 12,
-                  marginTop: 2,
+                  marginTop: 4,
                 }}
               >
                 Home
@@ -602,19 +647,33 @@ export default function HomeScreen() {
             </TouchableOpacity>
             {/* Settings Icon */}
             <TouchableOpacity
-              onPress={() => router.replace("/settings")}
+              onPress={() => {
+                setCurrentRoute("/settings");
+                router.replace("/settings");
+              }}
               style={{ alignItems: "center", flex: 1 }}
             >
               <FiBrSettings
                 width={32}
                 height={32}
-                fill={isDark ? colors.dark.icon : colors.light.icon}
+                fill={
+                  currentRoute === "/settings"
+                    ? getNavibarIconActiveColor(isDark)
+                    : isDark
+                    ? colors.dark.icon
+                    : colors.light.icon
+                }
               />
               <Text
                 style={{
-                  color: isDark ? colors.dark.icon : colors.light.icon,
+                  color:
+                    currentRoute === "/settings"
+                      ? getNavibarIconActiveColor(isDark)
+                      : isDark
+                      ? colors.dark.icon
+                      : colors.light.icon,
                   fontSize: 12,
-                  marginTop: 2,
+                  marginTop: 4,
                 }}
               >
                 Settings
@@ -622,24 +681,74 @@ export default function HomeScreen() {
             </TouchableOpacity>
             {/* Profile Icon */}
             <TouchableOpacity
-              onPress={() => router.replace("/profile")}
+              onPress={() => {
+                setCurrentRoute("/profile");
+                router.replace("/profile");
+              }}
               style={{ alignItems: "center", flex: 1 }}
             >
               <FiBrMemberList
                 width={32}
                 height={32}
-                fill={isDark ? colors.dark.icon : colors.light.icon}
+                fill={
+                  currentRoute === "/profile"
+                    ? getNavibarIconActiveColor(isDark)
+                    : isDark
+                    ? colors.dark.icon
+                    : colors.light.icon
+                }
               />
               <Text
                 style={{
-                  color: isDark ? colors.dark.icon : colors.light.icon,
+                  color:
+                    currentRoute === "/profile"
+                      ? getNavibarIconActiveColor(isDark)
+                      : isDark
+                      ? colors.dark.icon
+                      : colors.light.icon,
                   fontSize: 12,
-                  marginTop: 2,
+                  marginTop: 4,
                 }}
               >
                 Profile
               </Text>
             </TouchableOpacity>
+            {/* Debug Icon (conditionally rendered) */}
+            {showDebug && (
+              <TouchableOpacity
+                onPress={() => {
+                  setCurrentRoute("/runtime-debug");
+                  router.replace("/runtime-debug");
+                }}
+                style={{ alignItems: "center", flex: 1 }}
+              >
+                <FiBrSquareTerminal
+                  width={32}
+                  height={32}
+                  fill={
+                    currentRoute === "/runtime-debug"
+                      ? getNavibarIconActiveColor(isDark)
+                      : isDark
+                      ? colors.dark.icon
+                      : colors.light.icon
+                  }
+                />
+                <Text
+                  style={{
+                    color:
+                      currentRoute === "/runtime-debug"
+                        ? getNavibarIconActiveColor(isDark)
+                        : isDark
+                        ? colors.dark.icon
+                        : colors.light.icon,
+                    fontSize: 12,
+                    marginTop: 4,
+                  }}
+                >
+                  Debug
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
       </View>
