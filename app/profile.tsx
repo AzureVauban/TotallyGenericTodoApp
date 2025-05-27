@@ -115,79 +115,122 @@ export default function UserProfileScreen() {
               }}
             >
               {isSignedIn ? (
-                <TouchableOpacity
-                  style={[
-                    styles.logoutButton,
-                    {
-                      backgroundColor: isDark
-                        ? colors.dark.redbutton_background
-                        : colors.light.redbutton_background,
-                    },
-                  ]}
-                  onPress={async () => {
-                    console.log("USER LOGGED OUT");
-                    await supabase.auth.signOut();
-                    router.push("/welcome");
-                  }}
-                >
-                  <FiBrMemberList
-                    width={20}
-                    height={20}
-                    fill={
-                      isDark
-                        ? colors.dark.redbutton_text_icon
-                        : colors.light.redbutton_text_icon
-                    }
-                    style={{ marginRight: 8 }}
-                  />
-                  <Text
+                <>
+                  <TouchableOpacity
                     style={[
-                      styles.logoutButtonText,
+                      styles.logoutButton,
                       {
-                        color: isDark
+                        backgroundColor: isDark
+                          ? colors.dark.redbutton_background
+                          : colors.light.redbutton_background,
+                      },
+                    ]}
+                    onPress={async () => {
+                      console.log("USER LOGGED OUT");
+                      await supabase.auth.signOut();
+                      router.push("/welcome");
+                    }}
+                  >
+                    <FiBrMemberList
+                      width={20}
+                      height={20}
+                      fill={
+                        isDark
                           ? colors.dark.redbutton_text_icon
-                          : colors.light.redbutton_text_icon,
-                      },
-                    ]}
-                  >
-                    Log Out
-                  </Text>
-                </TouchableOpacity>
+                          : colors.light.redbutton_text_icon
+                      }
+                      style={{ marginRight: 8 }}
+                    />
+                    <Text
+                      style={[
+                        styles.logoutButtonText,
+                        {
+                          color: isDark
+                            ? colors.dark.redbutton_text_icon
+                            : colors.light.redbutton_text_icon,
+                        },
+                      ]}
+                    >
+                      Log Out
+                    </Text>
+                  </TouchableOpacity>
+                </>
               ) : (
-                <TouchableOpacity
-                  style={[
-                    styles.logoutButton,
-                    {
-                      backgroundColor: isDark
-                        ? colors.dark.bluebutton_background
-                        : colors.light.bluebutton_background,
-                    },
-                  ]}
-                  onPress={() => router.push("/authentication/login")}
-                >
-                  <FiBrMemberList
-                    width={20}
-                    height={20}
-                    fill={
-                      isDark
-                        ? colors.dark.bluebutton_text_icon
-                        : colors.light.bluebutton_text_icon
-                    }
-                    style={{ marginRight: 8 }}
-                  />
-                  <Text
+                <>
+                  <TouchableOpacity
                     style={[
-                      styles.logoutButtonText,
+                      styles.logoutButton,
                       {
-                        color: isDark
-                          ? colors.dark.bluebutton_text_icon
-                          : colors.light.bluebutton_text_icon,
+                        backgroundColor: isDark
+                          ? colors.dark.bluebutton_background
+                          : colors.light.bluebutton_background,
                       },
                     ]}
+                    onPress={() => router.push("/authentication/login")}
                   >
-                    Account Login
-                  </Text>
-                </TouchableOpacity>
+                    <FiBrMemberList
+                      width={20}
+                      height={20}
+                      fill={
+                        isDark
+                          ? colors.dark.bluebutton_text_icon
+                          : colors.light.bluebutton_text_icon
+                      }
+                      style={{ marginRight: 8 }}
+                    />
+                    <Text
+                      style={[
+                        styles.logoutButtonText,
+                        {
+                          color: isDark
+                            ? colors.dark.bluebutton_text_icon
+                            : colors.light.bluebutton_text_icon,
+                        },
+                      ]}
+                    >
+                      Account Login
+                    </Text>
+                  </TouchableOpacity>
+                  {/* Always show logout button below Account Login */}
+                  <TouchableOpacity
+                    style={[
+                      styles.logoutButton,
+                      {
+                        backgroundColor: isDark
+                          ? colors.dark.redbutton_background
+                          : colors.light.redbutton_background,
+                      },
+                    ]}
+                    onPress={async () => {
+                      console.log("USER LOGGED OUT");
+                      await supabase.auth.signOut();
+                      router.push("/welcome");
+                    }}
+                  >
+                    <FiBrMemberList
+                      width={20}
+                      height={20}
+                      fill={
+                        isDark
+                          ? colors.dark.redbutton_text_icon
+                          : colors.light.redbutton_text_icon
+                      }
+                      style={{ marginRight: 8 }}
+                    />
+                    <Text
+                      style={[
+                        styles.logoutButtonText,
+                        {
+                          color: isDark
+                            ? colors.dark.redbutton_text_icon
+                            : colors.light.redbutton_text_icon,
+                        },
+                      ]}
+                    >
+                      Log Out
+                    </Text>
+                  </TouchableOpacity>
+                </>
               )}
             </View>
           </View>
