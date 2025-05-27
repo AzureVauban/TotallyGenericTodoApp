@@ -94,7 +94,7 @@ export default function UserProfileScreen() {
             },
           ]}
         >
-          <View style={{ marginTop: 30, flex: 1, justifyContent: "center" }}>
+          <View style={{ marginTop: 10, flex: 1, justifyContent: "center" }}>
             <Text
               style={{
                 color: isDark ? colors.dark.text : colors.light.text,

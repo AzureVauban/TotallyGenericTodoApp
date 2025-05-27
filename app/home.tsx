@@ -370,7 +370,7 @@ export default function HomeScreen() {
         <View
           style={{
             position: "absolute",
-            bottom: showNavibar ? 88 : 48, // push up for navibar if shown
+            bottom: showNavibar ? 93 : 53, // increased by 5px
             left: 0,
             right: 0,
             alignItems: "center",
