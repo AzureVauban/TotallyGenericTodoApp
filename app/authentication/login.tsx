@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Animated,
+  Linking,
 } from "react-native";
 import MemberListIcon from "../../assets/icons/svg/fi-br-member-list.svg";
 import { supabase } from "../../lib/supabaseClient";
@@ -21,6 +22,7 @@ export default function LoginScreen() {
   const [usernameError, setUsernameError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [magicEmail, setMagicEmail] = useState("");
   const router = useRouter();
   const { theme } = useTheme();
 
@@ -68,6 +70,48 @@ export default function LoginScreen() {
       ],
     });
 
+  const handleMagicLink = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: "sussysushi://home", // or your deep link
+        },
+      });
+      if (error) throw error;
+      alert("Magic link sent! Check your email.");
+    } catch (error) {
+      setErrorMessage(getAuthErrorMessage(error));
+    }
+  };
+
+  // Detect if app was opened via magic link
+  useEffect(() => {
+    const checkInitialUrl = async () => {
+      const url = await Linking.getInitialURL();
+      if (url) {
+        console.log("[Magic Link] App opened via URL:", url);
+        // Try to get the current user session
+        const { data, error } = await supabase.auth.getUser();
+        if (data?.user) {
+          console.log(
+            `[Magic Link] Authenticated user via magic link: userID=${data.user.id}, email=${data.user.email}`
+          );
+        } else {
+          console.log(
+            "[Magic Link] No authenticated user found after magic link.",
+            error
+          );
+        }
+      } else {
+        console.log(
+          "[Expo Debug] App opened via regular Expo session (no magic link URL)."
+        );
+      }
+    };
+    checkInitialUrl();
+  }, []);
+
   return (
     <View
       style={[styles.container, { backgroundColor: colors[theme].background }]}
@@ -85,121 +129,27 @@ export default function LoginScreen() {
         </Text>
       ) : null}
 
-      {/* Username/Email Field with Animated Background */}
-      <Animated.View
-        style={{
-          borderRadius: 6,
-          marginBottom: 12,
-          backgroundColor: getBgColor(usernameBgAnim, usernameError),
-        }}
-      >
-        <TextInput
-          style={[
-            styles.input,
-            {
-              borderColor: colors[theme].tertiary,
-              color: colors[theme].text,
-              backgroundColor: "transparent",
-            },
-          ]}
-          placeholder="Username or Email"
-          placeholderTextColor={colors[theme].secondary}
-          value={identifier}
-          onChangeText={setIdentifier}
-        />
-      </Animated.View>
-      {/* Password Field with Animated Background */}
-      <Animated.View
-        style={{
-          borderRadius: 6,
-          marginBottom: 12,
-          backgroundColor: getBgColor(passwordBgAnim, passwordError),
-        }}
-      >
-        <TextInput
-          style={[
-            styles.input,
-            {
-              borderColor: colors[theme].tertiary,
-              color: colors[theme].text,
-              backgroundColor: "transparent",
-            },
-          ]}
-          placeholder="Password"
-          placeholderTextColor={colors[theme].secondary}
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-      </Animated.View>
-
+      {/* Magic Link Section */}
+      <TextInput
+        style={[
+          styles.input,
+          {
+            borderColor: colors[theme].tertiary,
+            color: colors[theme].text,
+            backgroundColor: "transparent",
+          },
+        ]}
+        placeholder="Email for magic link"
+        placeholderTextColor={colors[theme].secondary}
+        value={magicEmail}
+        onChangeText={setMagicEmail}
+      />
       <TouchableOpacity
         style={[styles.button, { backgroundColor: colors[theme].primary }]}
-        onPress={async () => {
-          let hasError = false;
-          setErrorMessage(null);
-          if (!identifier) {
-            setUsernameError(true);
-            hasError = true;
-          } else {
-            setUsernameError(false);
-          }
-          if (!password) {
-            setPasswordError(true);
-            hasError = true;
-          } else {
-            setPasswordError(false);
-          }
-          if (hasError) {
-            return;
-          }
-          try {
-            // Determine if identifier is email or username
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            let emailToUse = identifier;
-            if (!emailRegex.test(identifier)) {
-              // Lookup the email using the username
-              const { data: profile, error: profileError } = await supabase
-                .from("profiles")
-                .select("email")
-                .eq("username", identifier)
-                .maybeSingle();
-
-              if (profileError || !profile?.email) {
-                setUsernameError(true);
-                setErrorMessage(
-                  getAuthErrorMessage(
-                    profileError || { message: "user not found" }
-                  )
-                );
-                return;
-              }
-              emailToUse = profile.email;
-            }
-            // Sign in with the email
-            const { error: authError } = await supabase.auth.signInWithPassword(
-              {
-                email: emailToUse,
-                password,
-              }
-            );
-
-            if (authError) {
-              setPasswordError(true);
-              setErrorMessage(getAuthErrorMessage(authError));
-              console.warn("Login failed:", authError.message);
-            } else {
-              setErrorMessage(null);
-              console.log("Login successful!");
-              router.replace("/home");
-            }
-          } catch (err: any) {
-            setErrorMessage(getAuthErrorMessage(err));
-          }
-        }}
+        onPress={() => handleMagicLink(magicEmail)}
       >
         <Text style={[styles.buttonText, { color: colors[theme].background }]}>
-          Sign In
+          Send Magic Link
         </Text>
       </TouchableOpacity>
 

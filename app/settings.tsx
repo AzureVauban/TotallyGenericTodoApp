@@ -19,15 +19,17 @@ import {
   GestureHandlerGestureEvent,
   PanGestureHandlerEventPayload,
 } from "react-native-gesture-handler";
-import FiBrAddressCard from "../assets/icons/svg/fi-br-address-card.svg";
+//! import FiBrAddressCard from "../assets/icons/svg/fi-br-address-card.svg";
 import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
 import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
 import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
 import { colors } from "@theme/colors";
 import { useTheme } from "lib/ThemeContext";
 import { styles, getNavibarIconActiveColor } from "@theme/styles";
-import { supabase } from "../lib/supabaseClient";
+//! import { supabase } from "../lib/supabaseClient";
 import { useSettings } from "../lib/SettingsContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
 
 export function RedirectToLogin() {
   const router = useRouter();
@@ -53,6 +55,24 @@ export default function SettingsScreen() {
 
   const [soundEnabled, setSoundEnabled] = useState(true);
   const { showNavibar, setShowNavibar } = useSettings();
+  // Add debug toggle state
+  const [showDebug, setShowDebug] = useState(false);
+
+  // Hydrate debug toggle from AsyncStorage on mount
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const value = await AsyncStorage.getItem("showDebug");
+        if (value !== null) setShowDebug(value === "true");
+      } catch {}
+    })();
+  }, []);
+
+  // Persist debug toggle to AsyncStorage
+  const handleDebugToggle = (value: boolean) => {
+    setShowDebug(value);
+    AsyncStorage.setItem("showDebug", value ? "true" : "false");
+  };
 
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === "dark";
@@ -79,6 +99,7 @@ export default function SettingsScreen() {
       hasNavigated.current = true;
       router.push("/home");
     }
+    // No debug navigation from settings
 
     if (
       event.nativeEvent.state === State.END ||
@@ -176,6 +197,27 @@ export default function SettingsScreen() {
                 }}
               />
             </View>
+            <View
+              style={[
+                styles.divider,
+                {
+                  backgroundColor: isDark
+                    ? colors.dark.tertiary
+                    : colors.light.tertiary,
+                },
+              ]}
+            />
+            <View style={styles.optionRow}>
+              <Text
+                style={[
+                  styles.optionText,
+                  { color: isDark ? colors.dark.text : colors.light.text },
+                ]}
+              >
+                Show Debug Screen
+              </Text>
+              <Switch value={showDebug} onValueChange={handleDebugToggle} />
+            </View>
           </View>
           <View
             style={[
@@ -189,6 +231,7 @@ export default function SettingsScreen() {
           />
           {/* Remove the logout button from settings screen */}
           {/* 
+
           <View
             style={{
               marginTop: 24,
@@ -196,7 +239,7 @@ export default function SettingsScreen() {
               alignItems: "center",
             }}
           >
-            <TouchableOpacity
+            <TouchableOpacity 
               style={[
                 styles.logoutButton,
                 {
@@ -235,27 +278,32 @@ export default function SettingsScreen() {
               </Text>
             </TouchableOpacity>
           </View>
+
           */}
           {/* Bottom Navibar */}
           {showNavibar && (
             <View
               style={{
                 position: "absolute",
-                left: 0,
-                right: 0,
-                bottom: 0,
-                height: 64,
+                left: 16,
+                right: 16,
+                bottom: 16,
+                paddingVertical: 10,
                 flexDirection: "row",
-                backgroundColor: isDark
-                  ? colors.dark.secondary
-                  : colors.light.secondary,
-                borderTopWidth: 1,
-                borderTopColor: isDark
-                  ? colors.dark.tertiary
-                  : colors.light.tertiary,
+                backgroundColor:
+                  (isDark ? colors.dark.secondary : colors.light.secondary) +
+                  "80", // 50% opacity
+                borderTopWidth: 0,
                 justifyContent: "space-around",
                 alignItems: "center",
                 zIndex: 100,
+                borderRadius: 16,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.18,
+                shadowRadius: 8,
+                elevation: 8,
+                overflow: "hidden",
               }}
             >
               {/* Home Icon */}
@@ -272,7 +320,7 @@ export default function SettingsScreen() {
                   style={{
                     color: isDark ? colors.dark.icon : colors.light.icon,
                     fontSize: 12,
-                    marginTop: 2,
+                    marginTop: 4,
                   }}
                 >
                   Home
@@ -292,7 +340,7 @@ export default function SettingsScreen() {
                   style={{
                     color: getNavibarIconActiveColor(isDark),
                     fontSize: 12,
-                    marginTop: 2,
+                    marginTop: 4,
                   }}
                 >
                   Settings
@@ -312,12 +360,34 @@ export default function SettingsScreen() {
                   style={{
                     color: isDark ? colors.dark.icon : colors.light.icon,
                     fontSize: 12,
-                    marginTop: 2,
+                    marginTop: 4,
                   }}
                 >
                   Profile
                 </Text>
               </TouchableOpacity>
+              {/* Debug Icon (conditionally rendered) */}
+              {showDebug && (
+                <TouchableOpacity
+                  onPress={() => router.replace("/runtime-debug")}
+                  style={{ alignItems: "center", flex: 1 }}
+                >
+                  <FiBrSquareTerminal
+                    width={32}
+                    height={32}
+                    fill={isDark ? colors.dark.icon : colors.light.icon}
+                  />
+                  <Text
+                    style={{
+                      color: isDark ? colors.dark.icon : colors.light.icon,
+                      fontSize: 12,
+                      marginTop: 4,
+                    }}
+                  >
+                    Debug
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           )}
         </View>
