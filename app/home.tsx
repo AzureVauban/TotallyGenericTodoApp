@@ -264,72 +264,92 @@ export default function HomeScreen() {
               renderItem={({ item }) => (
                 <Swipeable
                   renderRightActions={() => (
-                    <Pressable
-                      style={[
-                        styles.inlineButton,
-                        {
-                          backgroundColor: isDark
-                            ? colors.dark.redbutton_background
-                            : colors.light.redbutton_background,
-                        },
-                      ]}
-                      onPress={() => {
-                        Alert.alert(
-                          "Delete List",
-                          `Are you sure you want to delete ${item.name}?`,
-                          [
-                            { text: "Cancel", style: "cancel" },
-                            {
-                              text: "Delete",
-                              style: "destructive",
-                              onPress: () => {
-                                removeList(item.id);
-                                playRemoveSound();
-                                exportDataAsJSON();
-                              },
-                            },
-                          ]
-                        );
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "stretch",
+                        marginBottom: 10, // match taskListButton marginBottom
                       }}
                     >
-                      <FiBrtrash
-                        width={20}
-                        height={20}
-                        fill={
-                          isDark
-                            ? colors.dark.redbutton_text_icon
-                            : colors.light.redbutton_text_icon
-                        }
-                      />
-                    </Pressable>
+                      <Pressable
+                        style={[
+                          styles.inlineButton,
+                          {
+                            backgroundColor: isDark
+                              ? colors.dark.redbutton_background
+                              : colors.light.redbutton_background,
+                            height: 45, // match taskListButton height
+                            borderRadius: 8,
+                          },
+                        ]}
+                        onPress={() => {
+                          Alert.alert(
+                            "Delete List",
+                            `Are you sure you want to delete ${item.name}?`,
+                            [
+                              { text: "Cancel", style: "cancel" },
+                              {
+                                text: "Delete",
+                                style: "destructive",
+                                onPress: () => {
+                                  removeList(item.id);
+                                  playRemoveSound();
+                                  exportDataAsJSON();
+                                },
+                              },
+                            ]
+                          );
+                        }}
+                      >
+                        <FiBrtrash
+                          width={20}
+                          height={20}
+                          fill={
+                            isDark
+                              ? colors.dark.redbutton_text_icon
+                              : colors.light.redbutton_text_icon
+                          }
+                        />
+                      </Pressable>
+                    </View>
                   )}
                   renderLeftActions={() => (
-                    <Pressable
-                      style={[
-                        styles.inlineButton,
-                        {
-                          backgroundColor: isDark
-                            ? colors.dark.bluebutton_background
-                            : colors.light.bluebutton_background,
-                        },
-                      ]}
-                      onPress={() => {
-                        setRenameTarget(item);
-                        setRenameName(item.name);
-                        setRenameError(false);
-                        setRenameModalVisible(true);
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "stretch",
+                        marginBottom: 10, // match taskListButton marginBottom
                       }}
                     >
-                      <FiBredit
-                        width={20}
-                        height={20}
-                        fill={
-                          isDark
-                            ? colors.dark.bluebutton_text_icon
-                            : colors.light.bluebutton_text_icon
-                        }
-                      />
-                    </Pressable>
+                      <Pressable
+                        style={[
+                          styles.inlineButton,
+                          {
+                            backgroundColor: isDark
+                              ? colors.dark.bluebutton_background
+                              : colors.light.bluebutton_background,
+                            height: 45, // match taskListButton height
+                            borderRadius: 8,
+                          },
+                        ]}
+                        onPress={() => {
+                          setRenameTarget(item);
+                          setRenameName(item.name);
+                          setRenameError(false);
+                          setRenameModalVisible(true);
+                        }}
+                      >
+                        <FiBredit
+                          width={20}
+                          height={20}
+                          fill={
+                            isDark
+                              ? colors.dark.bluebutton_text_icon
+                              : colors.light.bluebutton_text_icon
+                          }
+                        />
+                      </Pressable>
+                    </View>
                   )}
                 >
                   <Pressable
@@ -504,8 +524,8 @@ export default function HomeScreen() {
                 styles.modalContent,
                 {
                   backgroundColor: isDark
-                    ? colors.dark.primary
-                    : colors.light.primary,
+                    ? colors.dark.secondary
+                    : colors.dark.secondary,
                 },
               ]}
             >
@@ -556,27 +576,12 @@ export default function HomeScreen() {
                   setRenameModalVisible(false);
                 }}
               >
-                <Text
-                  style={[
-                    styles.modalButtonText,
-                    {
-                      color: isDark
-                        ? colors.dark.primary
-                        : colors.light.primary,
-                    },
-                  ]}
-                >
-                  Ok
-                </Text>
+                <Text style={styles.modalButtonText}>Ok</Text>
               </Pressable>
               <Pressable
                 style={[
                   styles.modalButton,
-                  {
-                    backgroundColor: isDark
-                      ? colors.dark.secondary
-                      : colors.dark.secondary,
-                  },
+                  { backgroundColor: colors.dark.primary },
                 ]}
                 onPress={() => setRenameModalVisible(false)}
               >
