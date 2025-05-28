@@ -132,10 +132,9 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: 50,
-    height: "100%",
-    alignSelf: "stretch",
     margin: 0,
     borderRadius: 8,
+    // Height should be set where the button is used to match the row height
   },
   text: {
     color: colors.dark.text,
