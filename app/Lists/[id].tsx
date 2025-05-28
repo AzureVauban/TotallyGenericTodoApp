@@ -633,25 +633,51 @@ export default function MyList() {
         {/* New Task Modal */}
         <Modal visible={newTaskModalVisible} transparent animationType="fade">
           <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
+            <View
+              style={[
+                styles.modalContent,
+                {
+                  backgroundColor: isDark
+                    ? colors.dark.secondary
+                    : colors.dark.secondary,
+                },
+              ]}
+            >
               <Text style={styles.modalTitle}>New Task</Text>
               <TextInput
                 value={newTaskText}
                 onChangeText={setNewTaskText}
                 placeholder="Task description"
                 placeholderTextColor={colors.dark.text}
-                style={[
-                  styles.modalInput,
-                  newTaskError && { borderColor: "#450a0a" },
-                ]}
+                style={{
+                  borderWidth: 1,
+                  borderColor: newTaskError ? "#450a0a" : colors.dark.tertiary,
+                  color: colors.dark.text,
+                  padding: 8,
+                  borderRadius: 8,
+                  marginBottom: 10,
+                }}
               />
               {newTaskError ? (
-                <Text style={{ color: colors.dark.accent, marginBottom: 8 }}>
+                <Text
+                  style={{
+                    color: colors.dark.accent,
+                    marginBottom: 8,
+                    fontSize: 12,
+                  }}
+                >
                   {newTaskError}
                 </Text>
               ) : null}
               <Pressable
-                style={styles.modalButton}
+                style={[
+                  styles.modalButton,
+                  {
+                    backgroundColor: isDark
+                      ? colors.dark.primary
+                      : colors.light.primary,
+                  },
+                ]}
                 onPress={async () => {
                   const desc = newTaskText?.trim();
                   if (!desc) {
@@ -689,7 +715,7 @@ export default function MyList() {
               <Pressable
                 style={[
                   styles.modalButton,
-                  { backgroundColor: colors.dark.tertiary },
+                  { backgroundColor: colors.dark.primary },
                 ]}
                 onPress={() => {
                   setNewTaskText("");
@@ -706,17 +732,40 @@ export default function MyList() {
         {/* Rename Task Modal */}
         <Modal visible={renameModalVisible} transparent animationType="fade">
           <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
+            <View
+              style={[
+                styles.modalContent,
+                {
+                  backgroundColor: isDark
+                    ? colors.dark.secondary
+                    : colors.dark.secondary,
+                },
+              ]}
+            >
               <Text style={styles.modalTitle}>Rename Task</Text>
               <TextInput
                 value={renameText}
                 onChangeText={setRenameText}
                 placeholder="Task description"
                 placeholderTextColor={colors.dark.text}
-                style={styles.modalInput}
+                style={{
+                  borderWidth: 1,
+                  borderColor: colors.dark.tertiary,
+                  color: colors.dark.text,
+                  padding: 8,
+                  borderRadius: 8,
+                  marginBottom: 10,
+                }}
               />
               <Pressable
-                style={styles.modalButton}
+                style={[
+                  styles.modalButton,
+                  {
+                    backgroundColor: isDark
+                      ? colors.dark.primary
+                      : colors.light.primary,
+                  },
+                ]}
                 onPress={() => {
                   if (renameText.trim() && renameTaskId) {
                     console.log(
@@ -735,7 +784,7 @@ export default function MyList() {
               <Pressable
                 style={[
                   styles.modalButton,
-                  { backgroundColor: colors.dark.tertiary },
+                  { backgroundColor: colors.dark.primary },
                 ]}
                 onPress={() => {
                   setRenameText("");
@@ -752,14 +801,30 @@ export default function MyList() {
         {/* Task Details Modal */}
         <Modal visible={detailModalVisible} transparent animationType="fade">
           <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
+            <View
+              style={[
+                styles.modalContent,
+                {
+                  backgroundColor: isDark
+                    ? colors.dark.secondary
+                    : colors.dark.secondary,
+                },
+              ]}
+            >
               <Text style={styles.modalTitle}>Task Details</Text>
               <TextInput
                 value={detailDesc}
                 onChangeText={setDetailDesc}
                 placeholder={selectedTask?.title}
                 placeholderTextColor={colors.dark.text}
-                style={styles.modalInput}
+                style={{
+                  borderWidth: 1,
+                  borderColor: colors.dark.tertiary,
+                  color: colors.dark.text,
+                  padding: 8,
+                  borderRadius: 8,
+                  marginBottom: 10,
+                }}
               />
 
               <TextInput
@@ -767,7 +832,14 @@ export default function MyList() {
                 onChangeText={setDetailDate}
                 placeholder="Scheduled Date"
                 placeholderTextColor={colors.dark.text}
-                style={styles.modalInput}
+                style={{
+                  borderWidth: 1,
+                  borderColor: colors.dark.tertiary,
+                  color: colors.dark.text,
+                  padding: 8,
+                  borderRadius: 8,
+                  marginBottom: 10,
+                }}
               />
 
               {/* Color picker swatches */}
@@ -818,10 +890,24 @@ export default function MyList() {
                 onChangeText={setDetailColor}
                 placeholder="Button Color (hex)"
                 placeholderTextColor={colors.dark.text}
-                style={styles.modalInput}
+                style={{
+                  borderWidth: 1,
+                  borderColor: colors.dark.tertiary,
+                  color: colors.dark.text,
+                  padding: 8,
+                  borderRadius: 8,
+                  marginBottom: 10,
+                }}
               />
               <Pressable
-                style={styles.modalButton}
+                style={[
+                  styles.modalButton,
+                  {
+                    backgroundColor: isDark
+                      ? colors.dark.primary
+                      : colors.light.primary,
+                  },
+                ]}
                 onPress={() => {
                   if (selectedTask) {
                     const updateFn = (t: ContextTask) => ({
@@ -840,7 +926,7 @@ export default function MyList() {
               <Pressable
                 style={[
                   styles.modalButton,
-                  { backgroundColor: colors.dark.tertiary },
+                  { backgroundColor: colors.dark.primary },
                 ]}
                 onPress={() => setDetailModalVisible(false)}
               >
