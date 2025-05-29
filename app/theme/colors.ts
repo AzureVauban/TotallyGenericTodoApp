@@ -18,6 +18,7 @@ export const light = {
   redbutton_background: "rgb(127 ,29, 29)",
   redbutton_text_icon: "rgb(254, 202, 202)",
   input: "rgb(255, 255, 255)", // ADD THIS LINE
+  calendarBackground: "rgb(212, 212, 216)", // <-- Add this line
 };
 
 export const dark = {
@@ -39,6 +40,7 @@ export const dark = {
   redbutton_background: "rgb(127 ,29, 29)",
   redbutton_text_icon: "rgb(254, 202, 202)",
   input: "rgb(32, 32, 32)", // ADD THIS LINE
+  calendarBackground: "rgb(39, 39, 42)", // <-- Add this line
 };
 
 // zinc

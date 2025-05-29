@@ -23,6 +23,7 @@ import {
 import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
 import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
 import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
+import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
 import { colors } from "@theme/colors";
 import { useTheme } from "lib/ThemeContext";
 import { styles, getNavibarIconActiveColor } from "@theme/styles";
@@ -54,7 +55,12 @@ export default function SettingsScreen() {
   const [bgColor, setBgColor] = useState("#eef2ff");
 
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const { showNavibar, setShowNavibar } = useSettings();
+  const {
+    showNavibar,
+    setShowNavibar,
+    navibarTransparent,
+    setNavibarTransparent,
+  } = useSettings();
   // Add debug toggle state
   const [showDebug, setShowDebug] = useState(false);
 
@@ -97,7 +103,7 @@ export default function SettingsScreen() {
     // Swipe left: go to home
     if (translationX < -100 && !hasNavigated.current) {
       hasNavigated.current = true;
-      router.push("/home");
+      router.push("/calendar");
     }
     // No debug navigation from settings
 
@@ -170,6 +176,34 @@ export default function SettingsScreen() {
                 }}
               />
             </View>
+            {showNavibar && (
+              <>
+                <View
+                  style={[
+                    styles.divider,
+                    {
+                      backgroundColor: isDark
+                        ? colors.dark.tertiary
+                        : colors.light.tertiary,
+                    },
+                  ]}
+                />
+                <View style={styles.optionRow}>
+                  <Text
+                    style={[
+                      styles.optionText,
+                      { color: isDark ? colors.dark.text : colors.light.text },
+                    ]}
+                  >
+                    Transparent Navibar Background
+                  </Text>
+                  <Switch
+                    value={navibarTransparent}
+                    onValueChange={setNavibarTransparent}
+                  />
+                </View>
+              </>
+            )}
             <View
               style={[
                 styles.divider,
@@ -191,8 +225,8 @@ export default function SettingsScreen() {
               </Text>
               <Switch
                 value={isDark}
-                onValueChange={(value) => {
-                  console.log("Theme toggled, now dark:", value);
+                onValueChange={() => {
+                  console.log("Theme toggled, now dark:", !isDark);
                   toggleTheme();
                 }}
               />
@@ -219,67 +253,6 @@ export default function SettingsScreen() {
               <Switch value={showDebug} onValueChange={handleDebugToggle} />
             </View>
           </View>
-          <View
-            style={[
-              styles.divider,
-              {
-                backgroundColor: isDark
-                  ? colors.dark.tertiary
-                  : colors.light.tertiary,
-              },
-            ]}
-          />
-          {/* Remove the logout button from settings screen */}
-          {/* 
-
-          <View
-            style={{
-              marginTop: 24,
-              marginBottom: showNavibar ? 80 : 24,
-              alignItems: "center",
-            }}
-          >
-            <TouchableOpacity 
-              style={[
-                styles.logoutButton,
-                {
-                  backgroundColor: isDark
-                    ? colors.dark.redbutton_background
-                    : colors.light.redbutton_background,
-                },
-              ]}
-              onPress={async () => {
-                console.log("USER LOGGED OUT");
-                await supabase.auth.signOut();
-                router.push("/welcome");
-              }}
-            >
-              <FiBrAddressCard
-                width={20}
-                height={20}
-                fill={
-                  isDark
-                    ? colors.dark.redbutton_text_icon
-                    : colors.light.redbutton_text_icon
-                }
-                style={{ marginRight: 8 }}
-              />
-              <Text
-                style={[
-                  styles.logoutButtonText,
-                  {
-                    color: isDark
-                      ? colors.dark.redbutton_text_icon
-                      : colors.light.redbutton_text_icon,
-                  },
-                ]}
-              >
-                Log Out
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          */}
           {/* Bottom Navibar */}
           {showNavibar && (
             <View
@@ -290,9 +263,12 @@ export default function SettingsScreen() {
                 bottom: 16,
                 paddingVertical: 10,
                 flexDirection: "row",
-                backgroundColor:
-                  (isDark ? colors.dark.secondary : colors.light.secondary) +
-                  "80", // 50% opacity
+                backgroundColor: navibarTransparent
+                  ? isDark
+                    ? colors.dark.background
+                    : colors.light.background
+                  : (isDark ? colors.dark.secondary : colors.light.secondary) +
+                    "80",
                 borderTopWidth: 0,
                 justifyContent: "space-around",
                 alignItems: "center",
@@ -324,6 +300,26 @@ export default function SettingsScreen() {
                   }}
                 >
                   Home
+                </Text>
+              </TouchableOpacity>
+              {/* Calendar Icon */}
+              <TouchableOpacity
+                onPress={() => router.replace("/calendar")}
+                style={{ alignItems: "center", flex: 1 }}
+              >
+                <FiBrCalendar
+                  width={32}
+                  height={32}
+                  fill={isDark ? colors.dark.icon : colors.light.icon}
+                />
+                <Text
+                  style={{
+                    color: isDark ? colors.dark.icon : colors.light.icon,
+                    fontSize: 12,
+                    marginTop: 4,
+                  }}
+                >
+                  Calendar
                 </Text>
               </TouchableOpacity>
               {/* Settings Icon */}

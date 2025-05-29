@@ -10,6 +10,7 @@ import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { useFocusEffect } from "@react-navigation/native";
 import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
+import FiBrflagAlt from "../../../assets/icons/svg/fi-br-flag-alt.svg";
 import { useTasks } from "../../../backend/storage/TasksContext";
 import { styles } from "../../theme/styles";
 
@@ -23,6 +24,102 @@ export default function AllTasks() {
     React.useCallback(() => {
       exportDataAsJSON();
     }, [themeMode])
+  );
+
+  const TASK_ROW_HEIGHT = 48; // Match your taskItem height if not explicitly set in styles
+
+  const renderTaskRow = (item: any) => (
+    <Swipeable
+      renderRightActions={() => (
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "stretch",
+            height: TASK_ROW_HEIGHT,
+          }}
+        >
+          <Pressable
+            style={[
+              styles.inlineButton,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.redbutton_background
+                  : colors.light.redbutton_background,
+                borderRadius: 8,
+                height: TASK_ROW_HEIGHT,
+                minWidth: 48,
+                marginRight: 4,
+                justifyContent: "center",
+                alignItems: "center",
+                // Remove all padding for flush alignment
+                padding: 0,
+              },
+            ]}
+            onPress={() => {
+              removeTask(item.id);
+              exportDataAsJSON();
+            }}
+          >
+            <FiBrtrash
+              width={20}
+              height={20}
+              fill={
+                isDark
+                  ? colors.dark.redbutton_text_icon
+                  : colors.light.redbutton_text_icon
+              }
+            />
+          </Pressable>
+        </View>
+      )}
+    >
+      <View
+        style={[
+          styles.taskItem,
+          item.indent === 1 && styles.indentedTask,
+          item.completed
+            ? { backgroundColor: colors.dark.secondary }
+            : item.buttonColor
+            ? { backgroundColor: item.buttonColor }
+            : {
+                backgroundColor: isDark
+                  ? colors.dark.primary
+                  : colors.light.accent,
+              },
+          {
+            minHeight: TASK_ROW_HEIGHT,
+            flexDirection: "row",
+            alignItems: "center",
+          },
+        ]}
+      >
+        <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+          <Text
+            style={[
+              styles.taskText,
+              item.completed
+                ? {
+                    textDecorationLine: "line-through",
+                    color: colors.dark.tertiary,
+                  }
+                : {
+                    color: isDark ? colors.dark.text : colors.dark.primary,
+                  },
+            ]}
+          >
+            {item.title}
+          </Text>
+          {item.flagged && (
+            <FiBrflagAlt
+              width={18}
+              height={18}
+              style={{ marginLeft: 8 }}
+              fill={isDark ? "#fbbf24" : "#d97706"}
+            />
+          )}
+        </View>
+      </View>
+    </Swipeable>
   );
 
   return (
@@ -62,52 +159,7 @@ export default function AllTasks() {
       <FlatList
         data={visibleTasks}
         keyExtractor={(t) => t.id}
-        renderItem={({ item }) => (
-          <Swipeable
-            renderRightActions={() => (
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Pressable
-                  style={[styles.inlineButton, { backgroundColor: "#7f1d1d" }]}
-                  onPress={() => {
-                    removeTask(item.id);
-                    exportDataAsJSON();
-                  }}
-                >
-                  <FiBrtrash width={20} height={20} fill="#fecaca" />
-                </Pressable>
-              </View>
-            )}
-          >
-            <View
-              style={[
-                styles.taskItem,
-                // Use only styles from styles.ts for taskItem, indentedTask
-                item.completed
-                  ? { backgroundColor: colors.dark.secondary }
-                  : item.buttonColor
-                  ? { backgroundColor: item.buttonColor }
-                  : {
-                      backgroundColor: isDark
-                        ? colors.dark.primary
-                        : colors.light.accent,
-                    },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.taskText,
-                  item.completed
-                    ? styles.completedText
-                    : {
-                        color: isDark ? colors.dark.text : colors.dark.primary,
-                      },
-                ]}
-              >
-                {item.title}
-              </Text>
-            </View>
-          </Swipeable>
-        )}
+        renderItem={({ item }) => renderTaskRow(item)}
         contentContainerStyle={{
           backgroundColor: isDark
             ? colors.dark.background
