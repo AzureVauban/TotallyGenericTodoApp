@@ -61,6 +61,7 @@ import { useTasks } from "../../backend/storage/TasksContext";
 import { Task as ContextTask } from "../../backend/storage/TasksContext";
 import FiBrCalendar from "../../assets/icons/svg/fi-br-calendar.svg";
 import { Calendar } from "react-native-calendars";
+import ModalWrapper from "../components/ModalWrapper";
 /**
  * **MyList Screen**
  *
@@ -655,444 +656,409 @@ export default function MyList() {
         </TouchableOpacity>
 
         {/* New Task Modal */}
-        <Modal visible={newTaskModalVisible} transparent animationType="fade">
-          <View style={styles.modalOverlay}>
-            <View
-              style={[
-                styles.modalContent,
-                {
-                  backgroundColor: isDark
-                    ? colors.dark.secondary
-                    : colors.dark.secondary,
-                },
-              ]}
+        <ModalWrapper
+          visible={newTaskModalVisible}
+          onRequestClose={() => {
+            setNewTaskText("");
+            setNewTaskError("");
+            setNewTaskModalVisible(false);
+          }}
+        >
+          <Text style={styles.modalTitle}>New Task</Text>
+          <TextInput
+            value={newTaskText}
+            onChangeText={setNewTaskText}
+            placeholder="Task description"
+            placeholderTextColor={colors.dark.text}
+            style={{
+              borderWidth: 1,
+              borderColor: newTaskError ? "#450a0a" : colors.dark.tertiary,
+              color: colors.dark.text,
+              padding: 8,
+              borderRadius: 8,
+              marginBottom: 10,
+            }}
+          />
+          {newTaskError ? (
+            <Text
+              style={{
+                color: colors.dark.accent,
+                marginBottom: 8,
+                fontSize: 12,
+              }}
             >
-              <Text style={styles.modalTitle}>New Task</Text>
-              <TextInput
-                value={newTaskText}
-                onChangeText={setNewTaskText}
-                placeholder="Task description"
-                placeholderTextColor={colors.dark.text}
-                style={{
-                  borderWidth: 1,
-                  borderColor: newTaskError ? "#450a0a" : colors.dark.tertiary,
-                  color: colors.dark.text,
-                  padding: 8,
-                  borderRadius: 8,
-                  marginBottom: 10,
-                }}
-              />
-              {newTaskError ? (
-                <Text
-                  style={{
-                    color: colors.dark.accent,
-                    marginBottom: 8,
-                    fontSize: 12,
-                  }}
-                >
-                  {newTaskError}
-                </Text>
-              ) : null}
-              <Pressable
-                style={[
-                  styles.modalButton,
-                  {
-                    backgroundColor: isDark
-                      ? colors.dark.primary
-                      : colors.light.primary,
-                  },
-                ]}
-                onPress={async () => {
-                  const desc = newTaskText?.trim();
-                  if (!desc) {
-                    setNewTaskError("Please enter a task description.");
-                    return;
-                  }
-                  if (listTasks.some((t) => t.title.trim() === desc)) {
-                    playInvalidSound();
-                    setNewTaskError(
-                      "A task with that description already exists."
-                    );
-                    return;
-                  }
-                  if (typeof desc !== "string") {
-                    throw new Error(
-                      `Invalid task description: ${String(desc)}`
-                    );
-                  }
-                  await addTask({
-                    id: `${Date.now()}-${Math.random()
-                      .toString(36)
-                      .substr(2, 5)}`,
-                    title: desc,
-                    flagged: false,
-                    indent: 0,
-                    listName: listId,
-                  });
-                  setNewTaskError("");
-                  setNewTaskText("");
-                  setNewTaskModalVisible(false);
-                }}
-              >
-                <Text style={styles.modalButtonText}>Add</Text>
-              </Pressable>
-              <Pressable
-                style={[
-                  styles.modalButton,
-                  { backgroundColor: colors.dark.primary },
-                ]}
-                onPress={() => {
-                  setNewTaskText("");
-                  setNewTaskError("");
-                  setNewTaskModalVisible(false);
-                }}
-              >
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </Pressable>
-            </View>
-          </View>
-        </Modal>
+              {newTaskError}
+            </Text>
+          ) : null}
+          <Pressable
+            style={[
+              styles.modalButton,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.primary
+                  : colors.light.primary,
+              },
+            ]}
+            onPress={async () => {
+              const desc = newTaskText?.trim();
+              if (!desc) {
+                setNewTaskError("Please enter a task description.");
+                return;
+              }
+              if (listTasks.some((t) => t.title.trim() === desc)) {
+                playInvalidSound();
+                setNewTaskError("A task with that description already exists.");
+                return;
+              }
+              if (typeof desc !== "string") {
+                throw new Error(`Invalid task description: ${String(desc)}`);
+              }
+              await addTask({
+                id: `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+                title: desc,
+                flagged: false,
+                indent: 0,
+                listName: listId,
+              });
+              setNewTaskError("");
+              setNewTaskText("");
+              setNewTaskModalVisible(false);
+            }}
+          >
+            <Text style={styles.modalButtonText}>Add</Text>
+          </Pressable>
+          <Pressable
+            style={[
+              styles.modalButton,
+              { backgroundColor: colors.dark.primary },
+            ]}
+            onPress={() => {
+              setNewTaskText("");
+              setNewTaskError("");
+              setNewTaskModalVisible(false);
+            }}
+          >
+            <Text style={styles.modalButtonText}>Cancel</Text>
+          </Pressable>
+        </ModalWrapper>
 
         {/* Rename Task Modal */}
-        <Modal visible={renameModalVisible} transparent animationType="fade">
-          <View style={styles.modalOverlay}>
-            <View
-              style={[
-                styles.modalContent,
-                {
-                  backgroundColor: isDark
-                    ? colors.dark.secondary
-                    : colors.dark.secondary,
-                },
-              ]}
-            >
-              <Text style={styles.modalTitle}>Rename Task</Text>
-              <TextInput
-                value={renameText}
-                onChangeText={setRenameText}
-                placeholder="Task description"
-                placeholderTextColor={colors.dark.text}
-                style={{
-                  borderWidth: 1,
-                  borderColor: colors.dark.tertiary,
-                  color: colors.dark.text,
-                  padding: 8,
-                  borderRadius: 8,
-                  marginBottom: 10,
-                }}
-              />
-              <Pressable
-                style={[
-                  styles.modalButton,
-                  {
-                    backgroundColor: isDark
-                      ? colors.dark.primary
-                      : colors.light.primary,
-                  },
-                ]}
-                onPress={() => {
-                  if (renameText.trim() && renameTaskId) {
-                    console.log(
-                      `Updating task with ID ${renameTaskId} to new text: ${renameText}`
-                    );
-                    updateTaskText(renameTaskId, renameText);
-                    playRenameTaskSound();
-                  }
-                  setRenameText("");
-                  setRenameTaskId(null);
-                  setRenameModalVisible(false);
-                }}
-              >
-                <Text style={styles.modalButtonText}>Save</Text>
-              </Pressable>
-              <Pressable
-                style={[
-                  styles.modalButton,
-                  { backgroundColor: colors.dark.primary },
-                ]}
-                onPress={() => {
-                  setRenameText("");
-                  setRenameTaskId(null);
-                  setRenameModalVisible(false);
-                }}
-              >
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </Pressable>
-            </View>
-          </View>
-        </Modal>
+        <ModalWrapper
+          visible={renameModalVisible}
+          onRequestClose={() => {
+            setRenameText("");
+            setRenameTaskId(null);
+            setRenameModalVisible(false);
+          }}
+        >
+          <Text style={styles.modalTitle}>Rename Task</Text>
+          <TextInput
+            value={renameText}
+            onChangeText={setRenameText}
+            placeholder="Task description"
+            placeholderTextColor={colors.dark.text}
+            style={{
+              borderWidth: 1,
+              borderColor: colors.dark.tertiary,
+              color: colors.dark.text,
+              padding: 8,
+              borderRadius: 8,
+              marginBottom: 10,
+            }}
+          />
+          <Pressable
+            style={[
+              styles.modalButton,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.primary
+                  : colors.light.primary,
+              },
+            ]}
+            onPress={() => {
+              if (renameText.trim() && renameTaskId) {
+                updateTaskText(renameTaskId, renameText);
+                playRenameTaskSound();
+              }
+              setRenameText("");
+              setRenameTaskId(null);
+              setRenameModalVisible(false);
+            }}
+          >
+            <Text style={styles.modalButtonText}>Save</Text>
+          </Pressable>
+          <Pressable
+            style={[
+              styles.modalButton,
+              { backgroundColor: colors.dark.primary },
+            ]}
+            onPress={() => {
+              setRenameText("");
+              setRenameTaskId(null);
+              setRenameModalVisible(false);
+            }}
+          >
+            <Text style={styles.modalButtonText}>Cancel</Text>
+          </Pressable>
+        </ModalWrapper>
 
         {/* Task Details Modal */}
-        <Modal visible={detailModalVisible} transparent animationType="fade">
-          <View style={styles.modalOverlay}>
-            <View
-              style={[
-                styles.modalContent,
-                {
-                  backgroundColor: isDark
-                    ? colors.dark.secondary
-                    : colors.dark.secondary,
-                },
-              ]}
-            >
-              <Text style={styles.modalTitle}>Task Details</Text>
-              <TextInput
-                value={detailDesc}
-                onChangeText={setDetailDesc}
-                placeholder={selectedTask?.title}
-                placeholderTextColor={colors.dark.text}
-                style={{
-                  borderWidth: 1,
-                  borderColor: colors.dark.tertiary,
-                  color: colors.dark.text,
-                  padding: 8,
-                  borderRadius: 8,
-                  marginBottom: 10,
-                }}
-              />
+        <ModalWrapper
+          visible={detailModalVisible}
+          onRequestClose={() => setDetailModalVisible(false)}
+        >
+          <Text style={styles.modalTitle}>Task Details</Text>
+          <TextInput
+            value={detailDesc}
+            onChangeText={setDetailDesc}
+            placeholder={selectedTask?.title}
+            placeholderTextColor={colors.dark.text}
+            style={{
+              borderWidth: 1,
+              borderColor: colors.dark.tertiary,
+              color: colors.dark.text,
+              padding: 8,
+              borderRadius: 8,
+              marginBottom: 10,
+            }}
+          />
 
-              {/* Popover-style Date Picker */}
-              <View style={{ marginBottom: 10 }}>
-                <Text style={{ color: colors.dark.text, marginBottom: 6 }}>
-                  Scheduled Date
-                </Text>
-                <Pressable
-                  onPress={() => setShowDatePicker(true)}
+          {/* Popover-style Date Picker */}
+          <View style={{ marginBottom: 10 }}>
+            <Text style={{ color: colors.dark.text, marginBottom: 6 }}>
+              Scheduled Date
+            </Text>
+            <Pressable
+              onPress={() => setShowDatePicker(true)}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                borderWidth: 1,
+                borderColor: colors.dark.tertiary,
+                borderRadius: 8,
+                padding: 10,
+                backgroundColor: isDark
+                  ? colors.dark.secondary
+                  : colors.light.secondary,
+              }}
+            >
+              <FiBrCalendar
+                width={22}
+                height={22}
+                fill={
+                  isDark
+                    ? colors.dark.bluebutton_background
+                    : colors.light.bluebutton_background
+                }
+                style={{ marginRight: 8 }}
+              />
+              <Text
+                style={{
+                  color: detailDate ? colors.dark.text : colors.dark.tertiary,
+                  fontSize: 16,
+                }}
+              >
+                {detailDate ? formatDatePPP(detailDate) : "Pick a date"}
+              </Text>
+            </Pressable>
+            {showDatePicker && (
+              <Modal
+                transparent
+                animationType="fade"
+                visible={showDatePicker}
+                onRequestClose={() => setShowDatePicker(false)}
+              >
+                <View
                   style={{
-                    flexDirection: "row",
+                    flex: 1,
+                    justifyContent: "center",
                     alignItems: "center",
-                    borderWidth: 1,
-                    borderColor: colors.dark.tertiary,
-                    borderRadius: 8,
-                    padding: 10,
-                    backgroundColor: isDark
-                      ? colors.dark.secondary
-                      : colors.light.secondary,
+                    backgroundColor: "rgba(0,0,0,0.3)",
                   }}
                 >
-                  <FiBrCalendar
-                    width={22}
-                    height={22}
-                    fill={
-                      isDark
-                        ? colors.dark.bluebutton_background
-                        : colors.light.bluebutton_background
-                    }
-                    style={{ marginRight: 8 }}
-                  />
-                  <Text
+                  <View
                     style={{
-                      color: detailDate
-                        ? colors.dark.text
-                        : colors.dark.tertiary,
-                      fontSize: 16,
+                      backgroundColor: isDark
+                        ? colors.dark.secondary
+                        : colors.light.secondary,
+                      borderRadius: 12,
+                      padding: 16,
                     }}
                   >
-                    {detailDate ? formatDatePPP(detailDate) : "Pick a date"}
-                  </Text>
-                </Pressable>
-                {showDatePicker && (
-                  <Modal
-                    transparent
-                    animationType="fade"
-                    visible={showDatePicker}
-                    onRequestClose={() => setShowDatePicker(false)}
-                  >
-                    <View
-                      style={{
-                        flex: 1,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        backgroundColor: "rgba(0,0,0,0.3)",
-                      }}
-                    >
-                      <View
-                        style={{
-                          backgroundColor: isDark
-                            ? colors.dark.secondary
-                            : colors.light.secondary,
-                          borderRadius: 12,
-                          padding: 16,
-                        }}
-                      >
-                        <Calendar
-                          markedDates={
-                            detailDate
-                              ? {
-                                  [detailDate]: {
-                                    selected: true,
-                                    selectedColor: isDark
-                                      ? colors.dark.bluebutton_background
-                                      : colors.light.bluebutton_background,
-                                    customStyles: {
-                                      container: {
-                                        // Square with 50% border radius
-                                        borderRadius: 12,
-                                        width: 36,
-                                        height: 36,
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                      },
-                                      text: {
-                                        color: "#fff",
-                                        fontWeight: "bold",
-                                      },
-                                    },
+                    <Calendar
+                      markedDates={
+                        detailDate
+                          ? {
+                              [detailDate]: {
+                                selected: true,
+                                selectedColor: isDark
+                                  ? colors.dark.bluebutton_background
+                                  : colors.light.bluebutton_background,
+                                customStyles: {
+                                  container: {
+                                    borderRadius: 12,
+                                    width: 36,
+                                    height: 36,
+                                    alignItems: "center",
+                                    justifyContent: "center",
                                   },
-                                }
-                              : {}
-                          }
-                          markingType="custom"
-                          onDayPress={(day) => {
-                            setDetailDate(day.dateString);
-                            setShowDatePicker(false);
-                          }}
-                          theme={{
-                            backgroundColor: isDark
-                              ? colors.dark.secondary
-                              : colors.light.secondary,
-                            calendarBackground: isDark
-                              ? colors.dark.secondary
-                              : colors.light.secondary,
-                            textSectionTitleColor: colors.dark.text,
-                            selectedDayBackgroundColor: "transparent", // handled by customStyles
-                            selectedDayTextColor: "#fff",
-                            todayTextColor: "#facc15",
-                            dayTextColor: colors.dark.text,
-                            textDisabledColor: "#d1d5db",
-                            arrowColor: colors.dark.text,
-                            monthTextColor: colors.dark.text,
-                          }}
-                          style={{
-                            borderRadius: 12,
-                            minWidth: 320,
-                          }}
-                        />
-                        <Pressable
-                          style={{
-                            marginTop: 12,
-                            alignSelf: "flex-end",
-                            padding: 8,
-                          }}
-                          onPress={() => setShowDatePicker(false)}
-                        >
-                          <Text style={{ color: colors.dark.text }}>Close</Text>
-                        </Pressable>
-                      </View>
-                    </View>
-                  </Modal>
-                )}
-              </View>
-
-              {/* Color picker swatches grid */}
-              <View style={styles.colorPickerContainer}>
-                {[
-                  // 800
-                  "rgb(107, 33,168)",
-                  "rgb(30,64, 175)",
-                  "rgb(22, 101 ,52)",
-                  "rgb(146,64 ,14)",
-                  "rgb(157 ,23 ,77)",
-                  // 600
-                  "rgb(147 ,51 ,234)",
-                  "rgb(37  ,99 ,235)",
-                  "rgb(5   ,150, 105)",
-                  "rgb(202 ,138, 4)",
-                  "rgb(219 ,39 ,119)",
-                  // 400
-                  "rgb(192 ,132, 252)",
-                  "rgb(96  ,165, 250)",
-                  "rgb(74  ,222, 128)",
-                  "rgb(250 ,204, 21)",
-                  "rgb(244 ,114, 182)",
-                  // 200
-                  "rgb(233,213, 255)",
-                  "rgb(191,219, 254)",
-                  "rgb(187,247, 208)",
-                  "rgb(254,240, 138)",
-                  "rgb(251,207, 232)",
-                ].map((color) => (
-                  <Pressable
-                    key={color}
-                    onPress={() => setDetailColor(color)}
-                    style={[
-                      styles.colorSwatch,
-                      {
-                        backgroundColor: color,
-                        borderWidth: detailColor === color ? 2 : 0,
-                        borderColor: "#fff",
-                      },
-                    ]}
-                  />
-                ))}
-              </View>
-
-              <TextInput
-                value={detailColor}
-                onChangeText={setDetailColor}
-                placeholder="Button Color (hex)"
-                placeholderTextColor={colors.dark.text}
-                style={{
-                  borderWidth: 1,
-                  borderColor: colors.dark.tertiary,
-                  color: colors.dark.text,
-                  padding: 8,
-                  borderRadius: 8,
-                  marginBottom: 10,
-                }}
-              />
-              {/* Reset Color Button */}
-              <Pressable
-                style={[
-                  styles.modalButton,
-                  {
-                    backgroundColor: isDark
-                      ? colors.dark.primary
-                      : colors.light.primary,
-                    marginBottom: 8,
-                  },
-                ]}
-                onPress={() => setDetailColor("")}
-              >
-                <Text style={styles.modalButtonText}>Reset Color</Text>
-              </Pressable>
-              {/* Save Button */}
-              <Pressable
-                style={[
-                  styles.modalButton,
-                  {
-                    backgroundColor: isDark
-                      ? colors.dark.primary
-                      : colors.light.primary,
-                  },
-                ]}
-                onPress={() => {
-                  if (selectedTask) {
-                    const updateFn = (t: ContextTask) => ({
-                      ...t,
-                      title: detailDesc,
-                      scheduleDate: detailDate,
-                      buttonColor: detailColor,
-                    });
-                    updateTask(selectedTask.id, updateFn(selectedTask));
-                  }
-                  setDetailModalVisible(false);
-                }}
-              >
-                <Text style={styles.modalButtonText}>Save</Text>
-              </Pressable>
-              <Pressable
-                style={[
-                  styles.modalButton,
-                  { backgroundColor: colors.dark.primary },
-                ]}
-                onPress={() => setDetailModalVisible(false)}
-              >
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </Pressable>
-            </View>
+                                  text: {
+                                    color: "#fff",
+                                    fontWeight: "bold",
+                                  },
+                                },
+                              },
+                            }
+                          : {}
+                      }
+                      markingType="custom"
+                      onDayPress={(day) => {
+                        setDetailDate(day.dateString);
+                        setShowDatePicker(false);
+                      }}
+                      theme={{
+                        backgroundColor: isDark
+                          ? colors.dark.secondary
+                          : colors.light.secondary,
+                        calendarBackground: isDark
+                          ? colors.dark.secondary
+                          : colors.light.secondary,
+                        textSectionTitleColor: colors.dark.text,
+                        selectedDayBackgroundColor: "transparent",
+                        selectedDayTextColor: "#fff",
+                        todayTextColor: "#facc15",
+                        dayTextColor: colors.dark.text,
+                        textDisabledColor: "#d1d5db",
+                        arrowColor: colors.dark.text,
+                        monthTextColor: colors.dark.text,
+                      }}
+                      style={{
+                        borderRadius: 12,
+                        minWidth: 320,
+                      }}
+                    />
+                    <Pressable
+                      style={{
+                        marginTop: 12,
+                        alignSelf: "flex-end",
+                        padding: 8,
+                      }}
+                      onPress={() => setShowDatePicker(false)}
+                    >
+                      <Text style={{ color: colors.dark.text }}>Close</Text>
+                    </Pressable>
+                  </View>
+                </View>
+              </Modal>
+            )}
           </View>
-        </Modal>
+
+          {/* Color picker swatches grid */}
+          <View style={styles.colorPickerContainer}>
+            {[
+              // 800
+              "rgb(107, 33,168)",
+              "rgb(30,64, 175)",
+              "rgb(22, 101 ,52)",
+              "rgb(146,64 ,14)",
+              "rgb(157 ,23 ,77)",
+              // 600
+              "rgb(147 ,51 ,234)",
+              "rgb(37  ,99 ,235)",
+              "rgb(5   ,150, 105)",
+              "rgb(202 ,138, 4)",
+              "rgb(219 ,39 ,119)",
+              // 400
+              "rgb(192 ,132, 252)",
+              "rgb(96  ,165, 250)",
+              "rgb(74  ,222, 128)",
+              "rgb(250 ,204, 21)",
+              "rgb(244 ,114, 182)",
+              // 200
+              "rgb(233,213, 255)",
+              "rgb(191,219, 254)",
+              "rgb(187,247, 208)",
+              "rgb(254,240, 138)",
+              "rgb(251,207, 232)",
+            ].map((color) => (
+              <Pressable
+                key={color}
+                onPress={() => setDetailColor(color)}
+                style={[
+                  styles.colorSwatch,
+                  {
+                    backgroundColor: color,
+                    borderWidth: detailColor === color ? 2 : 0,
+                    borderColor: "#fff",
+                  },
+                ]}
+              />
+            ))}
+          </View>
+          <TextInput
+            value={detailColor}
+            onChangeText={setDetailColor}
+            placeholder="Button Color (hex)"
+            placeholderTextColor={colors.dark.text}
+            style={{
+              borderWidth: 1,
+              borderColor: colors.dark.tertiary,
+              color: colors.dark.text,
+              padding: 8,
+              borderRadius: 8,
+              marginBottom: 10,
+            }}
+          />
+          {/* Reset Color Button */}
+          <Pressable
+            style={[
+              styles.modalButton,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.primary
+                  : colors.light.primary,
+                marginBottom: 8,
+              },
+            ]}
+            onPress={() => setDetailColor("")}
+          >
+            <Text style={styles.modalButtonText}>Reset Color</Text>
+          </Pressable>
+          {/* Save Button */}
+          <Pressable
+            style={[
+              styles.modalButton,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.primary
+                  : colors.light.primary,
+              },
+            ]}
+            onPress={() => {
+              if (selectedTask) {
+                const updateFn = (t: ContextTask) => ({
+                  ...t,
+                  title: detailDesc,
+                  scheduleDate: detailDate,
+                  buttonColor: detailColor,
+                });
+                updateTask(selectedTask.id, updateFn(selectedTask));
+              }
+              setDetailModalVisible(false);
+            }}
+          >
+            <Text style={styles.modalButtonText}>Save</Text>
+          </Pressable>
+          <Pressable
+            style={[
+              styles.modalButton,
+              { backgroundColor: colors.dark.primary },
+            ]}
+            onPress={() => setDetailModalVisible(false)}
+          >
+            <Text style={styles.modalButtonText}>Cancel</Text>
+          </Pressable>
+        </ModalWrapper>
       </View>
     </PanGestureHandler>
   );

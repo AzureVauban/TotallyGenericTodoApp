@@ -103,7 +103,7 @@ export default function SettingsScreen() {
     // Swipe left: go to home
     if (translationX < -100 && !hasNavigated.current) {
       hasNavigated.current = true;
-      router.push("/calendar");
+      router.push("/task-calendar");
     }
     // No debug navigation from settings
 
@@ -304,7 +304,7 @@ export default function SettingsScreen() {
               </TouchableOpacity>
               {/* Calendar Icon */}
               <TouchableOpacity
-                onPress={() => router.replace("/calendar")}
+                onPress={() => router.replace("/task-calendar")}
                 style={{ alignItems: "center", flex: 1 }}
               >
                 <FiBrCalendar
