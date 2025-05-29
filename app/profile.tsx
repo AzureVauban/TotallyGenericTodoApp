@@ -316,8 +316,8 @@ export default function UserProfileScreen() {
               {/* Calendar Icon */}
               <TouchableOpacity
                 onPress={() => {
-                  setCurrentRoute("/calendar");
-                  router.replace("/calendar");
+                  setCurrentRoute("/task-calendar");
+                  router.replace("/task-calendar");
                 }}
                 style={{ alignItems: "center", flex: 1 }}
               >
@@ -325,7 +325,7 @@ export default function UserProfileScreen() {
                   width={32}
                   height={32}
                   fill={
-                    currentRoute === "/calendar"
+                    currentRoute === "/task-calendar"
                       ? getNavibarIconActiveColor(isDark)
                       : isDark
                       ? colors.dark.icon
@@ -335,7 +335,7 @@ export default function UserProfileScreen() {
                 <Text
                   style={{
                     color:
-                      currentRoute === "/calendar"
+                      currentRoute === "/task-calendar"
                         ? getNavibarIconActiveColor(isDark)
                         : isDark
                         ? colors.dark.icon
