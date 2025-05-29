@@ -44,6 +44,7 @@ import { useSettings } from "../lib/SettingsContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
 import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
+import ModalWrapper from "./components/ModalWrapper";
 
 export default function HomeScreen() {
   const { theme } = useTheme();
@@ -116,7 +117,7 @@ export default function HomeScreen() {
     // Swipe right: go to settings
     if (translationX > 100 && !hasNavigated.current) {
       hasNavigated.current = true;
-      router.push("/calendar");
+      router.push("/task-calendar");
     }
 
     if (
@@ -486,312 +487,281 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
         {/* Add List Modal */}
-        <Modal visible={addModalVisible} transparent animationType="fade">
-          <View style={styles.modalOverlay}>
-            <View
-              style={[
-                styles.modalContent,
-                {
-                  backgroundColor: isDark
-                    ? colors.dark.secondary
-                    : colors.dark.secondary,
-                },
-              ]}
+        <ModalWrapper
+          visible={addModalVisible}
+          onRequestClose={() => {
+            setAddModalVisible(false);
+            setNewListName("");
+            setDuplicateError(false);
+          }}
+        >
+          <Text style={styles.modalTitle}>New List</Text>
+          <TextInput
+            value={newListName}
+            onChangeText={setNewListName}
+            placeholder="List name"
+            placeholderTextColor={colors.dark.text}
+            style={{
+              borderWidth: 1,
+              borderColor: duplicateError ? "#450a0a" : colors.dark.tertiary,
+              color: colors.dark.text,
+              padding: 8,
+              borderRadius: 8,
+              marginBottom: 10,
+            }}
+          />
+          {duplicateError && (
+            <Text
+              style={{
+                color: colors.dark.accent,
+                marginBottom: 8,
+                fontSize: 12,
+              }}
             >
-              <Text style={styles.modalTitle}>New List</Text>
-              <TextInput
-                value={newListName}
-                onChangeText={setNewListName}
-                placeholder="List name"
-                placeholderTextColor={colors.dark.text}
-                style={{
-                  borderWidth: 1,
-                  borderColor: duplicateError
-                    ? "#450a0a"
-                    : colors.dark.tertiary,
-                  color: colors.dark.text,
-                  padding: 8,
-                  borderRadius: 8,
-                  marginBottom: 10,
-                }}
-              />
-              {duplicateError && (
-                <Text
-                  style={{
-                    color: colors.dark.accent,
-                    marginBottom: 8,
-                    fontSize: 12,
-                  }}
-                >
-                  List name already exists
-                </Text>
-              )}
-              <Pressable
-                style={[
-                  styles.modalButton,
-                  { backgroundColor: colors.dark.primary },
-                ]}
-                onPress={() => {
-                  setAddModalVisible(false);
-                  setNewListName("");
-                  setDuplicateError(false);
-                }}
-              >
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </Pressable>
-              <Pressable
-                style={[
-                  styles.modalButton,
-                  {
-                    backgroundColor: isDark
-                      ? colors.dark.primary
-                      : colors.light.primary,
-                  },
-                ]}
-                onPress={() => {
-                  const trimmedName = newListName.trim();
-                  // Check for duplicates (case-insensitive)
-                  const isDuplicate = lists.some(
-                    (list) =>
-                      list.name.toLowerCase() === trimmedName.toLowerCase()
-                  );
-                  if (isDuplicate) {
-                    playInvalidSound();
-                    setDuplicateError(true);
-                    return;
-                  }
-                  if (trimmedName) {
-                    addList(trimmedName);
-                    exportDataAsJSON();
-                    setNewListName("");
-                    setDuplicateError(false);
-                    setAddModalVisible(false);
-                  }
-                }}
-              >
-                <Text style={styles.modalButtonText}>Add</Text>
-              </Pressable>
-            </View>
-          </View>
-        </Modal>
-        {/* Removed Edit Task Modal as tasks are not managed here */}
+              List name already exists
+            </Text>
+          )}
+          <Pressable
+            style={[
+              styles.modalButton,
+              { backgroundColor: colors.dark.primary },
+            ]}
+            onPress={() => {
+              setAddModalVisible(false);
+              setNewListName("");
+              setDuplicateError(false);
+            }}
+          >
+            <Text style={styles.modalButtonText}>Cancel</Text>
+          </Pressable>
+          <Pressable
+            style={[
+              styles.modalButton,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.primary
+                  : colors.light.primary,
+              },
+            ]}
+            onPress={() => {
+              const trimmedName = newListName.trim();
+              // Check for duplicates (case-insensitive)
+              const isDuplicate = lists.some(
+                (list) => list.name.toLowerCase() === trimmedName.toLowerCase()
+              );
+              if (isDuplicate) {
+                playInvalidSound();
+                setDuplicateError(true);
+                return;
+              }
+              if (trimmedName) {
+                addList(trimmedName);
+                exportDataAsJSON();
+                setNewListName("");
+                setDuplicateError(false);
+                setAddModalVisible(false);
+              }
+            }}
+          >
+            <Text style={styles.modalButtonText}>Add</Text>
+          </Pressable>
+        </ModalWrapper>
         {/* Rename List Modal */}
-
-        <Modal visible={renameModalVisible} transparent animationType="fade">
-          <View style={styles.modalOverlay}>
-            <View
-              style={[
-                styles.modalContent,
-                {
-                  backgroundColor: isDark
-                    ? colors.dark.secondary
-                    : colors.dark.secondary,
-                },
-              ]}
-            >
-              <Text style={styles.modalTitle}>Rename List</Text>
-              <TextInput
-                value={renameName}
-                onChangeText={(text) => {
-                  setRenameName(text);
-                  setRenameError(false);
-                }}
-                placeholder="New name"
-                placeholderTextColor={colors.dark.text}
-                style={{
-                  borderWidth: 1,
-                  borderColor: renameError ? "#450a0a" : colors.dark.tertiary,
-                  borderRadius: 8,
-                  padding: 8,
-                  color: colors.dark.text,
-                  marginBottom: 10,
-                }}
-              />
-              <Pressable
-                style={[
-                  styles.modalButton,
-                  {
-                    backgroundColor: isDark
-                      ? colors.dark.primary
-                      : colors.light.primary,
-                  },
-                ]}
-                onPress={() => {
-                  if (!renameTarget) return;
-                  const trimmedName = renameName.trim();
-                  // Prevent duplicates (excluding the list being renamed), case‐insensitive
-                  const normalized = trimmedName.toLowerCase();
-                  const duplicate = lists
-                    .filter((l) => l.id !== renameTarget.id)
-                    .some((l) => l.name.trim().toLowerCase() === normalized);
-                  if (duplicate || !trimmedName) {
-                    playInvalidSound();
-                    setRenameError(true);
-                    return;
-                  }
-                  // Call context renameList to update storage and state
-                  renameList(renameTarget.id, trimmedName);
-                  // Navigate to the renamed list screen
-                  router.replace(`/Lists/${trimmedName}`);
-                  setRenameModalVisible(false);
-                }}
-              >
-                <Text style={styles.modalButtonText}>Ok</Text>
-              </Pressable>
-              <Pressable
-                style={[
-                  styles.modalButton,
-                  { backgroundColor: colors.dark.primary },
-                ]}
-                onPress={() => setRenameModalVisible(false)}
-              >
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </Pressable>
-            </View>
-          </View>
-        </Modal>
+        <ModalWrapper
+          visible={renameModalVisible}
+          onRequestClose={() => setRenameModalVisible(false)}
+        >
+          <Text style={styles.modalTitle}>Rename List</Text>
+          <TextInput
+            value={renameName}
+            onChangeText={(text) => {
+              setRenameName(text);
+              setRenameError(false);
+            }}
+            placeholder="New name"
+            placeholderTextColor={colors.dark.text}
+            style={{
+              borderWidth: 1,
+              borderColor: renameError ? "#450a0a" : colors.dark.tertiary,
+              borderRadius: 8,
+              padding: 8,
+              color: colors.dark.text,
+              marginBottom: 10,
+            }}
+          />
+          <Pressable
+            style={[
+              styles.modalButton,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.primary
+                  : colors.light.primary,
+              },
+            ]}
+            onPress={() => {
+              if (!renameTarget) return;
+              const trimmedName = renameName.trim();
+              // Prevent duplicates (excluding the list being renamed), case‐insensitive
+              const normalized = trimmedName.toLowerCase();
+              const duplicate = lists
+                .filter((l) => l.id !== renameTarget.id)
+                .some((l) => l.name.trim().toLowerCase() === normalized);
+              if (duplicate || !trimmedName) {
+                playInvalidSound();
+                setRenameError(true);
+                return;
+              }
+              // Call context renameList to update storage and state
+              renameList(renameTarget.id, trimmedName);
+              // Navigate to the renamed list screen
+              router.replace(`/Lists/${trimmedName}`);
+              setRenameModalVisible(false);
+            }}
+          >
+            <Text style={styles.modalButtonText}>Ok</Text>
+          </Pressable>
+          <Pressable
+            style={[
+              styles.modalButton,
+              { backgroundColor: colors.dark.primary },
+            ]}
+            onPress={() => setRenameModalVisible(false)}
+          >
+            <Text style={styles.modalButtonText}>Cancel</Text>
+          </Pressable>
+        </ModalWrapper>
         {/* Edit List Details Modal */}
-        <Modal visible={editListModalVisible} transparent animationType="fade">
-          <View style={styles.modalOverlay}>
-            <View
-              style={[
-                styles.modalContent,
-                {
-                  backgroundColor: isDark
-                    ? colors.dark.secondary
-                    : colors.dark.secondary,
-                },
-              ]}
-            >
-              <Text style={styles.modalTitle}>List Details</Text>
-              <TextInput
-                value={editListName}
-                onChangeText={setEditListName}
-                placeholder="List name"
-                placeholderTextColor={colors.dark.text}
-                style={{
-                  borderWidth: 1,
-                  borderColor: editListError ? "#450a0a" : colors.dark.tertiary,
-                  color: colors.dark.text,
-                  padding: 8,
-                  borderRadius: 8,
-                  marginBottom: 10,
-                }}
-              />
-              {/* Color picker swatches */}
-              <View style={styles.colorPickerContainer}>
-                {[
-                  // 800
-                  "rgb(107, 33,168)",
-                  "rgb(30,64, 175)",
-                  "rgb(22, 101 ,52)",
-                  "rgb(146,64 ,14)",
-                  "rgb(157 ,23 ,77)",
-                  // 600
-                  "rgb(147 ,51 ,234)",
-                  "rgb(37  ,99 ,235)",
-                  "rgb(5   ,150, 105)",
-                  "rgb(202 ,138, 4)",
-                  "rgb(219 ,39 ,119)",
-                  // 400
-                  "rgb(192 ,132, 252)",
-                  "rgb(96  ,165, 250)",
-                  "rgb(74  ,222, 128)",
-                  "rgb(250 ,204, 21)",
-                  "rgb(244 ,114, 182)",
-                  // 200
-                  "rgb(233,213, 255)",
-                  "rgb(191,219, 254)",
-                  "rgb(187,247, 208)",
-                  "rgb(254,240, 138)",
-                  "rgb(251,207, 232)",
-                ].map((color) => (
-                  <Pressable
-                    key={color}
-                    onPress={() => setEditListColor(color)}
-                    style={[
-                      styles.colorSwatch,
-                      {
-                        backgroundColor: color,
-                        borderWidth: editListColor === color ? 2 : 0,
-                        borderColor: "#fff",
-                      },
-                    ]}
-                  />
-                ))}
-              </View>
-              <TextInput
-                value={editListColor}
-                onChangeText={setEditListColor}
-                placeholder="Button Color (hex)"
-                placeholderTextColor={colors.dark.text}
-                style={{
-                  borderWidth: 1,
-                  borderColor: colors.dark.tertiary,
-                  color: colors.dark.text,
-                  padding: 8,
-                  borderRadius: 8,
-                  marginBottom: 10,
-                }}
-              />
-              {/* Reset Color Button */}
+        <ModalWrapper
+          visible={editListModalVisible}
+          onRequestClose={() => setEditListModalVisible(false)}
+        >
+          <Text style={styles.modalTitle}>List Details</Text>
+          <TextInput
+            value={editListName}
+            onChangeText={setEditListName}
+            placeholder="List name"
+            placeholderTextColor={colors.dark.text}
+            style={{
+              borderWidth: 1,
+              borderColor: editListError ? "#450a0a" : colors.dark.tertiary,
+              color: colors.dark.text,
+              padding: 8,
+              borderRadius: 8,
+              marginBottom: 10,
+            }}
+          />
+          {/* Color picker swatches */}
+          <View style={styles.colorPickerContainer}>
+            {[
+              // 800
+              "rgb(107, 33,168)",
+              "rgb(30,64, 175)",
+              "rgb(22, 101 ,52)",
+              "rgb(146,64 ,14)",
+              "rgb(157 ,23 ,77)",
+              // 600
+              "rgb(147 ,51 ,234)",
+              "rgb(37  ,99 ,235)",
+              "rgb(5   ,150, 105)",
+              "rgb(202 ,138, 4)",
+              "rgb(219 ,39 ,119)",
+              // 400
+              "rgb(192 ,132, 252)",
+              "rgb(96  ,165, 250)",
+              "rgb(74  ,222, 128)",
+              "rgb(250 ,204, 21)",
+              "rgb(244 ,114, 182)",
+              // 200
+              "rgb(233,213, 255)",
+              "rgb(191,219, 254)",
+              "rgb(187,247, 208)",
+              "rgb(254,240, 138)",
+              "rgb(251,207, 232)",
+            ].map((color) => (
               <Pressable
+                key={color}
+                onPress={() => setEditListColor(color)}
                 style={[
-                  styles.modalButton,
+                  styles.colorSwatch,
                   {
-                    backgroundColor: isDark
-                      ? colors.dark.primary
-                      : colors.light.primary,
-                    marginBottom: 8,
+                    backgroundColor: color,
+                    borderWidth: editListColor === color ? 2 : 0,
+                    borderColor: "#fff",
                   },
                 ]}
-                onPress={() => setEditListColor("")}
-              >
-                <Text style={styles.modalButtonText}>Reset Color</Text>
-              </Pressable>
-              {/* Save Button */}
-              <Pressable
-                style={[
-                  styles.modalButton,
-                  {
-                    backgroundColor: isDark
-                      ? colors.dark.primary
-                      : colors.light.primary,
-                  },
-                ]}
-                onPress={() => {
-                  if (!editListTarget) return;
-                  const trimmedName = editListName.trim();
-                  // Prevent duplicates (excluding the list being edited), case-insensitive
-                  const normalized = trimmedName.toLowerCase();
-                  const duplicate = lists
-                    .filter((l) => l.id !== editListTarget.id)
-                    .some((l) => l.name.trim().toLowerCase() === normalized);
-                  if (duplicate || !trimmedName) {
-                    playInvalidSound();
-                    setEditListError(true);
-                    return;
-                  }
-                  // Save name and color
-                  renameList(editListTarget.id, trimmedName, editListColor); // <-- Pass color as third argument
-                  setEditListModalVisible(false);
-                }}
-              >
-                <Text style={styles.modalButtonText}>Save</Text>
-              </Pressable>
-              {/* Cancel Button */}
-              <Pressable
-                style={[
-                  styles.modalButton,
-                  { backgroundColor: colors.dark.primary },
-                ]}
-                onPress={() => setEditListModalVisible(false)}
-              >
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </Pressable>
-            </View>
+              />
+            ))}
           </View>
-        </Modal>
+          <TextInput
+            value={editListColor}
+            onChangeText={setEditListColor}
+            placeholder="Button Color (hex)"
+            placeholderTextColor={colors.dark.text}
+            style={{
+              borderWidth: 1,
+              borderColor: colors.dark.tertiary,
+              color: colors.dark.text,
+              padding: 8,
+              borderRadius: 8,
+              marginBottom: 10,
+            }}
+          />
+          {/* Reset Color Button */}
+          <Pressable
+            style={[
+              styles.modalButton,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.primary
+                  : colors.light.primary,
+                marginBottom: 8,
+              },
+            ]}
+            onPress={() => setEditListColor("")}
+          >
+            <Text style={styles.modalButtonText}>Reset Color</Text>
+          </Pressable>
+          {/* Save Button */}
+          <Pressable
+            style={[
+              styles.modalButton,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.primary
+                  : colors.light.primary,
+              },
+            ]}
+            onPress={() => {
+              if (!editListTarget) return;
+              const trimmedName = editListName.trim();
+              // Prevent duplicates (excluding the list being edited), case-insensitive
+              const normalized = trimmedName.toLowerCase();
+              const duplicate = lists
+                .filter((l) => l.id !== editListTarget.id)
+                .some((l) => l.name.trim().toLowerCase() === normalized);
+              if (duplicate || !trimmedName) {
+                playInvalidSound();
+                setEditListError(true);
+                return;
+              }
+              // Save name and color
+              renameList(editListTarget.id, trimmedName, editListColor); // <-- Pass color as third argument
+              setEditListModalVisible(false);
+            }}
+          >
+            <Text style={styles.modalButtonText}>Save</Text>
+          </Pressable>
+          {/* Cancel Button */}
+          <Pressable
+            style={[
+              styles.modalButton,
+              { backgroundColor: colors.dark.primary },
+            ]}
+            onPress={() => setEditListModalVisible(false)}
+          >
+            <Text style={styles.modalButtonText}>Cancel</Text>
+          </Pressable>
+        </ModalWrapper>
         {/* Bottom Navibar */}
         {showNavibar && (
           <View
@@ -858,8 +828,8 @@ export default function HomeScreen() {
             {/* Calendar Icon */}
             <TouchableOpacity
               onPress={() => {
-                setCurrentRoute("/calendar");
-                router.replace("/calendar");
+                setCurrentRoute("/task-calendar");
+                router.replace("/task-calendar");
               }}
               style={{ alignItems: "center", flex: 1 }}
             >
@@ -867,7 +837,7 @@ export default function HomeScreen() {
                 width={32}
                 height={32}
                 fill={
-                  currentRoute === "/calendar"
+                  currentRoute === "/task-calendar"
                     ? getNavibarIconActiveColor(isDark)
                     : isDark
                     ? colors.dark.icon
@@ -877,7 +847,7 @@ export default function HomeScreen() {
               <Text
                 style={{
                   color:
-                    currentRoute === "/calendar"
+                    currentRoute === "/task-calendar"
                       ? getNavibarIconActiveColor(isDark)
                       : isDark
                       ? colors.dark.icon
