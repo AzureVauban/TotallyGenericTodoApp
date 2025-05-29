@@ -1,21 +1,18 @@
-/**
- * Completed Screen
- *
- * Shows every task marked done (and not deleted).
- */
 import React from "react";
-import { View, Text, FlatList } from "react-native";
-// import { useTasks } from "../../../backend/storage/TasksContext";
+
+import { FlatList, Text, View } from "react-native";
+import { Pressable } from "react-native";
 
 import Swipeable from "react-native-gesture-handler/Swipeable";
-import { Pressable } from "react-native";
-import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
-import FiBrflagAlt from "../../../assets/icons/svg/fi-br-flag-alt.svg";
-import { useTasks } from "../../../backend/storage/TasksContext";
-import { useFocusEffect } from "@react-navigation/native";
 import { colors } from "@theme/colors";
-import { useTheme } from "../../../lib/ThemeContext";
+import { useFocusEffect } from "@react-navigation/native";
+
+import FiBrflagAlt from "../../../assets/icons/svg/fi-br-flag-alt.svg";
+import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
 import { styles } from "../../theme/styles";
+import { useTasks } from "../../../backend/storage/TasksContext";
+import { useTheme } from "../../../lib/ThemeContext";
+
 // Local TaskItem shape
 interface TaskItem {
   id: string;

@@ -1,30 +1,19 @@
-import React, { useRef, useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Platform,
-  ScrollView,
-  Switch,
-} from "react-native";
-import { useRouter, useFocusEffect } from "expo-router";
-import {
-  PanGestureHandler,
-  State,
-  GestureHandlerGestureEvent,
-  PanGestureHandlerEventPayload,
-} from "react-native-gesture-handler";
 import { colors } from "@theme/colors";
+import { useRouter } from "expo-router";
 import { useTheme } from "lib/ThemeContext";
-import { styles, getNavibarIconActiveColor } from "./theme/styles";
-import { useSettings } from "../lib/SettingsContext";
-import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
-import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
-import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
-import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
-import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
+import React, { useRef, useState } from "react";
+import { SafeAreaView, Switch, Text, View } from "react-native";
+import {
+  GestureHandlerGestureEvent,
+  PanGestureHandler,
+  PanGestureHandlerEventPayload,
+  State,
+} from "react-native-gesture-handler";
 import { useTasks } from "../backend/storage/TasksContext";
+import { useSettings } from "../lib/SettingsContext";
 import CalendarHeatmap from "./components/CalendarHeatmap";
+import { Navibar } from "./components/Navibar";
+import { styles } from "./theme/styles";
 
 function getSunday(date: Date) {
   const d = new Date(date);
@@ -181,285 +170,103 @@ export default function CalendarScreen() {
 
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent}>
-      <View
-        style={[
-          styles.screenbackground,
-          {
-            backgroundColor: isDark
-              ? colors.dark.background
-              : colors.light.background,
-            flex: 1,
-            alignItems: "center",
-            paddingTop: 40,
-          },
-        ]}
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: isDark
+            ? colors.dark.background
+            : colors.light.background,
+        }}
       >
-        <Text
-          style={{
-            color: isDark ? colors.dark.text : colors.light.text,
-            fontSize: 22,
-            fontWeight: "bold",
-            marginBottom: 16,
-          }}
-        >
-          Tasks Calendar
-        </Text>
         <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginBottom: 16,
-          }}
+          style={[
+            styles.screenbackground,
+            {
+              backgroundColor: isDark
+                ? colors.dark.background
+                : colors.light.background,
+              flex: 1,
+              alignItems: "center",
+              paddingTop: 40,
+            },
+          ]}
         >
           <Text
             style={{
               color: isDark ? colors.dark.text : colors.light.text,
-              fontSize: 16,
-              marginRight: 8,
+              fontSize: 22,
+              fontWeight: "bold",
+              marginBottom: 16,
             }}
           >
-            Completed
+            Tasks Calendar
           </Text>
-          <Switch
-            value={viewMode === "scheduled"}
-            onValueChange={(v) => setViewMode(v ? "scheduled" : "completed")}
-            thumbColor={
-              isDark
-                ? colors.dark.bluebutton_background
-                : colors.light.bluebutton_background
-            }
-            trackColor={{
-              false: isDark ? colors.dark.secondary : colors.light.secondary,
-              true: isDark ? colors.dark.secondary : colors.light.secondary,
-            }}
-          />
-          <Text
-            style={{
-              color: isDark ? colors.dark.text : colors.light.text,
-              fontSize: 16,
-              marginLeft: 8,
-            }}
-          >
-            Scheduled
-          </Text>
-        </View>
-        <View style={{ width: "100%", alignItems: "center" }}>
-          <CalendarHeatmap
-            current={new Date().toISOString().slice(0, 10)}
-            minDate={Object.keys(daysMatrix)[0]}
-            maxDate={
-              Object.keys(daysMatrix)[Object.keys(daysMatrix).length - 1]
-            }
-            markedDates={markedDates}
-            onDayPress={(day) => {
-              router.push(`/Lists/Groups/scheduled?date=${day.dateString}`);
-            }}
-          />
-        </View>
-        {/* Bottom Navibar */}
-        {showNavibar && (
           <View
             style={{
-              position: "absolute",
-              left: 16,
-              right: 16,
-              bottom: 16,
-              paddingVertical: 10,
               flexDirection: "row",
-              backgroundColor: navibarTransparent
-                ? isDark
-                  ? colors.dark.background
-                  : colors.light.background
-                : (isDark ? colors.dark.secondary : colors.light.secondary) +
-                  "80",
-              borderTopWidth: 0,
-              justifyContent: "space-around",
               alignItems: "center",
-              zIndex: 100,
-              borderRadius: 16,
-              shadowColor: "rgb(0, 0, 0)",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.18,
-              shadowRadius: 8,
-              elevation: 8,
-              overflow: "hidden",
+              marginBottom: 16,
             }}
           >
-            {/* Home Icon */}
-            <TouchableOpacity
-              onPress={() => {
-                setCurrentRoute("/home");
-                router.replace("/home");
+            <Text
+              style={{
+                color: isDark ? colors.dark.text : colors.light.text,
+                fontSize: 16,
+                marginRight: 8,
               }}
-              style={{ alignItems: "center", flex: 1 }}
             >
-              <FiBrListCheck
-                width={32}
-                height={32}
-                fill={
-                  currentRoute === "/home"
-                    ? getNavibarIconActiveColor(isDark)
-                    : isDark
-                    ? colors.dark.icon
-                    : colors.light.icon
-                }
-              />
-              <Text
-                style={{
-                  color:
-                    currentRoute === "/home"
-                      ? getNavibarIconActiveColor(isDark)
-                      : isDark
-                      ? colors.dark.icon
-                      : colors.light.icon,
-                  fontSize: 12,
-                  marginTop: 4,
-                }}
-              >
-                Home
-              </Text>
-            </TouchableOpacity>
-            {/* Calendar Icon */}
-            <TouchableOpacity
-              onPress={() => {
-                setCurrentRoute("/task-calendar");
-                router.replace("/task-calendar");
+              Completed
+            </Text>
+            <Switch
+              value={viewMode === "scheduled"}
+              onValueChange={(v) => setViewMode(v ? "scheduled" : "completed")}
+              thumbColor={
+                isDark
+                  ? colors.dark.bluebutton_background
+                  : colors.light.bluebutton_background
+              }
+              trackColor={{
+                false: isDark ? colors.dark.secondary : colors.light.secondary,
+                true: isDark ? colors.dark.secondary : colors.light.secondary,
               }}
-              style={{ alignItems: "center", flex: 1 }}
-            >
-              <FiBrCalendar
-                width={32}
-                height={32}
-                fill={
-                  currentRoute === "/task-calendar"
-                    ? getNavibarIconActiveColor(isDark)
-                    : isDark
-                    ? colors.dark.icon
-                    : colors.light.icon
-                }
-              />
-              <Text
-                style={{
-                  color:
-                    currentRoute === "/task-calendar"
-                      ? getNavibarIconActiveColor(isDark)
-                      : isDark
-                      ? colors.dark.icon
-                      : colors.light.icon,
-                  fontSize: 12,
-                  marginTop: 4,
-                }}
-              >
-                Calendar
-              </Text>
-            </TouchableOpacity>
-            {/* Settings Icon */}
-            <TouchableOpacity
-              onPress={() => {
-                setCurrentRoute("/settings");
-                router.replace("/settings");
+            />
+            <Text
+              style={{
+                color: isDark ? colors.dark.text : colors.light.text,
+                fontSize: 16,
+                marginLeft: 8,
               }}
-              style={{ alignItems: "center", flex: 1 }}
             >
-              <FiBrSettings
-                width={32}
-                height={32}
-                fill={
-                  currentRoute === "/settings"
-                    ? getNavibarIconActiveColor(isDark)
-                    : isDark
-                    ? colors.dark.icon
-                    : colors.light.icon
-                }
-              />
-              <Text
-                style={{
-                  color:
-                    currentRoute === "/settings"
-                      ? getNavibarIconActiveColor(isDark)
-                      : isDark
-                      ? colors.dark.icon
-                      : colors.light.icon,
-                  fontSize: 12,
-                  marginTop: 4,
-                }}
-              >
-                Settings
-              </Text>
-            </TouchableOpacity>
-            {/* Profile Icon */}
-            <TouchableOpacity
-              onPress={() => {
-                setCurrentRoute("/profile");
-                router.replace("/profile");
-              }}
-              style={{ alignItems: "center", flex: 1 }}
-            >
-              <FiBrMemberList
-                width={32}
-                height={32}
-                fill={
-                  currentRoute === "/profile"
-                    ? getNavibarIconActiveColor(isDark)
-                    : isDark
-                    ? colors.dark.icon
-                    : colors.light.icon
-                }
-              />
-              <Text
-                style={{
-                  color:
-                    currentRoute === "/profile"
-                      ? getNavibarIconActiveColor(isDark)
-                      : isDark
-                      ? colors.dark.icon
-                      : colors.light.icon,
-                  fontSize: 12,
-                  marginTop: 4,
-                }}
-              >
-                Profile
-              </Text>
-            </TouchableOpacity>
-            {/* Debug Icon (conditionally rendered) */}
-            {showDebug && (
-              <TouchableOpacity
-                onPress={() => {
-                  setCurrentRoute("/runtime-debug");
-                  router.replace("/runtime-debug");
-                }}
-                style={{ alignItems: "center", flex: 1 }}
-              >
-                <FiBrSquareTerminal
-                  width={32}
-                  height={32}
-                  fill={
-                    currentRoute === "/runtime-debug"
-                      ? getNavibarIconActiveColor(isDark)
-                      : isDark
-                      ? colors.dark.icon
-                      : colors.light.icon
-                  }
-                />
-                <Text
-                  style={{
-                    color:
-                      currentRoute === "/runtime-debug"
-                        ? getNavibarIconActiveColor(isDark)
-                        : isDark
-                        ? colors.dark.icon
-                        : colors.light.icon,
-                    fontSize: 12,
-                    marginTop: 4,
-                  }}
-                >
-                  Debug
-                </Text>
-              </TouchableOpacity>
-            )}
+              Scheduled
+            </Text>
           </View>
-        )}
-      </View>
+          <View style={{ width: "100%", alignItems: "center" }}>
+            <CalendarHeatmap
+              current={new Date().toISOString().slice(0, 10)}
+              minDate={Object.keys(daysMatrix)[0]}
+              maxDate={
+                Object.keys(daysMatrix)[Object.keys(daysMatrix).length - 1]
+              }
+              markedDates={markedDates}
+              onDayPress={(day) => {
+                router.push(`/Lists/Groups/scheduled?date=${day.dateString}`);
+              }}
+            />
+          </View>
+          {/* Bottom Navibar */}
+          {showNavibar && (
+            <Navibar
+              currentRoute={currentRoute}
+              setCurrentRoute={setCurrentRoute}
+              router={router}
+              isDark={isDark}
+              showDebug={showDebug}
+              showNavibar={showNavibar}
+              navibarTransparent={navibarTransparent}
+            />
+          )}
+        </View>
+      </SafeAreaView>
     </PanGestureHandler>
   );
 }

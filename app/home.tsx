@@ -9,14 +9,13 @@ TODO FUTURE ADDITIONS
  * Supports swipe gestures to navigate to the settings screen and manage lists.
  * Includes modals for adding and renaming task lists.
  */
-import { useTheme } from "lib/ThemeContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { colors } from "@theme/colors";
-import { styles, getNavibarIconActiveColor } from "../app/theme/styles";
 import { Link, useFocusEffect, useRouter } from "expo-router";
+import { useTheme } from "lib/ThemeContext";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
-  Modal,
   Pressable,
   ScrollView,
   Text,
@@ -32,19 +31,21 @@ import {
   State,
   Swipeable,
 } from "react-native-gesture-handler";
+import { getNavibarIconActiveColor, styles } from "../app/theme/styles";
+import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
+import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
+import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
+import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
+import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
 import FiBredit from "../assets/icons/svg/fi-br-text-box-edit.svg";
 import FiBrtrash from "../assets/icons/svg/fi-br-trash.svg";
-import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
-import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
-import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
 import { useTasks } from "../backend/storage/TasksContext";
+import { useSettings } from "../lib/SettingsContext";
 import { playInvalidSound } from "../utils/sounds/invalid";
 import { playRemoveSound } from "../utils/sounds/trash";
-import { useSettings } from "../lib/SettingsContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
-import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
 import ModalWrapper from "./components/ModalWrapper";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Navibar } from "./components/Navibar";
 
 export default function HomeScreen() {
   const { theme } = useTheme();
@@ -166,20 +167,29 @@ export default function HomeScreen() {
 
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent}>
-      <View
-        style={[
-          styles.screenbackground,
-          {
-            backgroundColor: isDark
-              ? colors.dark.background
-              : colors.light.background,
-          },
-        ]}
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: isDark
+            ? colors.dark.background
+            : colors.light.background,
+        }}
       >
         {/* Task Groups (Green Buttons) */}
-
-        <View style={styles.taskGroupsWrapper}>
-          <View style={styles.taskGroupRow}>
+        <View
+          style={{
+            marginTop: 24,
+            marginBottom: 16,
+            paddingHorizontal: 12,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginBottom: 16,
+            }}
+          >
             <Link
               href="/Lists/Groups/scheduled"
               onPress={() => exportDataAsJSON()}
@@ -227,7 +237,9 @@ export default function HomeScreen() {
               </Text>
             </Link>
           </View>
-          <View style={styles.taskGroupRow}>
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
+          >
             <Link
               href="/Lists/Groups/flagged"
               onPress={() => exportDataAsJSON()}
@@ -275,14 +287,12 @@ export default function HomeScreen() {
               </Text>
             </Link>
           </View>
-          <View style={styles.divider} />
         </View>
-        {/* User Lists (Blue Scrollable Region) */}
-        <View style={{ marginTop: 200 }}>
+        <View style={{ marginTop: 200, marginBottom: 0, flex: 1 }}>
           <View style={styles.divider} />
           <ScrollView
             style={{ flexGrow: 0, maxHeight: 220 }}
-            contentContainerStyle={{ paddingBottom: 10 }}
+            contentContainerStyle={{ paddingBottom: showNavibar ? 24 : 24 }}
             showsVerticalScrollIndicator={false}
           >
             <FlatList
@@ -446,25 +456,14 @@ export default function HomeScreen() {
               scrollEnabled={false}
             />
           </ScrollView>
-        </View>
-        {/* --- The rest of the original task/chores UI could be rendered below this, if needed --- */}
-        <View
-          style={{
-            position: "absolute",
-            bottom: showNavibar ? 93 : 53, // increased by 5px
-            left: 0,
-            right: 0,
-            alignItems: "center",
-          }}
-        >
-          {/* Divider just above button */}
-          <View style={[styles.divider, { width: "90%", marginBottom: 8 }]} />
-          {/* Centered Add-Task-List button */}
+          {/* Restore Add List Button below the user lists */}
           <TouchableOpacity
             style={[
               styles.addTaskListButton,
               {
                 width: 300,
+                alignSelf: "center",
+                marginTop: 24,
                 backgroundColor: isDark
                   ? colors.dark.bluebutton_background
                   : colors.light.bluebutton_background,
@@ -472,20 +471,10 @@ export default function HomeScreen() {
             ]}
             onPress={() => setAddModalVisible(true)}
           >
-            <Text
-              style={[
-                styles.addTaskListButtonText,
-                {
-                  color: isDark
-                    ? colors.dark.bluebutton_text_icon
-                    : colors.light.bluebutton_text_icon,
-                },
-              ]}
-            >
-              New List
-            </Text>
+            <Text style={styles.modalButtonText}>New List</Text>
           </TouchableOpacity>
         </View>
+        {/* --- The rest of the original task/chores UI could be rendered below this, if needed --- */}
         {/* Add List Modal */}
         <ModalWrapper
           visible={addModalVisible}
@@ -764,208 +753,19 @@ export default function HomeScreen() {
         </ModalWrapper>
         {/* Bottom Navibar */}
         {showNavibar && (
-          <View
-            style={{
-              position: "absolute",
-              left: 16,
-              right: 16,
-              bottom: 16,
-              paddingVertical: 10,
-              flexDirection: "row",
-              backgroundColor: navibarTransparent
-                ? isDark
-                  ? colors.dark.background
-                  : colors.light.background
-                : (isDark ? colors.dark.secondary : colors.light.secondary) +
-                  "80",
-              borderTopWidth: 0,
-              justifyContent: "space-around",
-              alignItems: "center",
-              zIndex: 100,
-              borderRadius: 16,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.18,
-              shadowRadius: 8,
-              elevation: 8,
-              overflow: "hidden",
-            }}
-          >
-            {/* Home Icon */}
-            <TouchableOpacity
-              onPress={() => {
-                setCurrentRoute("/home");
-                router.replace("/home");
-              }}
-              style={{ alignItems: "center", flex: 1 }}
-            >
-              <FiBrListCheck
-                width={32}
-                height={32}
-                fill={
-                  currentRoute === "/home"
-                    ? getNavibarIconActiveColor(isDark)
-                    : isDark
-                    ? colors.dark.icon
-                    : colors.light.icon
-                }
-              />
-              <Text
-                style={{
-                  color:
-                    currentRoute === "/home"
-                      ? getNavibarIconActiveColor(isDark)
-                      : isDark
-                      ? colors.dark.icon
-                      : colors.light.icon,
-                  fontSize: 12,
-                  marginTop: 4,
-                }}
-              >
-                Home
-              </Text>
-            </TouchableOpacity>
-            {/* Calendar Icon */}
-            <TouchableOpacity
-              onPress={() => {
-                setCurrentRoute("/task-calendar");
-                router.replace("/task-calendar");
-              }}
-              style={{ alignItems: "center", flex: 1 }}
-            >
-              <FiBrCalendar
-                width={32}
-                height={32}
-                fill={
-                  currentRoute === "/task-calendar"
-                    ? getNavibarIconActiveColor(isDark)
-                    : isDark
-                    ? colors.dark.icon
-                    : colors.light.icon
-                }
-              />
-              <Text
-                style={{
-                  color:
-                    currentRoute === "/task-calendar"
-                      ? getNavibarIconActiveColor(isDark)
-                      : isDark
-                      ? colors.dark.icon
-                      : colors.light.icon,
-                  fontSize: 12,
-                  marginTop: 4,
-                }}
-              >
-                Calendar
-              </Text>
-            </TouchableOpacity>
-            {/* Settings Icon */}
-            <TouchableOpacity
-              onPress={() => {
-                setCurrentRoute("/settings");
-                router.replace("/settings");
-              }}
-              style={{ alignItems: "center", flex: 1 }}
-            >
-              <FiBrSettings
-                width={32}
-                height={32}
-                fill={
-                  currentRoute === "/settings"
-                    ? getNavibarIconActiveColor(isDark)
-                    : isDark
-                    ? colors.dark.icon
-                    : colors.light.icon
-                }
-              />
-              <Text
-                style={{
-                  color:
-                    currentRoute === "/settings"
-                      ? getNavibarIconActiveColor(isDark)
-                      : isDark
-                      ? colors.dark.icon
-                      : colors.light.icon,
-                  fontSize: 12,
-                  marginTop: 4,
-                }}
-              >
-                Settings
-              </Text>
-            </TouchableOpacity>
-            {/* Profile Icon */}
-            <TouchableOpacity
-              onPress={() => {
-                setCurrentRoute("/profile");
-                router.replace("/profile");
-              }}
-              style={{ alignItems: "center", flex: 1 }}
-            >
-              <FiBrMemberList
-                width={32}
-                height={32}
-                fill={
-                  currentRoute === "/profile"
-                    ? getNavibarIconActiveColor(isDark)
-                    : isDark
-                    ? colors.dark.icon
-                    : colors.light.icon
-                }
-              />
-              <Text
-                style={{
-                  color:
-                    currentRoute === "/profile"
-                      ? getNavibarIconActiveColor(isDark)
-                      : isDark
-                      ? colors.dark.icon
-                      : colors.light.icon,
-                  fontSize: 12,
-                  marginTop: 4,
-                }}
-              >
-                Profile
-              </Text>
-            </TouchableOpacity>
-            {/* Debug Icon (conditionally rendered) */}
-            {showDebug && (
-              <TouchableOpacity
-                onPress={() => {
-                  setCurrentRoute("/runtime-debug");
-                  router.replace("/runtime-debug");
-                }}
-                style={{ alignItems: "center", flex: 1 }}
-              >
-                <FiBrSquareTerminal
-                  width={32}
-                  height={32}
-                  fill={
-                    currentRoute === "/runtime-debug"
-                      ? getNavibarIconActiveColor(isDark)
-                      : isDark
-                      ? colors.dark.icon
-                      : colors.light.icon
-                  }
-                />
-                <Text
-                  style={{
-                    color:
-                      currentRoute === "/runtime-debug"
-                        ? getNavibarIconActiveColor(isDark)
-                        : isDark
-                        ? colors.dark.icon
-                        : colors.light.icon,
-                    fontSize: 12,
-                    marginTop: 4,
-                  }}
-                >
-                  Debug
-                </Text>
-              </TouchableOpacity>
-            )}
+          <View style={{ marginBottom: 0 }}>
+            <Navibar
+              currentRoute={currentRoute}
+              setCurrentRoute={setCurrentRoute}
+              router={router}
+              isDark={isDark}
+              showDebug={showDebug}
+              showNavibar={showNavibar}
+              navibarTransparent={navibarTransparent}
+            />
           </View>
         )}
-      </View>
+      </SafeAreaView>
     </PanGestureHandler>
   );
 }

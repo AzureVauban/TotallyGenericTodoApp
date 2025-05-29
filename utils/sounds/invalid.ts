@@ -1,7 +1,9 @@
 import { Audio } from "expo-av";
+import { getCurrentSoundEnabled } from "../../lib/SettingsContext";
 let soundObject: Audio.Sound | null = null;
 
 export async function playInvalidSound() {
+  if (!getCurrentSoundEnabled()) return;
   const sound_file_name: string = "invalid_sound.mp3";
   console.log("request to play", sound_file_name, "was inputted");
   try {

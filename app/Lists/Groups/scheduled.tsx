@@ -1,24 +1,20 @@
-/**
- * Scheduled Screen
- *
- * Shows all non-deleted tasks that have any `scheduleDate` set.
- */
-import { colors } from "@theme/colors";
-import { useTheme } from "lib/ThemeContext";
-import { useFocusEffect } from "@react-navigation/native";
-
 import React from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+
+import { FlatList, Pressable, Text, View } from "react-native";
+
+import { useLocalSearchParams } from "expo-router";
+
 import Swipeable from "react-native-gesture-handler/Swipeable";
-import { Pressable } from "react-native";
-import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
+import { colors } from "@theme/colors";
+import { useFocusEffect } from "@react-navigation/native";
+import { useTheme } from "lib/ThemeContext";
+
 import FiBrflagAlt from "../../../assets/icons/svg/fi-br-flag-alt.svg";
+import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
 import {
-  useTasks,
-  Task as ContextTask,
+  useTasks
 } from "../../../backend/storage/TasksContext";
 import { styles } from "../../theme/styles";
-import { useLocalSearchParams } from "expo-router";
 
 // Local TaskItem shape
 interface TaskItem {
