@@ -16,13 +16,14 @@ import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
 import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
 import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
 import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
+import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
 import { supabase } from "../lib/supabaseClient";
 import { Session } from "@supabase/supabase-js";
 
 export default function RuntimeDebugScreen() {
   const router = useRouter();
   const hasNavigated = useRef(false);
-  const { showNavibar } = useSettings();
+  const { showNavibar, navibarTransparent } = useSettings();
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [showDebug, setShowDebug] = useState(false);
@@ -190,9 +191,12 @@ export default function RuntimeDebugScreen() {
                 bottom: 16,
                 paddingVertical: 10,
                 flexDirection: "row",
-                backgroundColor:
-                  (isDark ? colors.dark.secondary : colors.light.secondary) +
-                  "80", // 50% opacity
+                backgroundColor: navibarTransparent
+                  ? isDark
+                    ? colors.dark.background
+                    : colors.light.background
+                  : (isDark ? colors.dark.secondary : colors.light.secondary) +
+                    "80",
                 borderTopWidth: 0,
                 justifyContent: "space-around",
                 alignItems: "center",
@@ -238,6 +242,40 @@ export default function RuntimeDebugScreen() {
                   }}
                 >
                   Home
+                </Text>
+              </TouchableOpacity>
+              {/* Calendar Icon */}
+              <TouchableOpacity
+                onPress={() => {
+                  setCurrentRoute("/calendar");
+                  router.replace("/calendar");
+                }}
+                style={{ alignItems: "center", flex: 1 }}
+              >
+                <FiBrCalendar
+                  width={32}
+                  height={32}
+                  fill={
+                    currentRoute === "/calendar"
+                      ? getNavibarIconActiveColor(isDark)
+                      : isDark
+                      ? colors.dark.icon
+                      : colors.light.icon
+                  }
+                />
+                <Text
+                  style={{
+                    color:
+                      currentRoute === "/calendar"
+                        ? getNavibarIconActiveColor(isDark)
+                        : isDark
+                        ? colors.dark.icon
+                        : colors.light.icon,
+                    fontSize: 12,
+                    marginTop: 4,
+                  }}
+                >
+                  Calendar
                 </Text>
               </TouchableOpacity>
               {/* Settings Icon */}

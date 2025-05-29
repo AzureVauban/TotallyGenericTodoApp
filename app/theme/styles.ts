@@ -467,7 +467,17 @@ export const styles = StyleSheet.create({
   inputBackgroundError: {
     backgroundColor: "#450a0a",
   },
+  calendarBackground: {
+    backgroundColor: colors.dark.calendarBackground, // default to dark, switch in component
+    borderRadius: 12,
+    minWidth: 320,
+    marginBottom: 16,
+  },
 });
 
 export const getNavibarIconActiveColor = (isDark: boolean) =>
-  isDark ? "#22d3ee" : "#0ea5e9";
+  isDark ? "#facc15" : "#ca8a04";
+
+// Add these to your theme/colors.ts if not already present:
+// colors.light.calendarBackground = "rgb(212, 212, 216)";
+// colors.dark.calendarBackground = "rgb(39, 39, 42)";

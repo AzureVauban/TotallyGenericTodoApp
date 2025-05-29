@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Platform } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import {
   PanGestureHandler,
@@ -12,6 +12,7 @@ import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
 import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
+import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
 import { colors } from "@theme/colors";
 import { useTheme } from "lib/ThemeContext";
 import { styles, getNavibarIconActiveColor } from "@theme/styles";
@@ -21,7 +22,7 @@ import { useSettings } from "../lib/SettingsContext";
 export default function UserProfileScreen() {
   const router = useRouter();
   const hasNavigated = useRef(false);
-  const { showNavibar } = useSettings();
+  const { showNavibar, navibarTransparent } = useSettings();
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [showDebug, setShowDebug] = React.useState(false);
@@ -244,26 +245,38 @@ export default function UserProfileScreen() {
                 bottom: 16,
                 paddingVertical: 10,
                 flexDirection: "row",
-                backgroundColor:
-                  (isDark ? colors.dark.secondary : colors.light.secondary) +
-                  "80", // 50% opacity
+                backgroundColor: navibarTransparent
+                  ? "transparent"
+                  : (isDark ? colors.dark.secondary : colors.light.secondary) +
+                    "80",
                 borderTopWidth: 0,
                 justifyContent: "space-around",
                 alignItems: "center",
                 zIndex: 100,
-                borderRadius: 16, // rectangle with rounded corners
+                borderRadius: 16,
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.18,
                 shadowRadius: 8,
                 elevation: 8,
                 overflow: "hidden",
-                // Glassy effect
-                borderColor: isDark
-                  ? "rgba(255,255,255,0.15)"
-                  : "rgba(0,0,0,0.10)",
-                borderWidth: 1,
-                backdropFilter: "blur(8px)", // for web, ignored on native
+                ...(navibarTransparent
+                  ? {
+                      borderColor:
+                        Platform.OS === "web"
+                          ? isDark
+                            ? "rgba(255,255,255,0.15)"
+                            : "rgba(0,0,0,0.10)"
+                          : "transparent",
+                      borderWidth: Platform.OS === "web" ? 1 : 0,
+                      ...(Platform.OS === "web" && {
+                        backdropFilter: "blur(8px)",
+                      }),
+                    }
+                  : {
+                      borderColor: "transparent",
+                      borderWidth: 0,
+                    }),
               }}
             >
               {/* Home Icon */}
@@ -298,6 +311,40 @@ export default function UserProfileScreen() {
                   }}
                 >
                   Home
+                </Text>
+              </TouchableOpacity>
+              {/* Calendar Icon */}
+              <TouchableOpacity
+                onPress={() => {
+                  setCurrentRoute("/calendar");
+                  router.replace("/calendar");
+                }}
+                style={{ alignItems: "center", flex: 1 }}
+              >
+                <FiBrCalendar
+                  width={32}
+                  height={32}
+                  fill={
+                    currentRoute === "/calendar"
+                      ? getNavibarIconActiveColor(isDark)
+                      : isDark
+                      ? colors.dark.icon
+                      : colors.light.icon
+                  }
+                />
+                <Text
+                  style={{
+                    color:
+                      currentRoute === "/calendar"
+                        ? getNavibarIconActiveColor(isDark)
+                        : isDark
+                        ? colors.dark.icon
+                        : colors.light.icon,
+                    fontSize: 12,
+                    marginTop: 4,
+                  }}
+                >
+                  Calendar
                 </Text>
               </TouchableOpacity>
               {/* Settings Icon */}

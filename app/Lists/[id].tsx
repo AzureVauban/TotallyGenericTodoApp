@@ -36,13 +36,12 @@ import {
 import { playCompleteSound } from "../../utils/sounds/completed";
 import { playInvalidSound } from "../../utils/sounds/invalid";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Alert,
   FlatList,
   Modal,
   Pressable,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -60,7 +59,8 @@ import FiBrArrowRight from "../../assets/icons/svg/fi-br-arrow-alt-right.svg";
 import FiBrArrowLeft from "../../assets/icons/svg/fi-br-arrow-alt-left.svg";
 import { useTasks } from "../../backend/storage/TasksContext";
 import { Task as ContextTask } from "../../backend/storage/TasksContext";
-import { Audio, Video } from "expo-av";
+import FiBrCalendar from "../../assets/icons/svg/fi-br-calendar.svg";
+import { Calendar } from "react-native-calendars";
 /**
  * **MyList Screen**
  *
@@ -164,6 +164,18 @@ export default function MyList() {
   const [detailDate, setDetailDate] = useState("");
   const [detailColor, setDetailColor] = useState("");
   const [newTaskError, setNewTaskError] = useState<string>("");
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  // Helper to format date as "PPP" (e.g., "Apr 27, 2024")
+  function formatDatePPP(dateStr: string | undefined) {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    return d.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  }
 
   // Dynamic route: only for regular lists, never special lists
   const isSpecialList = false;
@@ -538,27 +550,39 @@ export default function MyList() {
                           },
                     ]}
                   >
-                    <Text
-                      style={[
-                        styles.taskText,
-                        {
-                          color: isDark
-                            ? colors.dark.text
-                            : colors.dark.primary,
-                        },
-                        item.completed && {
-                          textDecorationLine: "line-through",
-                          color: colors.dark.tertiary,
-                        },
-                        item.indent === 1 &&
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <Text
+                        style={[
+                          styles.taskText,
+                          {
+                            color: isDark
+                              ? colors.dark.text
+                              : colors.dark.primary,
+                          },
                           item.completed && {
                             textDecorationLine: "line-through",
                             color: colors.dark.tertiary,
                           },
-                      ]}
-                    >
-                      {item.title}
-                    </Text>
+                          item.indent === 1 &&
+                            item.completed && {
+                              textDecorationLine: "line-through",
+                              color: colors.dark.tertiary,
+                            },
+                        ]}
+                      >
+                        {item.title}
+                      </Text>
+                      {item.flagged && (
+                        <FiBrflagAlt
+                          width={18}
+                          height={18}
+                          style={{ marginLeft: 8 }}
+                          fill={isDark ? "#fbbf24" : "#d97706"}
+                        />
+                      )}
+                    </View>
                   </View>
                 </Pressable>
               </Swipeable>
@@ -827,22 +851,140 @@ export default function MyList() {
                 }}
               />
 
-              <TextInput
-                value={detailDate}
-                onChangeText={setDetailDate}
-                placeholder="Scheduled Date"
-                placeholderTextColor={colors.dark.text}
-                style={{
-                  borderWidth: 1,
-                  borderColor: colors.dark.tertiary,
-                  color: colors.dark.text,
-                  padding: 8,
-                  borderRadius: 8,
-                  marginBottom: 10,
-                }}
-              />
+              {/* Popover-style Date Picker */}
+              <View style={{ marginBottom: 10 }}>
+                <Text style={{ color: colors.dark.text, marginBottom: 6 }}>
+                  Scheduled Date
+                </Text>
+                <Pressable
+                  onPress={() => setShowDatePicker(true)}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    borderWidth: 1,
+                    borderColor: colors.dark.tertiary,
+                    borderRadius: 8,
+                    padding: 10,
+                    backgroundColor: isDark
+                      ? colors.dark.secondary
+                      : colors.light.secondary,
+                  }}
+                >
+                  <FiBrCalendar
+                    width={22}
+                    height={22}
+                    fill={
+                      isDark
+                        ? colors.dark.bluebutton_background
+                        : colors.light.bluebutton_background
+                    }
+                    style={{ marginRight: 8 }}
+                  />
+                  <Text
+                    style={{
+                      color: detailDate
+                        ? colors.dark.text
+                        : colors.dark.tertiary,
+                      fontSize: 16,
+                    }}
+                  >
+                    {detailDate ? formatDatePPP(detailDate) : "Pick a date"}
+                  </Text>
+                </Pressable>
+                {showDatePicker && (
+                  <Modal
+                    transparent
+                    animationType="fade"
+                    visible={showDatePicker}
+                    onRequestClose={() => setShowDatePicker(false)}
+                  >
+                    <View
+                      style={{
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        backgroundColor: "rgba(0,0,0,0.3)",
+                      }}
+                    >
+                      <View
+                        style={{
+                          backgroundColor: isDark
+                            ? colors.dark.secondary
+                            : colors.light.secondary,
+                          borderRadius: 12,
+                          padding: 16,
+                        }}
+                      >
+                        <Calendar
+                          markedDates={
+                            detailDate
+                              ? {
+                                  [detailDate]: {
+                                    selected: true,
+                                    selectedColor: isDark
+                                      ? colors.dark.bluebutton_background
+                                      : colors.light.bluebutton_background,
+                                    customStyles: {
+                                      container: {
+                                        // Square with 50% border radius
+                                        borderRadius: 12,
+                                        width: 36,
+                                        height: 36,
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                      },
+                                      text: {
+                                        color: "#fff",
+                                        fontWeight: "bold",
+                                      },
+                                    },
+                                  },
+                                }
+                              : {}
+                          }
+                          markingType="custom"
+                          onDayPress={(day) => {
+                            setDetailDate(day.dateString);
+                            setShowDatePicker(false);
+                          }}
+                          theme={{
+                            backgroundColor: isDark
+                              ? colors.dark.secondary
+                              : colors.light.secondary,
+                            calendarBackground: isDark
+                              ? colors.dark.secondary
+                              : colors.light.secondary,
+                            textSectionTitleColor: colors.dark.text,
+                            selectedDayBackgroundColor: "transparent", // handled by customStyles
+                            selectedDayTextColor: "#fff",
+                            todayTextColor: "#facc15",
+                            dayTextColor: colors.dark.text,
+                            textDisabledColor: "#d1d5db",
+                            arrowColor: colors.dark.text,
+                            monthTextColor: colors.dark.text,
+                          }}
+                          style={{
+                            borderRadius: 12,
+                            minWidth: 320,
+                          }}
+                        />
+                        <Pressable
+                          style={{
+                            marginTop: 12,
+                            alignSelf: "flex-end",
+                            padding: 8,
+                          }}
+                          onPress={() => setShowDatePicker(false)}
+                        >
+                          <Text style={{ color: colors.dark.text }}>Close</Text>
+                        </Pressable>
+                      </View>
+                    </View>
+                  </Modal>
+                )}
+              </View>
 
-              {/* Color picker swatches */}
+              {/* Color picker swatches grid */}
               <View style={styles.colorPickerContainer}>
                 {[
                   // 800
@@ -899,6 +1041,22 @@ export default function MyList() {
                   marginBottom: 10,
                 }}
               />
+              {/* Reset Color Button */}
+              <Pressable
+                style={[
+                  styles.modalButton,
+                  {
+                    backgroundColor: isDark
+                      ? colors.dark.primary
+                      : colors.light.primary,
+                    marginBottom: 8,
+                  },
+                ]}
+                onPress={() => setDetailColor("")}
+              >
+                <Text style={styles.modalButtonText}>Reset Color</Text>
+              </Pressable>
+              {/* Save Button */}
               <Pressable
                 style={[
                   styles.modalButton,
