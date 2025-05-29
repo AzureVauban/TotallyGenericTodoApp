@@ -12,6 +12,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 type SettingsContextType = {
   showNavibar: boolean;
   setShowNavibar: Dispatch<SetStateAction<boolean>>;
+  navibarTransparent: boolean;
+  setNavibarTransparent: Dispatch<SetStateAction<boolean>>;
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(
@@ -20,6 +22,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(
 
 export const SettingsProvider = ({ children }: { children: ReactNode }) => {
   const [showNavibar, setShowNavibarState] = useState(true);
+  const [navibarTransparent, setNavibarTransparentState] = useState(false);
 
   // Hydrate from AsyncStorage on mount
   useEffect(() => {
@@ -27,6 +30,9 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
       try {
         const value = await AsyncStorage.getItem("showNavibar");
         if (value !== null) setShowNavibarState(value === "true");
+        const navibarTrans = await AsyncStorage.getItem("navibarTransparent");
+        if (navibarTrans !== null)
+          setNavibarTransparentState(navibarTrans === "true");
       } catch {}
     })();
   }, []);
@@ -40,8 +46,23 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const setNavibarTransparent: Dispatch<SetStateAction<boolean>> = (value) => {
+    setNavibarTransparentState((prev) => {
+      const next = typeof value === "function" ? value(prev) : value;
+      AsyncStorage.setItem("navibarTransparent", next ? "true" : "false");
+      return next;
+    });
+  };
+
   return (
-    <SettingsContext.Provider value={{ showNavibar, setShowNavibar }}>
+    <SettingsContext.Provider
+      value={{
+        showNavibar,
+        setShowNavibar,
+        navibarTransparent,
+        setNavibarTransparent,
+      }}
+    >
       {children}
     </SettingsContext.Provider>
   );

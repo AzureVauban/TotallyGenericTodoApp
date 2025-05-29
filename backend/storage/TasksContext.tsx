@@ -72,6 +72,7 @@ export interface Task {
 export interface ListEntry {
   id: string;
   name: string;
+  color?: string; // <-- add this line
 }
 export interface TasksContextValue {
   tasks: Task[];
@@ -81,7 +82,7 @@ export interface TasksContextValue {
   lists: ListEntry[];
   addList: (name: string) => void;
   removeList: (id: string) => void;
-  renameList: (id: string, newName: string) => void;
+  renameList: (id: string, newName: string, color?: string) => void;
   renameTask: (id: string, newName: string) => void;
   updateTaskText: (id: string, newText: string) => void;
   updateTask: (id: string, updatedTask: Task) => void;
@@ -251,9 +252,9 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Corrected addList with proper AsyncStorage synchronization
-  const addList = (name: string) => {
+  const addList = (name: string, color?: string) => {
     setLists((old) => {
-      const newList = { id: Date.now().toString(), name };
+      const newList = { id: Date.now().toString(), name, color };
       const updated = [...old, newList];
       AsyncStorage.setItem(LISTS_STORAGE_KEY, JSON.stringify(updated));
 
@@ -271,22 +272,33 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
     setLists((old) => {
       const updated = old.filter((x) => x.id !== id);
       AsyncStorage.setItem(LISTS_STORAGE_KEY, JSON.stringify(updated));
-
-      // Auto-save to JSON
+      // Also remove all tasks belonging to this list
+      setTasks((prevTasks) => {
+        const filteredTasks = prevTasks.filter(
+          (t) => t.listName !== old.find((l) => l.id === id)?.name
+        );
+        AsyncStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(filteredTasks));
+        // Auto-save to JSON after both lists and tasks are updated
+        exportDataAsJSON();
+        return filteredTasks;
+      });
+      // Auto-save to JSON after lists are updated (for safety)
       exportDataAsJSON();
       return updated;
     });
   };
 
   // Corrected renameList with proper AsyncStorage synchronization
-  const renameList = (id: string, newName: string) => {
+  const renameList = (id: string, newName: string, color?: string) => {
     if (newName.trim() === "") {
       console.warn("Invalid name. Rename failed.");
       return;
     }
     setLists((old) => {
       const updated = old.map((list) =>
-        list.id === id ? { ...list, name: newName } : list
+        list.id === id
+          ? { ...list, name: newName, color: color ?? list.color }
+          : list
       );
       AsyncStorage.setItem(LISTS_STORAGE_KEY, JSON.stringify(updated));
       return updated;

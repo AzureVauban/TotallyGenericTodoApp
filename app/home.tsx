@@ -43,13 +43,14 @@ import { playRemoveSound } from "../utils/sounds/trash";
 import { useSettings } from "../lib/SettingsContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
+import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
 
 export default function HomeScreen() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const { lists, addList, removeList, renameList, exportDataAsJSON } =
+  const { lists, addList, removeList, renameList, exportDataAsJSON, tasks } =
     useTasks();
-  const { showNavibar } = useSettings();
+  const { showNavibar, navibarTransparent } = useSettings();
   const [showDebug, setShowDebug] = useState(false);
 
   // Hydrate debug toggle from AsyncStorage on mount
@@ -73,6 +74,19 @@ export default function HomeScreen() {
     id: string;
     name: string;
   } | null>(null);
+
+  // Edit List Details modal state
+  const [editListModalVisible, setEditListModalVisible] = useState(false);
+  const [editListTarget, setEditListTarget] = useState<{
+    id: string;
+    name: string;
+    color?: string;
+  } | null>(null);
+  const [editListName, setEditListName] = useState("");
+  const [editListColor, setEditListColor] = useState<string | undefined>(
+    undefined
+  );
+  const [editListError, setEditListError] = useState(false);
 
   // Home screen component
   const router = useRouter();
@@ -102,7 +116,7 @@ export default function HomeScreen() {
     // Swipe right: go to settings
     if (translationX > 100 && !hasNavigated.current) {
       hasNavigated.current = true;
-      router.push("/settings");
+      router.push("/calendar");
     }
 
     if (
@@ -136,6 +150,18 @@ export default function HomeScreen() {
     // We'll use a fallback for now:
     setCurrentRoute("/home");
   }, []);
+
+  // Task group counts
+  const scheduledCount = tasks.filter(
+    (t) => t.scheduleDate && !t.recentlyDeleted
+  ).length;
+  const allCount = tasks.filter((t) => !t.recentlyDeleted).length;
+  const flaggedCount = tasks.filter(
+    (t) => !!t.flagged && !t.recentlyDeleted
+  ).length;
+  const completedCount = tasks.filter(
+    (t) => t.completed && !t.recentlyDeleted
+  ).length;
 
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent}>
@@ -173,7 +199,7 @@ export default function HomeScreen() {
                   },
                 ]}
               >
-                Scheduled
+                Scheduled ({scheduledCount})
               </Text>
             </Link>
             <Link
@@ -196,7 +222,7 @@ export default function HomeScreen() {
                   },
                 ]}
               >
-                All
+                All ({allCount})
               </Text>
             </Link>
           </View>
@@ -221,7 +247,7 @@ export default function HomeScreen() {
                   },
                 ]}
               >
-                Flagged
+                Flagged ({flaggedCount})
               </Text>
             </Link>
             <Link
@@ -244,7 +270,7 @@ export default function HomeScreen() {
                   },
                 ]}
               >
-                Completed
+                Completed ({completedCount})
               </Text>
             </Link>
           </View>
@@ -268,9 +294,40 @@ export default function HomeScreen() {
                       style={{
                         flexDirection: "row",
                         alignItems: "stretch",
-                        marginBottom: 10, // match taskListButton marginBottom
+                        marginBottom: 10,
                       }}
                     >
+                      {/* Purple inline button for list details (moved to right swipe) */}
+                      <Pressable
+                        style={[
+                          styles.inlineButton,
+                          {
+                            backgroundColor: isDark
+                              ? colors.dark.purplebutton_background
+                              : colors.light.purplebutton_background,
+                            height: 45,
+                            borderRadius: 8,
+                          },
+                        ]}
+                        onPress={() => {
+                          setEditListTarget(item);
+                          setEditListName(item.name);
+                          setEditListColor(item.color || "");
+                          setEditListError(false);
+                          setEditListModalVisible(true);
+                        }}
+                      >
+                        <FiBrSettings
+                          width={20}
+                          height={20}
+                          fill={
+                            isDark
+                              ? colors.dark.purplebutton_text_icon
+                              : colors.light.purplebutton_text_icon
+                          }
+                        />
+                      </Pressable>
+                      {/* Existing red delete button */}
                       <Pressable
                         style={[
                           styles.inlineButton,
@@ -278,7 +335,7 @@ export default function HomeScreen() {
                             backgroundColor: isDark
                               ? colors.dark.redbutton_background
                               : colors.light.redbutton_background,
-                            height: 45, // match taskListButton height
+                            height: 45,
                             borderRadius: 8,
                           },
                         ]}
@@ -318,9 +375,10 @@ export default function HomeScreen() {
                       style={{
                         flexDirection: "row",
                         alignItems: "stretch",
-                        marginBottom: 10, // match taskListButton marginBottom
+                        marginBottom: 10,
                       }}
                     >
+                      {/* Existing blue edit button */}
                       <Pressable
                         style={[
                           styles.inlineButton,
@@ -328,7 +386,7 @@ export default function HomeScreen() {
                             backgroundColor: isDark
                               ? colors.dark.bluebutton_background
                               : colors.light.bluebutton_background,
-                            height: 45, // match taskListButton height
+                            height: 45,
                             borderRadius: 8,
                           },
                         ]}
@@ -356,9 +414,11 @@ export default function HomeScreen() {
                     style={[
                       styles.taskListButton,
                       {
-                        backgroundColor: isDark
-                          ? colors.dark.secondary
-                          : colors.light.primary,
+                        backgroundColor:
+                          item.color ||
+                          (isDark
+                            ? colors.dark.secondary
+                            : colors.light.primary),
                       },
                     ]}
                     onPress={() => {
@@ -590,6 +650,148 @@ export default function HomeScreen() {
             </View>
           </View>
         </Modal>
+        {/* Edit List Details Modal */}
+        <Modal visible={editListModalVisible} transparent animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View
+              style={[
+                styles.modalContent,
+                {
+                  backgroundColor: isDark
+                    ? colors.dark.secondary
+                    : colors.dark.secondary,
+                },
+              ]}
+            >
+              <Text style={styles.modalTitle}>List Details</Text>
+              <TextInput
+                value={editListName}
+                onChangeText={setEditListName}
+                placeholder="List name"
+                placeholderTextColor={colors.dark.text}
+                style={{
+                  borderWidth: 1,
+                  borderColor: editListError ? "#450a0a" : colors.dark.tertiary,
+                  color: colors.dark.text,
+                  padding: 8,
+                  borderRadius: 8,
+                  marginBottom: 10,
+                }}
+              />
+              {/* Color picker swatches */}
+              <View style={styles.colorPickerContainer}>
+                {[
+                  // 800
+                  "rgb(107, 33,168)",
+                  "rgb(30,64, 175)",
+                  "rgb(22, 101 ,52)",
+                  "rgb(146,64 ,14)",
+                  "rgb(157 ,23 ,77)",
+                  // 600
+                  "rgb(147 ,51 ,234)",
+                  "rgb(37  ,99 ,235)",
+                  "rgb(5   ,150, 105)",
+                  "rgb(202 ,138, 4)",
+                  "rgb(219 ,39 ,119)",
+                  // 400
+                  "rgb(192 ,132, 252)",
+                  "rgb(96  ,165, 250)",
+                  "rgb(74  ,222, 128)",
+                  "rgb(250 ,204, 21)",
+                  "rgb(244 ,114, 182)",
+                  // 200
+                  "rgb(233,213, 255)",
+                  "rgb(191,219, 254)",
+                  "rgb(187,247, 208)",
+                  "rgb(254,240, 138)",
+                  "rgb(251,207, 232)",
+                ].map((color) => (
+                  <Pressable
+                    key={color}
+                    onPress={() => setEditListColor(color)}
+                    style={[
+                      styles.colorSwatch,
+                      {
+                        backgroundColor: color,
+                        borderWidth: editListColor === color ? 2 : 0,
+                        borderColor: "#fff",
+                      },
+                    ]}
+                  />
+                ))}
+              </View>
+              <TextInput
+                value={editListColor}
+                onChangeText={setEditListColor}
+                placeholder="Button Color (hex)"
+                placeholderTextColor={colors.dark.text}
+                style={{
+                  borderWidth: 1,
+                  borderColor: colors.dark.tertiary,
+                  color: colors.dark.text,
+                  padding: 8,
+                  borderRadius: 8,
+                  marginBottom: 10,
+                }}
+              />
+              {/* Reset Color Button */}
+              <Pressable
+                style={[
+                  styles.modalButton,
+                  {
+                    backgroundColor: isDark
+                      ? colors.dark.primary
+                      : colors.light.primary,
+                    marginBottom: 8,
+                  },
+                ]}
+                onPress={() => setEditListColor("")}
+              >
+                <Text style={styles.modalButtonText}>Reset Color</Text>
+              </Pressable>
+              {/* Save Button */}
+              <Pressable
+                style={[
+                  styles.modalButton,
+                  {
+                    backgroundColor: isDark
+                      ? colors.dark.primary
+                      : colors.light.primary,
+                  },
+                ]}
+                onPress={() => {
+                  if (!editListTarget) return;
+                  const trimmedName = editListName.trim();
+                  // Prevent duplicates (excluding the list being edited), case-insensitive
+                  const normalized = trimmedName.toLowerCase();
+                  const duplicate = lists
+                    .filter((l) => l.id !== editListTarget.id)
+                    .some((l) => l.name.trim().toLowerCase() === normalized);
+                  if (duplicate || !trimmedName) {
+                    playInvalidSound();
+                    setEditListError(true);
+                    return;
+                  }
+                  // Save name and color
+                  renameList(editListTarget.id, trimmedName, editListColor); // <-- Pass color as third argument
+                  setEditListModalVisible(false);
+                }}
+              >
+                <Text style={styles.modalButtonText}>Save</Text>
+              </Pressable>
+              {/* Cancel Button */}
+              <Pressable
+                style={[
+                  styles.modalButton,
+                  { backgroundColor: colors.dark.primary },
+                ]}
+                onPress={() => setEditListModalVisible(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
         {/* Bottom Navibar */}
         {showNavibar && (
           <View
@@ -600,9 +802,12 @@ export default function HomeScreen() {
               bottom: 16,
               paddingVertical: 10,
               flexDirection: "row",
-              backgroundColor:
-                (isDark ? colors.dark.secondary : colors.light.secondary) +
-                "80", // 50% opacity
+              backgroundColor: navibarTransparent
+                ? isDark
+                  ? colors.dark.background
+                  : colors.light.background
+                : (isDark ? colors.dark.secondary : colors.light.secondary) +
+                  "80",
               borderTopWidth: 0,
               justifyContent: "space-around",
               alignItems: "center",
@@ -648,6 +853,40 @@ export default function HomeScreen() {
                 }}
               >
                 Home
+              </Text>
+            </TouchableOpacity>
+            {/* Calendar Icon */}
+            <TouchableOpacity
+              onPress={() => {
+                setCurrentRoute("/calendar");
+                router.replace("/calendar");
+              }}
+              style={{ alignItems: "center", flex: 1 }}
+            >
+              <FiBrCalendar
+                width={32}
+                height={32}
+                fill={
+                  currentRoute === "/calendar"
+                    ? getNavibarIconActiveColor(isDark)
+                    : isDark
+                    ? colors.dark.icon
+                    : colors.light.icon
+                }
+              />
+              <Text
+                style={{
+                  color:
+                    currentRoute === "/calendar"
+                      ? getNavibarIconActiveColor(isDark)
+                      : isDark
+                      ? colors.dark.icon
+                      : colors.light.icon,
+                  fontSize: 12,
+                  marginTop: 4,
+                }}
+              >
+                Calendar
               </Text>
             </TouchableOpacity>
             {/* Settings Icon */}
