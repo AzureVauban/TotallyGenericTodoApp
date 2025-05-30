@@ -1,42 +1,5 @@
-/*
-TODO FUTURE ADDITIONS
-- dynmaic List title text color contrasting (revising this description)
-*/
-
-/**
- * MyList Screen
- *
- * This screen renders a task list for a given ID (from the route parameter).
- * It supports displaying and managing both user-created task lists and system-defined
- * virtual task categories (like "Today", "Completed", etc.).
- *
- * Features:
- * - Shows tasks grouped into active and completed sections
- * - Handles swipe actions to flag, rename, delete, or indent tasks
- * - Supports gesture-based navigation (e.g., swipe right to return home)
- * - Includes modals for adding, renaming, and editing task details
- * - Applies theme-aware styling and supports light/dark modes
- *
- * Task operations are fully integrated with context (`useTasks`).
- */
-import { useTheme } from "lib/ThemeContext";
-import { useFocusEffect } from "@react-navigation/native";
-import { colors } from "@theme/colors";
-import { playRemoveSound } from "../../utils/sounds/trash";
-import { playIndentTasksound } from "../../utils/sounds/indent";
-import { playRenameTaskSound } from "../../utils/sounds/remove";
-import { playFlaggedSound } from "../../utils/sounds/flag";
-import { playUnflaggedSound } from "../../utils/sounds/unflag";
-// Helper to get tomorrow's date at midnight in mm-dd-yyyy format
-import {
-  PanGestureHandler,
-  State,
-  GestureHandlerGestureEvent,
-} from "react-native-gesture-handler";
-import { playCompleteSound } from "../../utils/sounds/completed";
-import { playInvalidSound } from "../../utils/sounds/invalid";
-import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
+
 import {
   Alert,
   FlatList,
@@ -47,65 +10,39 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
+import { useLocalSearchParams, useRouter } from "expo-router";
+
 import DraggableFlatList, {
   RenderItemParams,
 } from "react-native-draggable-flatlist";
-import FiBrsettings from "../../assets/icons/svg/fi-br-settings.svg";
 import Swipeable from "react-native-gesture-handler/Swipeable";
-import FiBrflagAlt from "../../assets/icons/svg/fi-br-flag-alt.svg";
-import FiBredit from "../../assets/icons/svg/fi-br-text-box-edit.svg";
-import FiBrtrash from "../../assets/icons/svg/fi-br-trash.svg";
-import FiBrArrowRight from "../../assets/icons/svg/fi-br-arrow-alt-right.svg";
-import FiBrArrowLeft from "../../assets/icons/svg/fi-br-arrow-alt-left.svg";
-import { useTasks } from "../../backend/storage/TasksContext";
-import { Task as ContextTask } from "../../backend/storage/TasksContext";
-import FiBrCalendar from "../../assets/icons/svg/fi-br-calendar.svg";
+import {
+  GestureHandlerGestureEvent,
+  PanGestureHandler,
+  State,
+} from "react-native-gesture-handler";
 import { Calendar } from "react-native-calendars";
+import { colors } from "@theme/colors";
+import { useFocusEffect } from "@react-navigation/native";
+import { useTheme } from "lib/ThemeContext";
+
+import FiBrArrowLeft from "../../assets/icons/svg/fi-br-arrow-alt-left.svg";
+import FiBrArrowRight from "../../assets/icons/svg/fi-br-arrow-alt-right.svg";
+import FiBrCalendar from "../../assets/icons/svg/fi-br-calendar.svg";
+import FiBredit from "../../assets/icons/svg/fi-br-text-box-edit.svg";
+import FiBrflagAlt from "../../assets/icons/svg/fi-br-flag-alt.svg";
+import FiBrsettings from "../../assets/icons/svg/fi-br-settings.svg";
+import FiBrtrash from "../../assets/icons/svg/fi-br-trash.svg";
 import ModalWrapper from "../components/ModalWrapper";
-/**
- * **MyList Screen**
- *
- * Renders the task view for a single list route (e.g. `/taskLists/<list-name>`). The component handles
- * both *regular* user lists (persisted under `TASKS_<list-name>` in `AsyncStorage`) **and** the six
- * virtual “task-group” views (Today, Scheduled, All, Flagged, Completed, Recently Deleted). In
- * virtual views it aggregates tasks from *all* lists and applies in-memory filters so no additional
- * storage is written.
- *
- * **Responsibilities**
- * 1. **Load Tasks** – On mount decides whether to fetch one list or aggregate all; normalises each
- *    task (`flagged`, `indent`, etc.).
- * 2. **Persist Tasks** – Saves changes back to `AsyncStorage` for regular lists only.
- * 3. **Task Interactions**
- *    • *Tap* toggles `done` (only inside a regular list).
- *    • *Long-press* opens a **Task Details** modal (edit description, date, colour).
- *    • *Swipe left* shows **flag** and **rename** actions.
- *    • *Swipe right* shows the **delete** action (moves to Recently Deleted).
- * 4. **Indentation** – Toggles a one-level sub-task view via an `indent` flag.
- * 5. **Special-list helpers** – `updateTaskAcrossLists` keeps aggregated views in sync.
- *
- * @returns JSX element representing the list screen.
- */
-
-const getTomorrowMidnight = () => {
-  const d = new Date();
-  d.setDate(d.getDate() + 1);
-  d.setHours(0, 0, 0, 0);
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  const yyyy = d.getFullYear();
-  return `${mm}-${dd}-${yyyy}`;
-};
-
-// Special list types (for reference, but not used for routing)
-// const SPECIAL_LISTS = [
-//   "Today",
-//   "Scheduled",
-//   "All",
-//   "Flagged",
-//   "Completed",
-//   "Recently Deleted",
-// ];
-
+import { Task as ContextTask, useTasks } from "../../backend/storage/TasksContext";
+import { playCompleteSound } from "../../utils/sounds/completed";
+import { playFlaggedSound } from "../../utils/sounds/flag";
+import { playIndentTasksound } from "../../utils/sounds/indent";
+import { playInvalidSound } from "../../utils/sounds/invalid";
+import { playRemoveSound } from "../../utils/sounds/trash";
+import { playRenameTaskSound } from "../../utils/sounds/remove";
+import { playUnflaggedSound } from "../../utils/sounds/unflag";
 import { styles } from "../theme/styles";
 
 export default function MyList() {
@@ -314,6 +251,14 @@ export default function MyList() {
           }: RenderItemParams<ContextTask>) => {
             const index = getIndex();
             const activeIndex = activeTasks.findIndex((t) => t.id === item.id);
+            function getTomorrowMidnight(): string {
+              const now = new Date();
+              const tomorrow = new Date(now);
+              tomorrow.setDate(now.getDate() + 1);
+              tomorrow.setHours(0, 0, 0, 0);
+              // Return as YYYY-MM-DD string
+              return tomorrow.toISOString().slice(0, 10);
+            }
             return (
               <Swipeable
                 renderRightActions={() => (

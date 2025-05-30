@@ -3,11 +3,11 @@
  * Shows a "Go Back" button that returns the user to the previous screen.
  * Styles adapt based on light or dark mode using the system color scheme.
  */
-import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { colors } from "@theme/colors";
 import { useRouter } from "expo-router";
 import { useTheme } from "lib/ThemeContext";
-import { colors } from "@theme/colors";
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function NotFoundScreen() {
   const router = useRouter();

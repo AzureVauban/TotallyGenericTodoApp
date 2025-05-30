@@ -3,6 +3,7 @@ TODO FUTURE ADDITIONS
 - display avatar of logged in user
 - show UID (via a toggle)
 - display user's display-name (via a toggle)
+
 */
 
 /**
@@ -10,31 +11,29 @@ TODO FUTURE ADDITIONS
  * Includes gesture navigation (right swipe to return to home).
  * Features logout, theme toggle, and sound enable switches.
  */
-import React, { useRef, useState } from "react";
-import { View, Text, TouchableOpacity, Switch } from "react-native";
-import { useRouter, useFocusEffect } from "expo-router";
-import {
-  PanGestureHandler,
-  State,
-  GestureHandlerGestureEvent,
-  PanGestureHandlerEventPayload,
-} from "react-native-gesture-handler";
-//! import FiBrAddressCard from "../assets/icons/svg/fi-br-address-card.svg";
-import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
-import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
-import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
-import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
-import { colors } from "@theme/colors";
-import { useTheme } from "lib/ThemeContext";
-import { styles, getNavibarIconActiveColor } from "@theme/styles";
-//! import { supabase } from "../lib/supabaseClient";
-import { useSettings } from "../lib/SettingsContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { colors } from "@theme/colors";
+import { getNavibarIconActiveColor, styles } from "@theme/styles";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useTheme } from "lib/ThemeContext";
+import React, { useRef, useState } from "react";
+import { Switch, Text, TouchableOpacity, View } from "react-native";
+import {
+  GestureHandlerGestureEvent,
+  PanGestureHandler,
+  PanGestureHandlerEventPayload,
+  State,
+} from "react-native-gesture-handler";
+import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
+import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
+import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
+import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
 import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
+import { useSettings } from "../lib/SettingsContext";
 
 export function RedirectToLogin() {
   const router = useRouter();
-  const isUserLoggedIn: boolean = false; //! Replace with your actual login check
+  const isUserLoggedIn: boolean = false;
 
   React.useEffect(() => {
     const timeout = setTimeout(() => {
@@ -54,12 +53,13 @@ export default function SettingsScreen() {
   const hasNavigated = useRef(false);
   const [bgColor, setBgColor] = useState("#eef2ff");
 
-  const [soundEnabled, setSoundEnabled] = useState(true);
   const {
     showNavibar,
     setShowNavibar,
     navibarTransparent,
     setNavibarTransparent,
+    soundEnabled,
+    setSoundEnabled,
   } = useSettings();
   // Add debug toggle state
   const [showDebug, setShowDebug] = useState(false);
@@ -142,13 +142,7 @@ export default function SettingsScreen() {
               >
                 Enable Sound Effects
               </Text>
-              <Switch
-                value={soundEnabled}
-                onValueChange={(value) => {
-                  console.log("Sound Effects toggled:", value);
-                  setSoundEnabled(value);
-                }}
-              />
+              <Switch value={soundEnabled} onValueChange={setSoundEnabled} />
             </View>
             <View
               style={[

@@ -1,10 +1,11 @@
 import React from "react";
+
 import {
   Modal,
-  View,
-  StyleSheet,
   TouchableWithoutFeedback,
+  View
 } from "react-native";
+
 import { styles as sharedStyles } from "../theme/styles";
 
 interface ModalWrapperProps {

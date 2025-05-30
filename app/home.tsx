@@ -9,20 +9,19 @@ TODO FUTURE ADDITIONS
  * Supports swipe gestures to navigate to the settings screen and manage lists.
  * Includes modals for adding and renaming task lists.
  */
-import { useTheme } from "lib/ThemeContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { colors } from "@theme/colors";
-import { styles, getNavibarIconActiveColor } from "../app/theme/styles";
 import { Link, useFocusEffect, useRouter } from "expo-router";
+import { useTheme } from "lib/ThemeContext";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
-  Modal,
   Pressable,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import {
   FlatList,
@@ -32,18 +31,18 @@ import {
   State,
   Swipeable,
 } from "react-native-gesture-handler";
+import { getNavibarIconActiveColor, styles } from "../app/theme/styles";
+import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
+import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
+import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
+import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
+import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
 import FiBredit from "../assets/icons/svg/fi-br-text-box-edit.svg";
 import FiBrtrash from "../assets/icons/svg/fi-br-trash.svg";
-import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
-import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
-import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
 import { useTasks } from "../backend/storage/TasksContext";
+import { useSettings } from "../lib/SettingsContext";
 import { playInvalidSound } from "../utils/sounds/invalid";
 import { playRemoveSound } from "../utils/sounds/trash";
-import { useSettings } from "../lib/SettingsContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
-import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
 import ModalWrapper from "./components/ModalWrapper";
 
 export default function HomeScreen() {

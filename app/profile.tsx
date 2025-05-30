@@ -1,23 +1,23 @@
-import React, { useRef } from "react";
-import { View, Text, TouchableOpacity, Platform } from "react-native";
-import { useRouter, useFocusEffect } from "expo-router";
-import {
-  PanGestureHandler,
-  State,
-  GestureHandlerGestureEvent,
-  PanGestureHandlerEventPayload,
-} from "react-native-gesture-handler";
-import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
-import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
-import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
-import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
 import { colors } from "@theme/colors";
+import { getNavibarIconActiveColor, styles } from "@theme/styles";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useTheme } from "lib/ThemeContext";
-import { styles, getNavibarIconActiveColor } from "@theme/styles";
-import { supabase } from "../lib/supabaseClient";
+import React, { useRef } from "react";
+import { Platform, Text, TouchableOpacity, View } from "react-native";
+import {
+  GestureHandlerGestureEvent,
+  PanGestureHandler,
+  PanGestureHandlerEventPayload,
+  State,
+} from "react-native-gesture-handler";
+import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
+import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
+import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
+import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
+import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
 import { useSettings } from "../lib/SettingsContext";
+import { supabase } from "../lib/supabaseClient";
 
 export default function UserProfileScreen() {
   const router = useRouter();

@@ -3,21 +3,20 @@
  * Provides access to the home screen, forgot password screen, and sign up/sign in links.
  * Layout and button colors respond dynamically to light/dark theme selection.
  */
-import "react-native-url-polyfill/auto";
+import { useFocusEffect } from "@react-navigation/native";
+import { colors } from "@theme/colors";
+import { styles } from "@theme/styles";
+import { useRouter } from "expo-router";
+import { useTheme } from "lib/ThemeContext";
 import React from "react";
 import {
-  View,
-  TouchableOpacity,
-  Text,
   Dimensions,
-  Platform,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
-import { useRouter } from "expo-router";
+import "react-native-url-polyfill/auto";
 import FISignatureIcon from "../assets/icons/svg/fi-br-list-check.svg";
-import { colors } from "@theme/colors";
-import { useTheme } from "lib/ThemeContext";
-import { useFocusEffect } from "@react-navigation/native";
-import { styles } from "@theme/styles";
 import { supabase } from "../lib/supabaseClient";
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const BUTTON_WIDTH = SCREEN_WIDTH * 0.7;

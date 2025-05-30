@@ -1,7 +1,9 @@
 import React from "react";
+
 import { Calendar } from "react-native-calendars";
 import { colors } from "@theme/colors";
 import { useTheme } from "lib/ThemeContext";
+
 import { styles } from "../theme/styles";
 
 /**

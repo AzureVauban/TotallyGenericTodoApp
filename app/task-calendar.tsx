@@ -1,30 +1,28 @@
+import { colors } from "@theme/colors";
+import { useRouter } from "expo-router";
+import { useTheme } from "lib/ThemeContext";
 import React, { useRef, useState } from "react";
 import {
-  View,
+  Switch,
   Text,
   TouchableOpacity,
-  Platform,
-  ScrollView,
-  Switch,
+  View
 } from "react-native";
-import { useRouter, useFocusEffect } from "expo-router";
 import {
-  PanGestureHandler,
-  State,
   GestureHandlerGestureEvent,
+  PanGestureHandler,
   PanGestureHandlerEventPayload,
+  State,
 } from "react-native-gesture-handler";
-import { colors } from "@theme/colors";
-import { useTheme } from "lib/ThemeContext";
-import { styles, getNavibarIconActiveColor } from "./theme/styles";
-import { useSettings } from "../lib/SettingsContext";
-import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
-import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
-import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
-import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
 import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
+import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
+import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
+import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
+import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
 import { useTasks } from "../backend/storage/TasksContext";
+import { useSettings } from "../lib/SettingsContext";
 import CalendarHeatmap from "./components/CalendarHeatmap";
+import { getNavibarIconActiveColor, styles } from "./theme/styles";
 
 function getSunday(date: Date) {
   const d = new Date(date);

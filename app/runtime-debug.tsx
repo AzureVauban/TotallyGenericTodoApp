@@ -1,29 +1,36 @@
-import React, { useRef, useEffect, useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
-import {
-  PanGestureHandler,
-  State,
-  GestureHandlerGestureEvent,
-  PanGestureHandlerEventPayload,
-} from "react-native-gesture-handler";
-import { colors } from "@theme/colors";
-import { useTheme } from "lib/ThemeContext";
-import { styles, getNavibarIconActiveColor } from "@theme/styles";
-import { useSettings } from "../lib/SettingsContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
-import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
-import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
-import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
-import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
-import { supabase } from "../lib/supabaseClient";
 import { Session } from "@supabase/supabase-js";
+import { colors } from "@theme/colors";
+import { getNavibarIconActiveColor, styles } from "@theme/styles";
+import { useRouter } from "expo-router";
+import { useTheme } from "lib/ThemeContext";
+import React, { useEffect, useRef, useState } from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  GestureHandlerGestureEvent,
+  PanGestureHandler,
+  PanGestureHandlerEventPayload,
+  State,
+} from "react-native-gesture-handler";
+import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
+import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
+import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
+import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
+import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
+import { useSettings } from "../lib/SettingsContext";
+import { supabase } from "../lib/supabaseClient";
+import { playCompleteSound } from "../utils/sounds/completed";
+import { playRemoveSound } from "../utils/sounds/trash";
+import { playFlaggedSound } from "../utils/sounds/flag";
+import { playUnflaggedSound } from "../utils/sounds/unflag";
+import { playIndentTasksound } from "../utils/sounds/indent";
+import { playRenameTaskSound } from "../utils/sounds/remove";
+import { playInvalidSound } from "../utils/sounds/invalid";
 
 export default function RuntimeDebugScreen() {
   const router = useRouter();
   const hasNavigated = useRef(false);
-  const { showNavibar, navibarTransparent } = useSettings();
+  const { showNavibar, navibarTransparent, soundEnabled } = useSettings();
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const [showDebug, setShowDebug] = useState(false);
@@ -179,6 +186,80 @@ export default function RuntimeDebugScreen() {
                   Access Token: {session.access_token}
                 </Text>
               )}
+            </View>
+          </View>
+          {/* Sound Effect Test Buttons */}
+          <View
+            style={{ marginTop: 32, alignItems: "center", marginBottom: 24 }}
+          >
+            <Text
+              style={{
+                fontWeight: "bold",
+                fontSize: 16,
+                color: isDark ? colors.dark.text : colors.light.text,
+                marginBottom: 8,
+              }}
+            >
+              Sound Effect Test Buttons
+            </Text>
+            <View style={{ maxHeight: 400, width: "100%" }}>
+              <ScrollView
+                showsVerticalScrollIndicator={true}
+                contentContainerStyle={{
+                  alignItems: "center",
+                  paddingBottom: 16,
+                }}
+                style={{ width: "100%" }}
+              >
+                {[
+                  { label: "Complete", fn: playCompleteSound },
+                  { label: "Remove", fn: playRemoveSound },
+                  { label: "Flag", fn: playFlaggedSound },
+                  { label: "Unflag", fn: playUnflaggedSound },
+                  { label: "Indent", fn: playIndentTasksound },
+                  { label: "Rename", fn: playRenameTaskSound },
+                  { label: "Invalid", fn: playInvalidSound },
+                ].map(({ label, fn }) => (
+                  <TouchableOpacity
+                    key={label}
+                    onPress={fn}
+                    disabled={!soundEnabled}
+                    style={[
+                      styles.addTaskListButton,
+                      {
+                        width: 300,
+                        marginVertical: 6,
+                        backgroundColor: soundEnabled
+                          ? isDark
+                            ? colors.dark.bluebutton_background
+                            : colors.light.bluebutton_background
+                          : isDark
+                          ? colors.dark.tertiary
+                          : colors.light.tertiary,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.addTaskListButtonText,
+                        {
+                          color: soundEnabled
+                            ? isDark
+                              ? colors.dark.bluebutton_text_icon
+                              : colors.light.bluebutton_text_icon
+                            : isDark
+                            ? colors.dark.tertiary
+                            : colors.light.tertiary,
+                          fontWeight: "bold",
+                          fontSize: 15,
+                        },
+                      ]}
+                    >
+                      {label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
             </View>
           </View>
           {/* Bottom Navibar */}
