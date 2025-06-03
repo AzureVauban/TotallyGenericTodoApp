@@ -120,6 +120,17 @@ export default function LoginScreen() {
     checkInitialUrl();
   }, []);
 
+  // After successful login or magic link:
+  useEffect(() => {
+    const fetchSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      console.log("[Login] Session after login:", session);
+    };
+    fetchSession();
+  }, []);
+
   return (
     <View
       style={[styles.container, { backgroundColor: colors[theme].background }]}
