@@ -3,6 +3,7 @@ TODO FUTURE ADDITIONS
 - display avatar of logged in user
 - show UID (via a toggle)
 - display user's display-name (via a toggle)
+
 */
 
 /**
@@ -10,31 +11,26 @@ TODO FUTURE ADDITIONS
  * Includes gesture navigation (right swipe to return to home).
  * Features logout, theme toggle, and sound enable switches.
  */
-import React, { useRef, useState } from "react";
-import { View, Text, TouchableOpacity, Switch } from "react-native";
-import { useRouter, useFocusEffect } from "expo-router";
-import {
-  PanGestureHandler,
-  State,
-  GestureHandlerGestureEvent,
-  PanGestureHandlerEventPayload,
-} from "react-native-gesture-handler";
-//! import FiBrAddressCard from "../assets/icons/svg/fi-br-address-card.svg";
-import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
-import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
-import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
-import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
-import { colors } from "@theme/colors";
-import { useTheme } from "lib/ThemeContext";
-import { styles, getNavibarIconActiveColor } from "@theme/styles";
-//! import { supabase } from "../lib/supabaseClient";
-import { useSettings } from "../lib/SettingsContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
+import { colors } from "@theme/colors";
+import { styles } from "@theme/styles";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useTheme } from "lib/ThemeContext";
+import React, { useRef, useState } from "react";
+import { Switch, Text, View } from "react-native";
+import {
+  GestureHandlerGestureEvent,
+  PanGestureHandler,
+  PanGestureHandlerEventPayload,
+  State,
+} from "react-native-gesture-handler";
+import { useSettings } from "../lib/SettingsContext";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Navibar } from "./components/Navibar";
 
 export function RedirectToLogin() {
   const router = useRouter();
-  const isUserLoggedIn: boolean = false; //! Replace with your actual login check
+  const isUserLoggedIn: boolean = false;
 
   React.useEffect(() => {
     const timeout = setTimeout(() => {
@@ -54,12 +50,13 @@ export default function SettingsScreen() {
   const hasNavigated = useRef(false);
   const [bgColor, setBgColor] = useState("#eef2ff");
 
-  const [soundEnabled, setSoundEnabled] = useState(true);
   const {
     showNavibar,
     setShowNavibar,
     navibarTransparent,
     setNavibarTransparent,
+    soundEnabled,
+    setSoundEnabled,
   } = useSettings();
   // Add debug toggle state
   const [showDebug, setShowDebug] = useState(false);
@@ -119,275 +116,162 @@ export default function SettingsScreen() {
     }
   };
 
+  // Add currentRoute and setCurrentRoute state for navibar highlighting
+  const [currentRoute, setCurrentRoute] = useState("/settings");
+
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent}>
-      <View style={{ flex: 1 }}>
-        <View
-          style={[
-            styles.screenbackground,
-            {
-              backgroundColor: isDark
-                ? colors.dark.background
-                : colors.light.background,
-            },
-          ]}
-        >
-          <View style={{ marginTop: 30 }}>
-            <View style={styles.optionRow}>
-              <Text
-                style={[
-                  styles.optionText,
-                  { color: isDark ? colors.dark.text : colors.light.text },
-                ]}
-              >
-                Enable Sound Effects
-              </Text>
-              <Switch
-                value={soundEnabled}
-                onValueChange={(value) => {
-                  console.log("Sound Effects toggled:", value);
-                  setSoundEnabled(value);
-                }}
-              />
-            </View>
-            <View
-              style={[
-                styles.divider,
-                {
-                  backgroundColor: isDark
-                    ? colors.dark.tertiary
-                    : colors.light.tertiary,
-                },
-              ]}
-            />
-            <View style={styles.optionRow}>
-              <Text
-                style={[
-                  styles.optionText,
-                  { color: isDark ? colors.dark.text : colors.light.text },
-                ]}
-              >
-                Show Bottom Navigation Bar
-              </Text>
-              <Switch
-                value={showNavibar}
-                onValueChange={(value) => {
-                  setShowNavibar(value);
-                }}
-              />
-            </View>
-            {showNavibar && (
-              <>
-                <View
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: isDark
+            ? colors.dark.background
+            : colors.light.background,
+        }}
+      >
+        <View style={{ flex: 1 }}>
+          <View
+            style={[
+              styles.screenbackground,
+              {
+                backgroundColor: isDark
+                  ? colors.dark.background
+                  : colors.light.background,
+              },
+            ]}
+          >
+            <View style={{ marginTop: 30 }}>
+              <View style={styles.optionRow}>
+                <Text
                   style={[
-                    styles.divider,
-                    {
-                      backgroundColor: isDark
-                        ? colors.dark.tertiary
-                        : colors.light.tertiary,
-                    },
+                    styles.optionText,
+                    { color: isDark ? colors.dark.text : colors.light.text },
                   ]}
-                />
-                <View style={styles.optionRow}>
-                  <Text
-                    style={[
-                      styles.optionText,
-                      { color: isDark ? colors.dark.text : colors.light.text },
-                    ]}
-                  >
-                    Transparent Navibar Background
-                  </Text>
-                  <Switch
-                    value={navibarTransparent}
-                    onValueChange={setNavibarTransparent}
-                  />
-                </View>
-              </>
-            )}
-            <View
-              style={[
-                styles.divider,
-                {
-                  backgroundColor: isDark
-                    ? colors.dark.tertiary
-                    : colors.light.tertiary,
-                },
-              ]}
-            />
-            <View style={styles.optionRow}>
-              <Text
+                >
+                  Enable Sound Effects
+                </Text>
+                <Switch value={soundEnabled} onValueChange={setSoundEnabled} />
+              </View>
+              <View
                 style={[
-                  styles.optionText,
-                  { color: isDark ? colors.dark.text : colors.light.text },
+                  styles.divider,
+                  {
+                    backgroundColor: isDark
+                      ? colors.dark.tertiary
+                      : colors.light.tertiary,
+                  },
                 ]}
-              >
-                Light/Dark Theme
-              </Text>
-              <Switch
-                value={isDark}
-                onValueChange={() => {
-                  console.log("Theme toggled, now dark:", !isDark);
-                  toggleTheme();
-                }}
               />
-            </View>
-            <View
-              style={[
-                styles.divider,
-                {
-                  backgroundColor: isDark
-                    ? colors.dark.tertiary
-                    : colors.light.tertiary,
-                },
-              ]}
-            />
-            <View style={styles.optionRow}>
-              <Text
-                style={[
-                  styles.optionText,
-                  { color: isDark ? colors.dark.text : colors.light.text },
-                ]}
-              >
-                Show Debug Screen
-              </Text>
-              <Switch value={showDebug} onValueChange={handleDebugToggle} />
-            </View>
-          </View>
-          {/* Bottom Navibar */}
-          {showNavibar && (
-            <View
-              style={{
-                position: "absolute",
-                left: 16,
-                right: 16,
-                bottom: 16,
-                paddingVertical: 10,
-                flexDirection: "row",
-                backgroundColor: navibarTransparent
-                  ? isDark
-                    ? colors.dark.background
-                    : colors.light.background
-                  : (isDark ? colors.dark.secondary : colors.light.secondary) +
-                    "80",
-                borderTopWidth: 0,
-                justifyContent: "space-around",
-                alignItems: "center",
-                zIndex: 100,
-                borderRadius: 16,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.18,
-                shadowRadius: 8,
-                elevation: 8,
-                overflow: "hidden",
-              }}
-            >
-              {/* Home Icon */}
-              <TouchableOpacity
-                onPress={() => router.replace("/home")}
-                style={{ alignItems: "center", flex: 1 }}
-              >
-                <FiBrListCheck
-                  width={32}
-                  height={32}
-                  fill={isDark ? colors.dark.icon : colors.light.icon}
-                />
+              <View style={styles.optionRow}>
                 <Text
-                  style={{
-                    color: isDark ? colors.dark.icon : colors.light.icon,
-                    fontSize: 12,
-                    marginTop: 4,
-                  }}
+                  style={[
+                    styles.optionText,
+                    { color: isDark ? colors.dark.text : colors.light.text },
+                  ]}
                 >
-                  Home
+                  Show Bottom Navigation Bar
                 </Text>
-              </TouchableOpacity>
-              {/* Calendar Icon */}
-              <TouchableOpacity
-                onPress={() => router.replace("/task-calendar")}
-                style={{ alignItems: "center", flex: 1 }}
-              >
-                <FiBrCalendar
-                  width={32}
-                  height={32}
-                  fill={isDark ? colors.dark.icon : colors.light.icon}
+                <Switch
+                  value={showNavibar}
+                  onValueChange={(value) => {
+                    setShowNavibar(value);
+                  }}
                 />
-                <Text
-                  style={{
-                    color: isDark ? colors.dark.icon : colors.light.icon,
-                    fontSize: 12,
-                    marginTop: 4,
-                  }}
-                >
-                  Calendar
-                </Text>
-              </TouchableOpacity>
-              {/* Settings Icon */}
-              <TouchableOpacity
-                onPress={() => router.replace("/settings")}
-                style={{ alignItems: "center", flex: 1 }}
-              >
-                <FiBrSettings
-                  width={32}
-                  height={32}
-                  fill={getNavibarIconActiveColor(isDark)}
-                />
-                <Text
-                  style={{
-                    color: getNavibarIconActiveColor(isDark),
-                    fontSize: 12,
-                    marginTop: 4,
-                  }}
-                >
-                  Settings
-                </Text>
-              </TouchableOpacity>
-              {/* Profile Icon */}
-              <TouchableOpacity
-                onPress={() => router.replace("/profile")}
-                style={{ alignItems: "center", flex: 1 }}
-              >
-                <FiBrMemberList
-                  width={32}
-                  height={32}
-                  fill={isDark ? colors.dark.icon : colors.light.icon}
-                />
-                <Text
-                  style={{
-                    color: isDark ? colors.dark.icon : colors.light.icon,
-                    fontSize: 12,
-                    marginTop: 4,
-                  }}
-                >
-                  Profile
-                </Text>
-              </TouchableOpacity>
-              {/* Debug Icon (conditionally rendered) */}
-              {showDebug && (
-                <TouchableOpacity
-                  onPress={() => router.replace("/runtime-debug")}
-                  style={{ alignItems: "center", flex: 1 }}
-                >
-                  <FiBrSquareTerminal
-                    width={32}
-                    height={32}
-                    fill={isDark ? colors.dark.icon : colors.light.icon}
+              </View>
+              {showNavibar && (
+                <>
+                  <View
+                    style={[
+                      styles.divider,
+                      {
+                        backgroundColor: isDark
+                          ? colors.dark.tertiary
+                          : colors.light.tertiary,
+                      },
+                    ]}
                   />
-                  <Text
-                    style={{
-                      color: isDark ? colors.dark.icon : colors.light.icon,
-                      fontSize: 12,
-                      marginTop: 4,
-                    }}
-                  >
-                    Debug
-                  </Text>
-                </TouchableOpacity>
+                  <View style={styles.optionRow}>
+                    <Text
+                      style={[
+                        styles.optionText,
+                        {
+                          color: isDark ? colors.dark.text : colors.light.text,
+                        },
+                      ]}
+                    >
+                      Transparent Navibar Background
+                    </Text>
+                    <Switch
+                      value={navibarTransparent}
+                      onValueChange={setNavibarTransparent}
+                    />
+                  </View>
+                </>
               )}
+              <View
+                style={[
+                  styles.divider,
+                  {
+                    backgroundColor: isDark
+                      ? colors.dark.tertiary
+                      : colors.light.tertiary,
+                  },
+                ]}
+              />
+              <View style={styles.optionRow}>
+                <Text
+                  style={[
+                    styles.optionText,
+                    { color: isDark ? colors.dark.text : colors.light.text },
+                  ]}
+                >
+                  Light/Dark Theme
+                </Text>
+                <Switch
+                  value={isDark}
+                  onValueChange={() => {
+                    console.log("Theme toggled, now dark:", !isDark);
+                    toggleTheme();
+                  }}
+                />
+              </View>
+              <View
+                style={[
+                  styles.divider,
+                  {
+                    backgroundColor: isDark
+                      ? colors.dark.tertiary
+                      : colors.light.tertiary,
+                  },
+                ]}
+              />
+              <View style={styles.optionRow}>
+                <Text
+                  style={[
+                    styles.optionText,
+                    { color: isDark ? colors.dark.text : colors.light.text },
+                  ]}
+                >
+                  Show Debug Screen
+                </Text>
+                <Switch value={showDebug} onValueChange={handleDebugToggle} />
+              </View>
             </View>
-          )}
+            {/* Bottom Navibar */}
+            {showNavibar && (
+              <Navibar
+                currentRoute={currentRoute}
+                setCurrentRoute={setCurrentRoute}
+                router={router}
+                isDark={isDark}
+                showDebug={showDebug}
+                showNavibar={showNavibar}
+                navibarTransparent={navibarTransparent}
+              />
+            )}
+          </View>
         </View>
-      </View>
+      </SafeAreaView>
     </PanGestureHandler>
   );
 }

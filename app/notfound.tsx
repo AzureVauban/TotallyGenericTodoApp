@@ -3,11 +3,12 @@
  * Shows a "Go Back" button that returns the user to the previous screen.
  * Styles adapt based on light or dark mode using the system color scheme.
  */
-import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { colors } from "@theme/colors";
 import { useRouter } from "expo-router";
 import { useTheme } from "lib/ThemeContext";
-import { colors } from "@theme/colors";
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function NotFoundScreen() {
   const router = useRouter();
@@ -15,38 +16,40 @@ export default function NotFoundScreen() {
   const themeColors = theme === "dark" ? colors.dark : colors.light;
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: themeColors.background,
-        },
-      ]}
-    >
-      <Text style={[styles.title, { color: themeColors.text }]}>404</Text>
-      <Text style={[styles.subtitle, { color: themeColors.text }]}>
-        Page Not Found
-      </Text>
-      <Pressable
-        onPress={() => router.back()}
-        style={({ pressed }) => [
-          styles.button,
+    <SafeAreaView style={{ flex: 1 }}>
+      <View
+        style={[
+          styles.container,
           {
-            backgroundColor: themeColors.redbutton_background,
-            opacity: pressed ? 0.7 : 1,
+            backgroundColor: themeColors.background,
           },
         ]}
       >
-        <Text
-          style={[
-            styles.buttonText,
-            { color: themeColors.redbutton_text_icon },
+        <Text style={[styles.title, { color: themeColors.text }]}>404</Text>
+        <Text style={[styles.subtitle, { color: themeColors.text }]}>
+          Page Not Found
+        </Text>
+        <Pressable
+          onPress={() => router.back()}
+          style={({ pressed }) => [
+            styles.button,
+            {
+              backgroundColor: themeColors.redbutton_background,
+              opacity: pressed ? 0.7 : 1,
+            },
           ]}
         >
-          Go Back
-        </Text>
-      </Pressable>
-    </View>
+          <Text
+            style={[
+              styles.buttonText,
+              { color: themeColors.redbutton_text_icon },
+            ]}
+          >
+            Go Back
+          </Text>
+        </Pressable>
+      </View>
+    </SafeAreaView>
   );
 }
 

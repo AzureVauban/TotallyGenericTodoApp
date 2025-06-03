@@ -1,12 +1,15 @@
 import React from "react";
-import { View, TouchableOpacity, Text, Platform } from "react-native";
-import FiBrListCheck from "../../assets/icons/svg/fi-br-list-check.svg";
-import FiBrSettings from "../../assets/icons/svg/fi-br-settings.svg";
-import FiBrMemberList from "../../assets/icons/svg/fi-br-member-list.svg";
-import FiBrSquareTerminal from "../../assets/icons/svg/fi-br-square-terminal.svg";
-import FiBrCalendar from "../../assets/icons/svg/fi-br-calendar.svg";
-import { getNavibarIconActiveColor, styles } from "../theme/styles";
+
+import { Text, TouchableOpacity, View } from "react-native";
+
 import { colors } from "@theme/colors";
+
+import FiBrCalendar from "../../assets/icons/svg/fi-br-calendar.svg";
+import FiBrListCheck from "../../assets/icons/svg/fi-br-list-check.svg";
+import FiBrMemberList from "../../assets/icons/svg/fi-br-member-list.svg";
+import FiBrSettings from "../../assets/icons/svg/fi-br-settings.svg";
+import FiBrSquareTerminal from "../../assets/icons/svg/fi-br-square-terminal.svg";
+import { getNavibarIconActiveColor } from "../theme/styles";
 
 export function Navibar({
   currentRoute,
@@ -90,8 +93,8 @@ export function Navibar({
       {/* Calendar Icon */}
       <TouchableOpacity
         onPress={() => {
-          setCurrentRoute("/calendar");
-          router.replace("/calendar");
+          setCurrentRoute("/task-calendar");
+          router.replace("/task-calendar");
         }}
         style={{ alignItems: "center", flex: 1 }}
       >
@@ -99,7 +102,7 @@ export function Navibar({
           width={32}
           height={32}
           fill={
-            currentRoute === "/calendar"
+            currentRoute === "/task-calendar"
               ? getNavibarIconActiveColor(isDark)
               : isDark
               ? colors.dark.icon
@@ -109,7 +112,7 @@ export function Navibar({
         <Text
           style={{
             color:
-              currentRoute === "/calendar"
+              currentRoute === "/task-calendar"
                 ? getNavibarIconActiveColor(isDark)
                 : isDark
                 ? colors.dark.icon
