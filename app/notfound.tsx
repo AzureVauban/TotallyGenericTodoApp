@@ -16,7 +16,7 @@ export default function NotFoundScreen() {
   const themeColors = theme === "dark" ? colors.dark : colors.light;
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: themeColors.background }}>
       <View
         style={[
           styles.container,

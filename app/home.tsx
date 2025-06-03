@@ -17,7 +17,6 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Pressable,
-  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -31,12 +30,8 @@ import {
   State,
   Swipeable,
 } from "react-native-gesture-handler";
-import { getNavibarIconActiveColor, styles } from "../app/theme/styles";
-import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
-import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
-import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
+import { styles } from "../app/theme/styles";
 import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
-import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
 import FiBredit from "../assets/icons/svg/fi-br-text-box-edit.svg";
 import FiBrtrash from "../assets/icons/svg/fi-br-trash.svg";
 import { useTasks } from "../backend/storage/TasksContext";
@@ -422,9 +417,7 @@ export default function HomeScreen() {
                     {
                       backgroundColor:
                         item.color ||
-                        (isDark
-                          ? colors.dark.secondary
-                          : colors.light.primary),
+                        (isDark ? colors.dark.secondary : colors.light.primary),
                     },
                   ]}
                   onPress={() => {
@@ -467,7 +460,14 @@ export default function HomeScreen() {
             ]}
             onPress={() => setAddModalVisible(true)}
           >
-            <Text style={styles.modalButtonText}>New List</Text>
+            <Text
+              style={[
+                styles.modalButtonText,
+                { color: colors.light.bluebutton_text_icon },
+              ]}
+            >
+              New List
+            </Text>
           </TouchableOpacity>
         </View>
         {/* --- The rest of the original task/chores UI could be rendered below this, if needed --- */}
