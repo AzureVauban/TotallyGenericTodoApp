@@ -1,20 +1,24 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
+
 import {
-  View,
+  Animated,
+  Linking,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  Animated,
-  Linking,
+  View,
 } from "react-native";
-import MemberListIcon from "../../assets/icons/svg/fi-br-member-list.svg";
-import { supabase } from "../../lib/supabaseClient";
+
 import { useRouter } from "expo-router";
+
 import { colors } from "@theme/colors";
-import { useTheme } from "lib/ThemeContext";
 import { playInvalidSound } from "utils/sounds/invalid";
+import { useTheme } from "lib/ThemeContext";
+
+import MemberListIcon from "../../assets/icons/svg/fi-br-member-list.svg";
 import { getAuthErrorMessage } from "../../lib/auth-exceptions";
+import { supabase } from "../../lib/supabaseClient";
 
 export default function LoginScreen() {
   const [identifier, setIdentifier] = useState(""); // replaces username

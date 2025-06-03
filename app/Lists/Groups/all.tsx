@@ -1,18 +1,16 @@
-/**
- * All Screen
- *
- * Shows every non-deleted task, regardless of state.
- */
-import { colors } from "@theme/colors";
-import { useTheme } from "../../../lib/ThemeContext";
 import React from "react";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+
+import { FlatList, Pressable, Text, View } from "react-native";
+
 import Swipeable from "react-native-gesture-handler/Swipeable";
+import { colors } from "@theme/colors";
 import { useFocusEffect } from "@react-navigation/native";
-import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
+
 import FiBrflagAlt from "../../../assets/icons/svg/fi-br-flag-alt.svg";
-import { useTasks } from "../../../backend/storage/TasksContext";
+import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
 import { styles } from "../../theme/styles";
+import { useTasks } from "../../../backend/storage/TasksContext";
+import { useTheme } from "../../../lib/ThemeContext";
 
 export default function AllTasks() {
   const { tasks, removeTask, exportDataAsJSON } = useTasks();

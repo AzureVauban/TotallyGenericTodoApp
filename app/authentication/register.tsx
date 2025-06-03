@@ -1,31 +1,26 @@
-/*
-TODO FINISH REWORKING THIS SCREEN
-[x] ADD EMAIL FIELD
-[x] ADD CONFIRM PASSWORD FIELD
-[x] add invalid sound for when a required field is missing
-- add visual feedback (input field becomes dark red) when required input is missing
-- make sure to add/change respective functionality
-- create a new screen for verifying account options and implement magic link
- */
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
+
 import {
-  View,
+  Animated,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  Animated,
+  View,
 } from "react-native";
-import MemberListIcon from "../../assets/icons/svg/fi-br-member-list.svg";
-import { supabase } from "../../lib/supabaseClient";
+
 import { useRouter } from "expo-router";
+
 import { colors } from "@theme/colors";
-import { useTheme } from "lib/ThemeContext";
-import { styles } from "@theme/styles";
 import { generateUsername } from "utils/generateUsername";
 import { playFlaggedSound } from "utils/sounds/flag";
 import { playInvalidSound } from "utils/sounds/invalid";
+import { styles } from "@theme/styles";
+import { useTheme } from "lib/ThemeContext";
+
+import MemberListIcon from "../../assets/icons/svg/fi-br-member-list.svg";
 import { getAuthErrorMessage } from "../../lib/auth-exceptions";
+import { supabase } from "../../lib/supabaseClient";
 
 export default function LoginScreen() {
   const [initialUsername, setInitialUsername] = useState(generateUsername());

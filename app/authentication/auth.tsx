@@ -1,9 +1,12 @@
-import "react-native-url-polyfill/auto";
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { ActivityIndicator, View, Linking } from "react-native";
+import React, { createContext, useContext, useEffect, useState } from "react";
+
+import { ActivityIndicator, Linking, View } from "react-native";
+
 import { useRouter } from "expo-router";
-import { supabase } from "../../lib/supabaseClient";
+
 import type { Session, User } from "@supabase/supabase-js";
+
+import { supabase } from "../../lib/supabaseClient";
 
 type AuthContextType = {
   user: User | null;
