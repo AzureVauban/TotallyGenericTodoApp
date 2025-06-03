@@ -1,7 +1,9 @@
 import React from "react";
+
 import { Calendar } from "react-native-calendars";
 import { colors } from "@theme/colors";
 import { useTheme } from "lib/ThemeContext";
+
 import { styles } from "../theme/styles";
 
 /**
@@ -51,9 +53,9 @@ const CalendarHeatmap = ({
         textSectionTitleColor: isDark ? colors.dark.text : colors.light.text,
         selectedDayBackgroundColor: "transparent",
         selectedDayTextColor: isDark ? colors.dark.text : colors.light.text,
-        todayTextColor: "rgb(250, 204, 21)",
+        todayTextColor: isDark ? "rgb(250, 204, 21)" : "rgb(139, 113, 7)",
         dayTextColor: isDark ? colors.dark.text : colors.light.text,
-        textDisabledColor: "rgb(209, 213, 219)",
+        textDisabledColor: "rgb(79, 108, 152)",
         arrowColor: isDark ? colors.dark.text : colors.light.text,
         monthTextColor: isDark ? colors.dark.text : colors.light.text,
       }}
