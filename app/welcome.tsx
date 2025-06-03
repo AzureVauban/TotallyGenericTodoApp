@@ -11,9 +11,10 @@ import { useTheme } from "lib/ThemeContext";
 import React from "react";
 import {
   Dimensions,
+  SafeAreaView,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import "react-native-url-polyfill/auto";
 import FISignatureIcon from "../assets/icons/svg/fi-br-list-check.svg";
@@ -36,173 +37,182 @@ export default function WelcomeScreen() {
   };
 
   return (
-    <View
-      style={[
-        styles.screenbackground,
-        {
-          backgroundColor: isDark
-            ? colors.dark.background
-            : colors.light.background,
-          // paddingTop: Platform.OS === "android" ? 32 : 0, // Add padding for Android
-        },
-      ]}
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: isDark
+          ? colors.dark.background
+          : colors.light.background,
+      }}
     >
       <View
-        style={{
-          flex: 1,
-          justifyContent: "flex-end",
-          alignItems: "center",
-          marginBottom: 150,
-          marginTop: 10, // decreased from default or previous value to 10
-        }}
+        style={[
+          styles.screenbackground,
+          {
+            backgroundColor: isDark
+              ? colors.dark.background
+              : colors.light.background,
+            // paddingTop: Platform.OS === "android" ? 32 : 0, // Add padding for Android
+          },
+        ]}
       >
-        <TouchableOpacity
-          onPress={() => {
-            console.log("Theme icon pressed. Toggling theme...");
-            toggleTheme();
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "flex-end",
+            alignItems: "center",
+            marginBottom: 150,
+            marginTop: 10, // decreased from default or previous value to 10
           }}
         >
-          <FISignatureIcon
-            style={styles.icon}
-            width={250}
-            height={250}
-            fill={isDark ? colors.dark.accent : colors.light.accent}
-          />
-        </TouchableOpacity>
-        <Text
-          style={[
-            styles.title,
-            {
-              color: isDark ? colors.dark.accent : colors.light.accent,
-              fontSize: 24,
-              fontWeight: "bold",
-              marginBottom: 20,
-            },
-          ]}
-        >
-          {" "}
-          This is a cool todo app!
-        </Text>
-        <Text
-          style={[
-            styles.subtitle,
-            {
-              paddingBottom: 50,
-              fontSize: 18,
-              marginBottom: 20,
-              color: isDark ? colors.dark.text : colors.light.text,
-            },
-          ]}
-        >
-          Complete tasks, get stuff done!
-        </Text>
-        <TouchableOpacity
-          style={[
-            styles.button,
-            {
-              flexDirection: "row",
-              width: BUTTON_WIDTH,
-              backgroundColor: isDark
-                ? colors.dark.bluebutton_background
-                : colors.light.bluebutton_background,
-            },
-          ]}
-          onPress={handleContinue}
-        >
+          <TouchableOpacity
+            onPress={() => {
+              console.log("Theme icon pressed. Toggling theme...");
+              toggleTheme();
+            }}
+          >
+            <FISignatureIcon
+              style={styles.icon}
+              width={250}
+              height={250}
+              fill={isDark ? colors.dark.accent : colors.light.accent}
+            />
+          </TouchableOpacity>
           <Text
             style={[
-              { fontSize: 16, fontWeight: "600" },
+              styles.title,
               {
-                color: isDark
-                  ? colors.dark.bluebutton_text_icon
-                  : colors.light.bluebutton_text_icon,
+                color: isDark ? colors.dark.accent : colors.light.accent,
+                fontSize: 24,
+                fontWeight: "bold",
+                marginBottom: 20,
               },
             ]}
           >
-            Continue to home screen
+            {" "}
+            This is a cool todo app!
           </Text>
-        </TouchableOpacity>
-        {/* Reset password button */}
-        {/* 
-        <TouchableOpacity
-          style={[
-            styles.buttonSecondary,
-            {
-              flexDirection: "row",
-              paddingVertical: 12,
-              paddingHorizontal: 20,
-              borderRadius: 5,
-              alignItems: "center",
-              justifyContent: "center",
-              width: BUTTON_WIDTH,
-              marginBottom: 20,
-              backgroundColor: isDark
-                ? colors.dark.bluebutton_background
-                : colors.light.bluebutton_background,
-            },
-          ]}
-          onPress={() => {
-            router.push("/notfound");
-          }}
-        >
           <Text
-            style={{
-              color: isDark
-                ? colors.dark.bluebutton_text_icon
-                : colors.light.bluebutton_text_icon,
-              fontSize: 16,
-              fontWeight: "600",
-            }}
+            style={[
+              styles.subtitle,
+              {
+                paddingBottom: 50,
+                fontSize: 18,
+                marginBottom: 20,
+                color: isDark ? colors.dark.text : colors.light.text,
+              },
+            ]}
           >
-            Forgot Password?
+            Complete tasks, get stuff done!
           </Text>
-        </TouchableOpacity>
-        */}
-        <View style={{ alignItems: "center" }}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "baseline",
-              marginVertical: -15,
-            }}
+          <TouchableOpacity
+            style={[
+              styles.button,
+              {
+                flexDirection: "row",
+                width: BUTTON_WIDTH,
+                backgroundColor: isDark
+                  ? colors.dark.bluebutton_background
+                  : colors.light.bluebutton_background,
+              },
+            ]}
+            onPress={handleContinue}
           >
             <Text
               style={[
-                styles.subtitle,
+                { fontSize: 16, fontWeight: "600" },
                 {
-                  fontWeight: "500",
                   color: isDark
-                    ? colors.dark.secondary
-                    : colors.light.secondary,
+                    ? colors.dark.bluebutton_text_icon
+                    : colors.light.bluebutton_text_icon,
                 },
               ]}
             >
-              Don't have an account?{" "}
+              Continue to home screen
             </Text>
-            <TouchableOpacity
-              onPress={() => {
-                router.push("/authentication/register");
+          </TouchableOpacity>
+          {/* Reset password button */}
+          {/* 
+          <TouchableOpacity
+            style={[
+              styles.buttonSecondary,
+              {
+                flexDirection: "row",
+                paddingVertical: 12,
+                paddingHorizontal: 20,
+                borderRadius: 5,
+                alignItems: "center",
+                justifyContent: "center",
+                width: BUTTON_WIDTH,
+                marginBottom: 20,
+                backgroundColor: isDark
+                  ? colors.dark.bluebutton_background
+                  : colors.light.bluebutton_background,
+              },
+            ]}
+            onPress={() => {
+              router.push("/notfound");
+            }}
+          >
+            <Text
+              style={{
+                color: isDark
+                  ? colors.dark.bluebutton_text_icon
+                  : colors.light.bluebutton_text_icon,
+                fontSize: 16,
+                fontWeight: "600",
+              }}
+            >
+              Forgot Password?
+            </Text>
+          </TouchableOpacity>
+          */}
+          <View style={{ alignItems: "center" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "baseline",
+                marginVertical: -15,
               }}
             >
               <Text
                 style={[
-                  styles.link,
+                  styles.subtitle,
                   {
-                    fontSize: 16,
-                    fontWeight: "bold",
+                    fontWeight: "500",
                     color: isDark
-                      ? colors.dark.bluebutton_text_icon
-                      : colors.light.bluebutton_text_icon,
+                      ? colors.dark.secondary
+                      : colors.light.secondary,
                   },
                 ]}
               >
-                Sign Up
+                Don't have an account?{" "}
               </Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  router.push("/authentication/register");
+                }}
+              >
+                <Text
+                  style={[
+                    styles.link,
+                    {
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: isDark
+                        ? colors.dark.bluebutton_text_icon
+                        : colors.light.bluebutton_text_icon,
+                    },
+                  ]}
+                >
+                  Sign Up
+                </Text>
+              </TouchableOpacity>
+            </View>
+            {/* Removed "Have an account already? Sign in" and "Continue without signing in" */}
           </View>
-          {/* Removed "Have an account already? Sign in" and "Continue without signing in" */}
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

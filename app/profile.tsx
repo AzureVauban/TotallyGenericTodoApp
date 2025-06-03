@@ -1,23 +1,21 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { colors } from "@theme/colors";
-import { getNavibarIconActiveColor, styles } from "@theme/styles";
+import { styles } from "@theme/styles";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useTheme } from "lib/ThemeContext";
 import React, { useRef } from "react";
-import { Platform, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import {
   GestureHandlerGestureEvent,
   PanGestureHandler,
   PanGestureHandlerEventPayload,
   State,
 } from "react-native-gesture-handler";
-import FiBrCalendar from "../assets/icons/svg/fi-br-calendar.svg";
-import FiBrListCheck from "../assets/icons/svg/fi-br-list-check.svg";
 import FiBrMemberList from "../assets/icons/svg/fi-br-member-list.svg";
-import FiBrSettings from "../assets/icons/svg/fi-br-settings.svg";
-import FiBrSquareTerminal from "../assets/icons/svg/fi-br-square-terminal.svg";
 import { useSettings } from "../lib/SettingsContext";
 import { supabase } from "../lib/supabaseClient";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Navibar } from "./components/Navibar";
 
 export default function UserProfileScreen() {
   const router = useRouter();
@@ -84,7 +82,14 @@ export default function UserProfileScreen() {
 
   return (
     <PanGestureHandler onGestureEvent={onGestureEvent}>
-      <View style={{ flex: 1 }}>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: isDark
+            ? colors.dark.background
+            : colors.light.background,
+        }}
+      >
         <View
           style={[
             styles.screenbackground,
@@ -237,224 +242,18 @@ export default function UserProfileScreen() {
           </View>
           {/* Bottom Navibar */}
           {showNavibar && (
-            <View
-              style={{
-                position: "absolute",
-                left: 16,
-                right: 16,
-                bottom: 16,
-                paddingVertical: 10,
-                flexDirection: "row",
-                backgroundColor: navibarTransparent
-                  ? "transparent"
-                  : (isDark ? colors.dark.secondary : colors.light.secondary) +
-                    "80",
-                borderTopWidth: 0,
-                justifyContent: "space-around",
-                alignItems: "center",
-                zIndex: 100,
-                borderRadius: 16,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.18,
-                shadowRadius: 8,
-                elevation: 8,
-                overflow: "hidden",
-                ...(navibarTransparent
-                  ? {
-                      borderColor:
-                        Platform.OS === "web"
-                          ? isDark
-                            ? "rgba(255,255,255,0.15)"
-                            : "rgba(0,0,0,0.10)"
-                          : "transparent",
-                      borderWidth: Platform.OS === "web" ? 1 : 0,
-                      ...(Platform.OS === "web" && {
-                        backdropFilter: "blur(8px)",
-                      }),
-                    }
-                  : {
-                      borderColor: "transparent",
-                      borderWidth: 0,
-                    }),
-              }}
-            >
-              {/* Home Icon */}
-              <TouchableOpacity
-                onPress={() => {
-                  setCurrentRoute("/home");
-                  router.replace("/home");
-                }}
-                style={{ alignItems: "center", flex: 1 }}
-              >
-                <FiBrListCheck
-                  width={32}
-                  height={32}
-                  fill={
-                    currentRoute === "/home"
-                      ? getNavibarIconActiveColor(isDark)
-                      : isDark
-                      ? colors.dark.icon
-                      : colors.light.icon
-                  }
-                />
-                <Text
-                  style={{
-                    color:
-                      currentRoute === "/home"
-                        ? getNavibarIconActiveColor(isDark)
-                        : isDark
-                        ? colors.dark.icon
-                        : colors.light.icon,
-                    fontSize: 12,
-                    marginTop: 4,
-                  }}
-                >
-                  Home
-                </Text>
-              </TouchableOpacity>
-              {/* Calendar Icon */}
-              <TouchableOpacity
-                onPress={() => {
-                  setCurrentRoute("/task-calendar");
-                  router.replace("/task-calendar");
-                }}
-                style={{ alignItems: "center", flex: 1 }}
-              >
-                <FiBrCalendar
-                  width={32}
-                  height={32}
-                  fill={
-                    currentRoute === "/task-calendar"
-                      ? getNavibarIconActiveColor(isDark)
-                      : isDark
-                      ? colors.dark.icon
-                      : colors.light.icon
-                  }
-                />
-                <Text
-                  style={{
-                    color:
-                      currentRoute === "/task-calendar"
-                        ? getNavibarIconActiveColor(isDark)
-                        : isDark
-                        ? colors.dark.icon
-                        : colors.light.icon,
-                    fontSize: 12,
-                    marginTop: 4,
-                  }}
-                >
-                  Calendar
-                </Text>
-              </TouchableOpacity>
-              {/* Settings Icon */}
-              <TouchableOpacity
-                onPress={() => {
-                  setCurrentRoute("/settings");
-                  router.replace("/settings");
-                }}
-                style={{ alignItems: "center", flex: 1 }}
-              >
-                <FiBrSettings
-                  width={32}
-                  height={32}
-                  fill={
-                    currentRoute === "/settings"
-                      ? getNavibarIconActiveColor(isDark)
-                      : isDark
-                      ? colors.dark.icon
-                      : colors.light.icon
-                  }
-                />
-                <Text
-                  style={{
-                    color:
-                      currentRoute === "/settings"
-                        ? getNavibarIconActiveColor(isDark)
-                        : isDark
-                        ? colors.dark.icon
-                        : colors.light.icon,
-                    fontSize: 12,
-                    marginTop: 4,
-                  }}
-                >
-                  Settings
-                </Text>
-              </TouchableOpacity>
-              {/* Profile Icon */}
-              <TouchableOpacity
-                onPress={() => {
-                  setCurrentRoute("/profile");
-                  router.replace("/profile");
-                }}
-                style={{ alignItems: "center", flex: 1 }}
-              >
-                <FiBrMemberList
-                  width={32}
-                  height={32}
-                  fill={
-                    currentRoute === "/profile"
-                      ? getNavibarIconActiveColor(isDark)
-                      : isDark
-                      ? colors.dark.icon
-                      : colors.light.icon
-                  }
-                />
-                <Text
-                  style={{
-                    color:
-                      currentRoute === "/profile"
-                        ? getNavibarIconActiveColor(isDark)
-                        : isDark
-                        ? colors.dark.icon
-                        : colors.light.icon,
-                    fontSize: 12,
-                    marginTop: 4,
-                  }}
-                >
-                  Profile
-                </Text>
-              </TouchableOpacity>
-              {/* Debug Icon (conditionally rendered) */}
-              {showDebug && (
-                <TouchableOpacity
-                  onPress={() => {
-                    setCurrentRoute("/runtime-debug");
-                    router.replace("/runtime-debug");
-                  }}
-                  style={{ alignItems: "center", flex: 1 }}
-                >
-                  <FiBrSquareTerminal
-                    width={32}
-                    height={32}
-                    fill={
-                      currentRoute === "/runtime-debug"
-                        ? getNavibarIconActiveColor(isDark)
-                        : isDark
-                        ? colors.dark.icon
-                        : colors.light.icon
-                    }
-                  />
-                  <Text
-                    style={{
-                      color:
-                        currentRoute === "/runtime-debug"
-                          ? getNavibarIconActiveColor(isDark)
-                          : isDark
-                          ? colors.dark.icon
-                          : colors.light.icon,
-                      fontSize: 12,
-                      marginTop: 4,
-                    }}
-                  >
-                    Debug
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
+            <Navibar
+              currentRoute={currentRoute}
+              setCurrentRoute={setCurrentRoute}
+              router={router}
+              isDark={isDark}
+              showDebug={showDebug}
+              showNavibar={showNavibar}
+              navibarTransparent={navibarTransparent}
+            />
           )}
         </View>
-      </View>
+      </SafeAreaView>
     </PanGestureHandler>
   );
 }
