@@ -288,174 +288,170 @@ export default function HomeScreen() {
             </Link>
           </View>
         </View>
-        <View style={{ marginTop: 200, marginBottom: 0, flex: 1 }}>
+        <View style={{ marginTop: 170, marginBottom: 0, flex: 1 }}>
           <View style={styles.divider} />
-          <ScrollView
-            style={{ flexGrow: 0, maxHeight: 220 }}
-            contentContainerStyle={{ paddingBottom: showNavibar ? 24 : 24 }}
-            showsVerticalScrollIndicator={false}
-          >
-            <FlatList
-              data={lists}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <Swipeable
-                  renderRightActions={() => (
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "stretch",
-                        marginBottom: 10,
-                      }}
-                    >
-                      {/* Purple inline button for list details (moved to right swipe) */}
-                      <Pressable
-                        style={[
-                          styles.inlineButton,
-                          {
-                            backgroundColor: isDark
-                              ? colors.dark.purplebutton_background
-                              : colors.light.purplebutton_background,
-                            height: 45,
-                            borderRadius: 8,
-                          },
-                        ]}
-                        onPress={() => {
-                          setEditListTarget(item);
-                          setEditListName(item.name);
-                          setEditListColor(item.color || "");
-                          setEditListError(false);
-                          setEditListModalVisible(true);
-                        }}
-                      >
-                        <FiBrSettings
-                          width={20}
-                          height={20}
-                          fill={
-                            isDark
-                              ? colors.dark.purplebutton_text_icon
-                              : colors.light.purplebutton_text_icon
-                          }
-                        />
-                      </Pressable>
-                      {/* Existing red delete button */}
-                      <Pressable
-                        style={[
-                          styles.inlineButton,
-                          {
-                            backgroundColor: isDark
-                              ? colors.dark.redbutton_background
-                              : colors.light.redbutton_background,
-                            height: 45,
-                            borderRadius: 8,
-                          },
-                        ]}
-                        onPress={() => {
-                          Alert.alert(
-                            "Delete List",
-                            `Are you sure you want to delete ${item.name}?`,
-                            [
-                              { text: "Cancel", style: "cancel" },
-                              {
-                                text: "Delete",
-                                style: "destructive",
-                                onPress: () => {
-                                  removeList(item.id);
-                                  playRemoveSound();
-                                  exportDataAsJSON();
-                                },
-                              },
-                            ]
-                          );
-                        }}
-                      >
-                        <FiBrtrash
-                          width={20}
-                          height={20}
-                          fill={
-                            isDark
-                              ? colors.dark.redbutton_text_icon
-                              : colors.light.redbutton_text_icon
-                          }
-                        />
-                      </Pressable>
-                    </View>
-                  )}
-                  renderLeftActions={() => (
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "stretch",
-                        marginBottom: 10,
-                      }}
-                    >
-                      {/* Existing blue edit button */}
-                      <Pressable
-                        style={[
-                          styles.inlineButton,
-                          {
-                            backgroundColor: isDark
-                              ? colors.dark.bluebutton_background
-                              : colors.light.bluebutton_background,
-                            height: 45,
-                            borderRadius: 8,
-                          },
-                        ]}
-                        onPress={() => {
-                          setRenameTarget(item);
-                          setRenameName(item.name);
-                          setRenameError(false);
-                          setRenameModalVisible(true);
-                        }}
-                      >
-                        <FiBredit
-                          width={20}
-                          height={20}
-                          fill={
-                            isDark
-                              ? colors.dark.bluebutton_text_icon
-                              : colors.light.bluebutton_text_icon
-                          }
-                        />
-                      </Pressable>
-                    </View>
-                  )}
-                >
-                  <Pressable
-                    style={[
-                      styles.taskListButton,
-                      {
-                        backgroundColor:
-                          item.color ||
-                          (isDark
-                            ? colors.dark.secondary
-                            : colors.light.primary),
-                      },
-                    ]}
-                    onPress={() => {
-                      exportDataAsJSON();
-                      router.push(`/Lists/${item.name}` as const);
+          <FlatList
+            data={lists}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <Swipeable
+                renderRightActions={() => (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "stretch",
+                      marginBottom: 10,
                     }}
                   >
-                    <Text
+                    {/* Purple inline button for list details (moved to right swipe) */}
+                    <Pressable
                       style={[
-                        styles.taskListButtonText,
+                        styles.inlineButton,
                         {
-                          color: isDark
-                            ? colors.light.primary
-                            : colors.dark.primary,
+                          backgroundColor: isDark
+                            ? colors.dark.purplebutton_background
+                            : colors.light.purplebutton_background,
+                          height: 45,
+                          borderRadius: 8,
                         },
                       ]}
+                      onPress={() => {
+                        setEditListTarget(item);
+                        setEditListName(item.name);
+                        setEditListColor(item.color || "");
+                        setEditListError(false);
+                        setEditListModalVisible(true);
+                      }}
                     >
-                      {item.name}
-                    </Text>
-                  </Pressable>
-                </Swipeable>
-              )}
-              ItemSeparatorComponent={() => <View style={{ height: 2 }} />}
-              scrollEnabled={false}
-            />
-          </ScrollView>
+                      <FiBrSettings
+                        width={20}
+                        height={20}
+                        fill={
+                          isDark
+                            ? colors.dark.purplebutton_text_icon
+                            : colors.light.purplebutton_text_icon
+                        }
+                      />
+                    </Pressable>
+                    {/* Existing red delete button */}
+                    <Pressable
+                      style={[
+                        styles.inlineButton,
+                        {
+                          backgroundColor: isDark
+                            ? colors.dark.redbutton_background
+                            : colors.light.redbutton_background,
+                          height: 45,
+                          borderRadius: 8,
+                        },
+                      ]}
+                      onPress={() => {
+                        Alert.alert(
+                          "Delete List",
+                          `Are you sure you want to delete ${item.name}?`,
+                          [
+                            { text: "Cancel", style: "cancel" },
+                            {
+                              text: "Delete",
+                              style: "destructive",
+                              onPress: () => {
+                                removeList(item.id);
+                                playRemoveSound();
+                                exportDataAsJSON();
+                              },
+                            },
+                          ]
+                        );
+                      }}
+                    >
+                      <FiBrtrash
+                        width={20}
+                        height={20}
+                        fill={
+                          isDark
+                            ? colors.dark.redbutton_text_icon
+                            : colors.light.redbutton_text_icon
+                        }
+                      />
+                    </Pressable>
+                  </View>
+                )}
+                renderLeftActions={() => (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "stretch",
+                      marginBottom: 10,
+                    }}
+                  >
+                    {/* Existing blue edit button */}
+                    <Pressable
+                      style={[
+                        styles.inlineButton,
+                        {
+                          backgroundColor: isDark
+                            ? colors.dark.bluebutton_background
+                            : colors.light.bluebutton_background,
+                          height: 45,
+                          borderRadius: 8,
+                        },
+                      ]}
+                      onPress={() => {
+                        setRenameTarget(item);
+                        setRenameName(item.name);
+                        setRenameError(false);
+                        setRenameModalVisible(true);
+                      }}
+                    >
+                      <FiBredit
+                        width={20}
+                        height={20}
+                        fill={
+                          isDark
+                            ? colors.dark.bluebutton_text_icon
+                            : colors.light.bluebutton_text_icon
+                        }
+                      />
+                    </Pressable>
+                  </View>
+                )}
+              >
+                <Pressable
+                  style={[
+                    styles.taskListButton,
+                    {
+                      backgroundColor:
+                        item.color ||
+                        (isDark
+                          ? colors.dark.secondary
+                          : colors.light.primary),
+                    },
+                  ]}
+                  onPress={() => {
+                    exportDataAsJSON();
+                    router.push(`/Lists/${item.name}` as const);
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.taskListButtonText,
+                      {
+                        color: isDark
+                          ? colors.light.primary
+                          : colors.dark.primary,
+                      },
+                    ]}
+                  >
+                    {item.name}
+                  </Text>
+                </Pressable>
+              </Swipeable>
+            )}
+            ItemSeparatorComponent={() => <View style={{ height: 2 }} />}
+            contentContainerStyle={{ paddingBottom: showNavibar ? 24 : 24 }}
+            style={{ maxHeight: 220 }}
+            showsVerticalScrollIndicator={false}
+          />
           {/* Restore Add List Button below the user lists */}
           <TouchableOpacity
             style={[
