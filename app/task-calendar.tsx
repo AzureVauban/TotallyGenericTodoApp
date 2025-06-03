@@ -2,7 +2,7 @@ import { colors } from "@theme/colors";
 import { useRouter } from "expo-router";
 import { useTheme } from "lib/ThemeContext";
 import React, { useRef, useState } from "react";
-import { SafeAreaView, Switch, Text, View } from "react-native";
+import { SafeAreaView, Switch, Text, View, Platform } from "react-native";
 import {
   GestureHandlerGestureEvent,
   PanGestureHandler,
@@ -253,8 +253,10 @@ export default function CalendarScreen() {
               }}
             />
           </View>
-          {/* Bottom Navibar */}
-          {showNavibar && (
+        </View>
+        {/* Bottom Navibar */}
+        {showNavibar && (
+          <View style={{ marginBottom: Platform.OS === "android" ? 25 : 0 }}>
             <Navibar
               currentRoute={currentRoute}
               setCurrentRoute={setCurrentRoute}
@@ -264,8 +266,8 @@ export default function CalendarScreen() {
               showNavibar={showNavibar}
               navibarTransparent={navibarTransparent}
             />
-          )}
-        </View>
+          </View>
+        )}
       </SafeAreaView>
     </PanGestureHandler>
   );
