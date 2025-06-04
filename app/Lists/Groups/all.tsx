@@ -13,6 +13,7 @@ import { useTasks } from "../../../backend/storage/TasksContext";
 import { useTheme } from "../../../lib/ThemeContext";
 
 export default function AllTasks() {
+  console.log("AllTasks rendered");
   const { tasks, removeTask, exportDataAsJSON } = useTasks();
   const { theme: themeMode } = useTheme();
   const isDark = themeMode === "dark";

@@ -23,8 +23,10 @@ import { playRenameTaskSound } from "../utils/sounds/remove";
 import { playInvalidSound } from "../utils/sounds/invalid";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Navibar } from "./components/Navibar";
+import { useAuth } from "./authentication/auth";
 
 export default function RuntimeDebugScreen() {
+  console.log("RuntimeDebugScreen rendered");
   const router = useRouter();
   const hasNavigated = useRef(false);
   const { showNavibar, navibarTransparent, soundEnabled } = useSettings();
@@ -32,10 +34,8 @@ export default function RuntimeDebugScreen() {
   const isDark = theme === "dark";
   const [showDebug, setShowDebug] = useState(false);
   const [currentRoute, setCurrentRoute] = useState<string>("/runtime-debug");
-  const [userId, setUserId] = useState<string | null>(null);
-  const [displayName, setDisplayName] = useState<string | null>(null);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  // Use Auth context for user/session
+  const { user, session } = useAuth();
 
   // Hydrate debug toggle from AsyncStorage on mount
   useEffect(() => {
@@ -45,27 +45,6 @@ export default function RuntimeDebugScreen() {
         setShowDebug(value === "true");
       } catch {}
     })();
-  }, []);
-
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      // Get the current session
-      const { data: sessionData } = await supabase.auth.getSession();
-      setSession(sessionData.session ?? null);
-
-      // Get the current user
-      const { data: userData } = await supabase.auth.getUser();
-      const user = userData.user;
-      setUserId(user?.id || null);
-      setDisplayName(
-        user?.user_metadata?.display_name ||
-          user?.user_metadata?.username ||
-          user?.email ||
-          null
-      );
-      setUserEmail(user?.email || null);
-    };
-    fetchUserInfo();
   }, []);
 
   // Gesture navigation logic
@@ -150,7 +129,7 @@ export default function RuntimeDebugScreen() {
                     marginBottom: 4,
                   }}
                 >
-                  User ID: {userId ?? "Not signed in"}
+                  User ID: {user?.id ?? "Not signed in"}
                 </Text>
                 <Text
                   style={{
@@ -159,7 +138,11 @@ export default function RuntimeDebugScreen() {
                     marginBottom: 4,
                   }}
                 >
-                  Display Name: {displayName ?? "N/A"}
+                  Display Name:{" "}
+                  {user?.user_metadata?.display_name ||
+                    user?.user_metadata?.username ||
+                    user?.email ||
+                    "N/A"}
                 </Text>
                 <Text
                   style={{
@@ -168,7 +151,7 @@ export default function RuntimeDebugScreen() {
                     marginBottom: 4,
                   }}
                 >
-                  Email: {userEmail ?? "N/A"}
+                  Email: {user?.email ?? "N/A"}
                 </Text>
                 <Text
                   style={{

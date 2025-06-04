@@ -11,9 +11,7 @@ import { useTheme } from "lib/ThemeContext";
 
 import FiBrflagAlt from "../../../assets/icons/svg/fi-br-flag-alt.svg";
 import FiBrtrash from "../../../assets/icons/svg/fi-br-trash.svg";
-import {
-  useTasks
-} from "../../../backend/storage/TasksContext";
+import { useTasks } from "../../../backend/storage/TasksContext";
 import { styles } from "../../theme/styles";
 
 // Local TaskItem shape
@@ -26,6 +24,7 @@ interface TaskItem {
 }
 
 export default function ScheduledTasks() {
+  console.log("ScheduledTasks rendered");
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const { tasks, removeTask, exportDataAsJSON } = useTasks();

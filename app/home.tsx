@@ -20,7 +20,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import {
   FlatList,
@@ -43,6 +43,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Navibar } from "./components/Navibar";
 
 export default function HomeScreen() {
+  console.log("HomeScreen rendered");
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const { lists, addList, removeList, renameList, exportDataAsJSON, tasks } =

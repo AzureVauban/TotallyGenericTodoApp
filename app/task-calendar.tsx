@@ -16,6 +16,7 @@ import { Navibar } from "./components/Navibar";
 import { styles } from "./theme/styles";
 
 function getSunday(date: Date) {
+  console.log("getSunday called with date:", date);
   const d = new Date(date);
   d.setDate(d.getDate() - d.getDay());
   d.setHours(0, 0, 0, 0);
@@ -23,6 +24,7 @@ function getSunday(date: Date) {
 }
 
 function getHeatColor(count: number, isDark: boolean) {
+  console.log("getHeatColor called with count:", count, "isDark:", isDark);
   // Use a single blue color from the current theme for all marked days
   return isDark
     ? colors.dark.bluebutton_background
@@ -30,6 +32,7 @@ function getHeatColor(count: number, isDark: boolean) {
 }
 
 function getMaxCount(days: { [date: string]: number }) {
+  //!console.log("getMaxCount called with days:", days);
   let max = 0;
   for (const k in days) {
     if (days[k] > max) max = days[k];
@@ -38,6 +41,7 @@ function getMaxCount(days: { [date: string]: number }) {
 }
 
 export default function CalendarScreen() {
+  console.log("CalendarScreen rendered");
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const router = useRouter();

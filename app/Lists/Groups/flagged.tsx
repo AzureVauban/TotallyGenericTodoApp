@@ -14,6 +14,7 @@ import { useTheme } from "../../../lib/ThemeContext";
 
 // …
 export default function FlaggedTasks() {
+  console.log("FlaggedTasks rendered");
   const { tasks, removeTask, exportDataAsJSON } = useTasks();
   const { theme: themeMode } = useTheme();
   const isDark = themeMode === "dark";

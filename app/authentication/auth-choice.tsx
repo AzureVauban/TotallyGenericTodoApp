@@ -1,16 +1,14 @@
 import React from "react";
-
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-
 import { useLocalSearchParams, useRouter } from "expo-router";
-
 import { colors } from "@theme/colors";
 import { useTheme } from "lib/ThemeContext";
-
 import MemberListIcon from "../../assets/icons/svg/fi-br-member-list.svg";
 import { supabase } from "../../lib/supabaseClient";
 
 const AuthChoiceScreen = () => {
+  console.log("AuthChoiceScreen rendered");
+
   const router = useRouter();
   const { theme } = useTheme();
   const params = useLocalSearchParams();
