@@ -109,7 +109,12 @@ export default function LoginScreen() {
         { backgroundColor: colors[theme].background },
       ]}
     >
-      <MemberListIcon width={32} height={32} style={register_styles.icon} />
+      <MemberListIcon
+        width={32}
+        height={32}
+        style={register_styles.icon}
+        fill={colors[theme].text}
+      />
       <Text style={[register_styles.title, { color: colors[theme].text }]}>
         Register
       </Text>

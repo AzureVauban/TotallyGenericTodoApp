@@ -1,8 +1,3 @@
-/*
-TODO FUTURE ADDITIONS
-- dynmaic List title text color contrasting (revising this description)
-*/
-
 /**
  * Home screen of the application.
  * Displays grouped task categories and user-defined task lists.

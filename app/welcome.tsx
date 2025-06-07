@@ -63,7 +63,7 @@ export default function WelcomeScreen() {
             justifyContent: "flex-end",
             alignItems: "center",
             marginBottom: 150,
-            marginTop: 10, // decreased from default or previous value to 10
+            marginTop: 10,
           }}
         >
           <TouchableOpacity

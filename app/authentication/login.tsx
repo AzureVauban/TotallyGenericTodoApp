@@ -135,7 +135,12 @@ export default function LoginScreen() {
     <View
       style={[styles.container, { backgroundColor: colors[theme].background }]}
     >
-      <MemberListIcon width={32} height={32} style={styles.icon} />
+      <MemberListIcon
+        width={32}
+        height={32}
+        style={styles.icon}
+        fill={colors[theme].text}
+      />
       <Text style={[styles.title, { color: colors[theme].text }]}>Sign In</Text>
       <Text style={[styles.description, { color: colors[theme].text }]}>
         login to your account
@@ -164,13 +169,18 @@ export default function LoginScreen() {
         onChangeText={setMagicEmail}
       />
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: colors[theme].primary }]}
-        onPress={() => {
-          console.log("[Login] Magic Link button pressed");
-          handleMagicLink(magicEmail);
-        }}
+        style={[
+          styles.button,
+          { backgroundColor: colors[theme].purplebutton_background },
+        ]}
+        onPress={() => handleMagicLink(magicEmail)}
       >
-        <Text style={[styles.buttonText, { color: colors[theme].background }]}>
+        <Text
+          style={[
+            styles.buttonText,
+            { color: colors[theme].purplebutton_text_icon },
+          ]}
+        >
           Send Magic Link
         </Text>
       </TouchableOpacity>

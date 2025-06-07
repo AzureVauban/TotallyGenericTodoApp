@@ -1,11 +1,3 @@
-/*
-TODO FUTURE ADDITIONS
-- display avatar of logged in user
-- show UID (via a toggle)
-- display user's display-name (via a toggle)
-
-*/
-
 /**
  * SettingsScreen provides user controls for theme and sound preferences.
  * Includes gesture navigation (right swipe to return to home).
