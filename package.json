@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
-    "@flaticon/flaticon-uicons": "^3.3.1",
     "@react-native-async-storage/async-storage": "2.1.2",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
@@ -94,6 +93,6 @@
   "author": "Michael Elder <niv14@txstate.edu>",
   "license": "MIT",
   "resolutions": {
-    "@expo/cli": "0.24.10"
+    "@expo/cli": "0.24.14"
   }
 }
