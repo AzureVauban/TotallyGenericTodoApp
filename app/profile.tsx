@@ -18,6 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Navibar } from "./components/Navibar";
 
 export default function UserProfileScreen() {
+  console.log("UserProfileScreen rendered");
   const router = useRouter();
   const hasNavigated = useRef(false);
   const { showNavibar, navibarTransparent } = useSettings();

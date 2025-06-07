@@ -7,6 +7,7 @@ import { useRouter } from "expo-router";
 import { useEffect } from "react";
 
 export default function IndexRedirect() {
+  console.log("IndexRedirect component rendered");
   const router = useRouter();
   const isUserLoggedIn: boolean = false; // Replace with your actual login check
 

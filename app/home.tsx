@@ -13,6 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { colors } from "@theme/colors";
 import { Link, useFocusEffect, useRouter } from "expo-router";
 import { useTheme } from "lib/ThemeContext";
+import { supabase } from "../lib/supabaseClient";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
@@ -43,6 +44,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Navibar } from "./components/Navibar";
 
 export default function HomeScreen() {
+  console.log("HomeScreen rendered");
   const { theme } = useTheme();
   const isDark = theme === "dark";
   const { lists, addList, removeList, renameList, exportDataAsJSON, tasks } =
@@ -58,6 +60,17 @@ export default function HomeScreen() {
         setShowDebug(value === "true");
       } catch {}
     })();
+  }, []);
+
+  // Manual session fetch on mount
+  useEffect(() => {
+    const fetchSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      console.log("[HomeScreen] Manual session fetch:", session);
+    };
+    fetchSession();
   }, []);
 
   // Add-list modal state

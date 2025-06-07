@@ -11,6 +11,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function NotFoundScreen() {
+  console.log("NotFoundScreen rendered");
   const router = useRouter();
   const { theme } = useTheme();
   const themeColors = theme === "dark" ? colors.dark : colors.light;

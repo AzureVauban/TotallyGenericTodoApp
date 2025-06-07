@@ -5,7 +5,7 @@ import {
   uniqueNamesGenerator,
 } from "unique-names-generator";
 
-export function generateUsername() {
+export function generateUsername(): string {
   const base = uniqueNamesGenerator({
     dictionaries: [adjectives, colors, animals],
     separator: "",
@@ -16,5 +16,6 @@ export function generateUsername() {
   for (let i = 0; i < length; i++) {
     digits += Math.floor(Math.random() * 10);
   }
-  return base + digits;
+  const username: string = base + digits;
+  return username;
 }

@@ -23,6 +23,7 @@ const SCREEN_WIDTH = Dimensions.get("window").width;
 const BUTTON_WIDTH = SCREEN_WIDTH * 0.7;
 
 export default function WelcomeScreen() {
+  console.log("WelcomeScreen rendered");
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === "dark";
   useFocusEffect(React.useCallback(() => {}, [theme]));

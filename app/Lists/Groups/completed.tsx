@@ -23,6 +23,7 @@ interface TaskItem {
 }
 
 export default function AllTasks() {
+  console.log("AllTasks rendered");
   const { tasks, removeTask, exportDataAsJSON } = useTasks();
   const { theme: themeMode } = useTheme();
   const isDark = themeMode === "dark";

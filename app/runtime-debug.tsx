@@ -1,5 +1,4 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Session } from "@supabase/supabase-js";
 import { colors } from "@theme/colors";
 import { styles } from "@theme/styles";
 import { useRouter } from "expo-router";
@@ -23,8 +22,10 @@ import { playRenameTaskSound } from "../utils/sounds/remove";
 import { playInvalidSound } from "../utils/sounds/invalid";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Navibar } from "./components/Navibar";
+import { useAuth } from "./authentication/auth";
 
 export default function RuntimeDebugScreen() {
+  console.log("RuntimeDebugScreen rendered");
   const router = useRouter();
   const hasNavigated = useRef(false);
   const { showNavibar, navibarTransparent, soundEnabled } = useSettings();
@@ -32,11 +33,10 @@ export default function RuntimeDebugScreen() {
   const isDark = theme === "dark";
   const [showDebug, setShowDebug] = useState(false);
   const [currentRoute, setCurrentRoute] = useState<string>("/runtime-debug");
-  const [userId, setUserId] = useState<string | null>(null);
-  const [displayName, setDisplayName] = useState<string | null>(null);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  // Use Auth context for user/session
+  const { user, session } = useAuth();
 
+  console.log("[DebugScreen] user:", user, "session:", session);
   // Hydrate debug toggle from AsyncStorage on mount
   useEffect(() => {
     (async () => {
@@ -47,25 +47,15 @@ export default function RuntimeDebugScreen() {
     })();
   }, []);
 
+  // Manual session fetch on mount
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      // Get the current session
-      const { data: sessionData } = await supabase.auth.getSession();
-      setSession(sessionData.session ?? null);
-
-      // Get the current user
-      const { data: userData } = await supabase.auth.getUser();
-      const user = userData.user;
-      setUserId(user?.id || null);
-      setDisplayName(
-        user?.user_metadata?.display_name ||
-          user?.user_metadata?.username ||
-          user?.email ||
-          null
-      );
-      setUserEmail(user?.email || null);
+    const fetchSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      console.log("[RuntimeDebugScreen] Manual session fetch:", session);
     };
-    fetchUserInfo();
+    fetchSession();
   }, []);
 
   // Gesture navigation logic
@@ -93,6 +83,21 @@ export default function RuntimeDebugScreen() {
       setTimeout(() => {
         hasNavigated.current = false;
       }, 1500);
+    }
+  };
+
+  // Utility to clear only Supabase session token (not all app data)
+  const clearSupabaseSession = async () => {
+    try {
+      await AsyncStorage.removeItem("supabase.auth.token");
+      console.log(
+        "[RuntimeDebugScreen] Cleared Supabase session token from AsyncStorage."
+      );
+    } catch (e) {
+      console.error(
+        "[RuntimeDebugScreen] Failed to clear Supabase session token:",
+        e
+      );
     }
   };
 
@@ -150,7 +155,7 @@ export default function RuntimeDebugScreen() {
                     marginBottom: 4,
                   }}
                 >
-                  User ID: {userId ?? "Not signed in"}
+                  User ID: {user?.id ?? "Not signed in"}
                 </Text>
                 <Text
                   style={{
@@ -159,7 +164,11 @@ export default function RuntimeDebugScreen() {
                     marginBottom: 4,
                   }}
                 >
-                  Display Name: {displayName ?? "N/A"}
+                  Display Name:{" "}
+                  {user?.user_metadata?.display_name ||
+                    user?.user_metadata?.username ||
+                    user?.email ||
+                    "N/A"}
                 </Text>
                 <Text
                   style={{
@@ -168,7 +177,7 @@ export default function RuntimeDebugScreen() {
                     marginBottom: 4,
                   }}
                 >
-                  Email: {userEmail ?? "N/A"}
+                  Email: {user?.email ?? "N/A"}
                 </Text>
                 <Text
                   style={{
@@ -179,19 +188,35 @@ export default function RuntimeDebugScreen() {
                 >
                   Session: {session ? "Active" : "None"}
                 </Text>
-                {session && (
-                  <Text
-                    style={{
-                      color: isDark ? colors.dark.text : colors.light.text,
-                      fontSize: 12,
-                      marginTop: 4,
-                    }}
-                    selectable
-                  >
-                    Access Token: {session.access_token}
-                  </Text>
-                )}
               </View>
+              <TouchableOpacity
+                style={[
+                  styles.addTaskListButton,
+                  {
+                    width: 300,
+                    marginVertical: 6,
+                    backgroundColor: soundEnabled
+                      ? isDark
+                        ? colors.dark.greenbutton_background
+                        : colors.light.greenbutton_background
+                      : isDark
+                      ? colors.dark.tertiary
+                      : colors.light.tertiary,
+                  },
+                ]}
+                onPress={clearSupabaseSession}
+              >
+                <Text
+                  style={{
+                    color: isDark ? colors.dark.text : colors.light.text,
+                    fontSize: 14,
+                    fontWeight: "bold",
+                    marginBottom: 4,
+                  }}
+                >
+                  Clear Supabase Session
+                </Text>
+              </TouchableOpacity>
             </View>
             {/* Sound Effect Test Buttons */}
             <View

@@ -29,6 +29,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Navibar } from "./components/Navibar";
 
 export function RedirectToLogin() {
+  console.log("RedirectToLogin component rendered");
   const router = useRouter();
   const isUserLoggedIn: boolean = false;
 
@@ -46,6 +47,7 @@ export function RedirectToLogin() {
 }
 
 export default function SettingsScreen() {
+  console.log("SettingsScreen rendered");
   const router = useRouter();
   const hasNavigated = useRef(false);
   const [bgColor, setBgColor] = useState("#eef2ff");
