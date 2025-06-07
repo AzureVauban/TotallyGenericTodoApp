@@ -21,6 +21,8 @@ import { getAuthErrorMessage } from "../../lib/auth-exceptions";
 import { supabase } from "../../lib/supabaseClient";
 
 export default function LoginScreen() {
+  console.log("LoginScreen rendered");
+
   const [identifier, setIdentifier] = useState(""); // replaces username
   const [password, setPassword] = useState("");
   const [usernameError, setUsernameError] = useState(false);
@@ -75,6 +77,8 @@ export default function LoginScreen() {
     });
 
   const handleMagicLink = async (email: string) => {
+    console.log("[Login] handleMagicLink called with email:", email);
+
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email,
@@ -116,6 +120,17 @@ export default function LoginScreen() {
     checkInitialUrl();
   }, []);
 
+  // After successful login or magic link:
+  useEffect(() => {
+    const fetchSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      console.log("[Login] Session after login:", session);
+    };
+    fetchSession();
+  }, []);
+
   return (
     <View
       style={[styles.container, { backgroundColor: colors[theme].background }]}
@@ -150,14 +165,22 @@ export default function LoginScreen() {
       />
       <TouchableOpacity
         style={[styles.button, { backgroundColor: colors[theme].primary }]}
-        onPress={() => handleMagicLink(magicEmail)}
+        onPress={() => {
+          console.log("[Login] Magic Link button pressed");
+          handleMagicLink(magicEmail);
+        }}
       >
         <Text style={[styles.buttonText, { color: colors[theme].background }]}>
           Send Magic Link
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => router.push("/notfound")}>
+      <TouchableOpacity
+        onPress={() => {
+          console.log("[Login] Forgot password link pressed");
+          router.push("/notfound");
+        }}
+      >
         <Text style={[styles.forgot, { color: colors[theme].accent }]}>
           Forgot your password? Reset it here
         </Text>

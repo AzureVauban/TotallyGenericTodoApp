@@ -50,6 +50,7 @@ import { playUnflaggedSound } from "../../utils/sounds/unflag";
 import { styles } from "../theme/styles";
 
 export default function MyList() {
+  console.log("MyList rendered");
   const { theme } = useTheme();
   const isDark = theme === "dark";
   useFocusEffect(

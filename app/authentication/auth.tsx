@@ -1,11 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-
-import { ActivityIndicator, Linking, View } from "react-native";
-
+import { ActivityIndicator, View } from "react-native";
 import { useRouter } from "expo-router";
-
 import type { Session, User } from "@supabase/supabase-js";
-
+import * as Linking from "expo-linking";
 import { supabase } from "../../lib/supabaseClient";
 
 type AuthContextType = {
@@ -19,23 +16,36 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function useAuth(): AuthContextType {
+  console.log("Auth component rendered (AuthContextType() function called)");
+
+  if (!AuthContext) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  console.log("Auth component rendered (AuthContextType() function called)");
+
+  if (!AuthContext) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
   return useContext(AuthContext);
 }
 
 export default function Auth({ children }: { children: React.ReactNode }) {
-  console.log(`Current file name: Auth()`);
+  console.log("Auth component rendered");
+
+  console.log("Auth component rendered");
+
   const router = useRouter();
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch initial session
     supabase.auth
       .getSession()
       .then(({ data: { session: initialSession } }) => {
-        setSession(initialSession);
         setUser(initialSession?.user ?? null);
+        setSession(initialSession);
+        console.log("[Auth] Initial session:", initialSession);
       })
       .catch((error) => console.error("Error fetching session:", error))
       .finally(() => setLoading(false));
@@ -46,6 +56,7 @@ export default function Auth({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange((event, newSession) => {
       setSession(newSession);
       setUser(newSession?.user ?? null);
+      console.log("[Auth] Auth state changed:", event, newSession);
       if (event === "SIGNED_IN") {
         router.replace("/home");
       }
@@ -58,60 +69,52 @@ export default function Auth({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Listen for deep link events
     const handleDeepLink = async (event: { url: string }) => {
-      // Wait for session to be available
+      console.log("[Auth] Deep link event:", event.url);
+
+      // Parse tokens from the URL fragment (after #)
+      const fragment = event.url.split("#")[1];
+      if (fragment) {
+        const params = new URLSearchParams(fragment);
+        const access_token = params.get("access_token");
+        const refresh_token = params.get("refresh_token");
+        if (access_token && refresh_token) {
+          // Set the session in Supabase
+          const { data, error } = await supabase.auth.setSession({
+            access_token,
+            refresh_token,
+          });
+          if (error) {
+            console.error(
+              "[Auth] Error setting session from magic link:",
+              error
+            );
+          } else {
+            console.log("[Auth] Session set from magic link:", data.session);
+            setSession(data.session);
+            setUser(data.session?.user ?? null);
+          }
+        }
+      }
+
+      // Fallback: fetch session as usual
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      if (session?.user?.email) {
-        // Fetch username from profiles table
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("display_name")
-          .eq("email", session.user.email)
-          .maybeSingle();
-
-        // If no profile, insert one using display_name from user_metadata
-        if (!profile) {
-          const displayName =
-            session.user.user_metadata?.display_name ||
-            session.user.user_metadata?.username ||
-            session.user.email;
-          await supabase.from("profiles").insert([
-            {
-              email: session.user.email,
-              display_name: displayName,
-              username: displayName,
-            },
-          ]);
-          console.log(`Created profile for ${displayName}`);
-        } else if (!profile.display_name) {
-          // If profile exists but missing display_name, update it
-          const displayName =
-            session.user.user_metadata?.display_name ||
-            session.user.user_metadata?.username ||
-            session.user.email;
-          await supabase
-            .from("profiles")
-            .update({ display_name: displayName, username: displayName })
-            .eq("email", session.user.email);
-          console.log(`Updated profile for ${displayName}`);
-        } else {
-          console.log(`Welcome back ${profile.display_name}`);
-        }
-      }
+      console.log("[Auth] Session after deep link:", session);
+      setSession(session);
+      setUser(session?.user ?? null);
     };
 
-    // Subscribe to deep link events
     const subscription = Linking.addEventListener("url", handleDeepLink);
 
-    // Also check if app was opened from a deep link initially
-    Linking.getInitialURL().then((url) => {
-      if (url) handleDeepLink({ url });
+    // Optionally check initial URL on mount
+    Linking.getInitialURL().then(async (url) => {
+      if (url) {
+        await handleDeepLink({ url });
+      }
     });
 
-    return () => {
-      subscription.remove();
-    };
+    return () => subscription.remove();
   }, []);
 
   if (loading) {

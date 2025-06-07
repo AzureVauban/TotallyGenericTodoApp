@@ -23,6 +23,8 @@ import { getAuthErrorMessage } from "../../lib/auth-exceptions";
 import { supabase } from "../../lib/supabaseClient";
 
 export default function LoginScreen() {
+  console.log("001 :LoginScreen rendered");
+
   const [initialUsername, setInitialUsername] = useState(generateUsername());
   const [username, setUsername] = useState(initialUsername);
   const [email, setEmail] = useState("");
@@ -237,6 +239,7 @@ export default function LoginScreen() {
           { backgroundColor: colors[theme].primary },
         ]}
         onPress={async () => {
+          console.log("002 :[Register] Continue button pressed");
           const isUsernameValid = username.length >= 3;
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           const isEmailValid = emailRegex.test(email);
@@ -244,27 +247,65 @@ export default function LoginScreen() {
           const isConfirmPasswordValid = password === confirmPassword;
 
           setUsernameError(!isUsernameValid);
+          console.log(
+            `003 :[Register] Username validation: ${
+              isUsernameValid ? "valid" : "invalid"
+            }`
+          );
           setEmailError(!isEmailValid);
+          console.log(
+            `004 :[Register] Email validation: ${
+              isEmailValid ? "valid" : "invalid"
+            }`
+          );
           setPasswordError(!isPasswordValid);
+          console.log(
+            `005 :[Register] Password validation: ${
+              isPasswordValid ? "valid" : "invalid"
+            }`
+          );
           setConfirmPasswordError(!isConfirmPasswordValid);
+          console.log(
+            `006 :[Register] Confirm Password validation: ${
+              isConfirmPasswordValid ? "valid" : "invalid"
+            }`
+          );
           setErrorMessage(null);
-
+          console.log("007 :[Register] Validation complete");
           // Always trigger animation and sound if invalid, even if already in error state
           if (!isUsernameValid && !isGeneratedUsername) {
             playInvalidSound();
+            console.warn(
+              "008 :[Register] Username is invalid or not generated, triggering error animation"
+            );
             triggerErrorAnimation(usernameBgAnim);
+            console.warn("009 :[Register] Username error animation triggered");
           }
           if (!isEmailValid) {
             playInvalidSound();
+            console.warn(
+              "010 :[Register] Email is invalid, triggering error animation"
+            );
             triggerErrorAnimation(emailBgAnim);
+            console.warn("011 :[Register] Email error animation triggered");
           }
           if (!isPasswordValid) {
             playInvalidSound();
+            console.warn(
+              "012 :[Register] Password is invalid, triggering error animation"
+            );
             triggerErrorAnimation(passwordBgAnim);
+            console.warn("013 :[Register] Password error animation triggered");
           }
           if (!isConfirmPasswordValid) {
             playInvalidSound();
+            console.warn(
+              "014 :[Register] Confirm Password does not match, triggering error animation"
+            );
             triggerErrorAnimation(confirmPasswordBgAnim);
+            console.warn(
+              "015 :[Register] Confirm Password error animation triggered"
+            );
           }
 
           if (
@@ -279,6 +320,9 @@ export default function LoginScreen() {
 
           try {
             // Pass values to auth-choice screen
+
+            //* FEATURE/DATABASE_IMPLEMENTATION CRASH HAS BEEN TRACKED TO THIS LINE
+            console.log("016 :[Register] Navigating to auth-choice screen");
             router.push({
               pathname: "/authentication/auth-choice",
               params: {
@@ -289,12 +333,14 @@ export default function LoginScreen() {
             });
 
             // After successful registration and email is known:
+            console.log("017 :[Register] Upserting profile in database");
             await supabase.from("profiles").upsert({
               email,
               username,
               display_name: username,
             });
           } catch (err: any) {
+            console.error("Error during registration:", err);
             setErrorMessage(getAuthErrorMessage(err));
           }
         }}
@@ -314,6 +360,7 @@ export default function LoginScreen() {
           { backgroundColor: colors[theme].primary },
         ]}
         onPress={() => {
+          console.log("016 :[Register] Generate new username button pressed");
           playFlaggedSound();
           const newUsername = generateUsername();
           setUsername(newUsername);
@@ -329,7 +376,12 @@ export default function LoginScreen() {
           Generate new username
         </Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => router.push("/notfound")}>
+      <TouchableOpacity
+        onPress={() => {
+          console.log("017 :[Register] Forgot password link pressed");
+          router.push("/notfound");
+        }}
+      >
         <Text style={[register_styles.forgot, { color: colors[theme].accent }]}>
           Forgot your password? Reset it here
         </Text>
