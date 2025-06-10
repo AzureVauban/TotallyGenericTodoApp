@@ -145,13 +145,12 @@ export default function MyList() {
   // Custom active and completed filters
   const activeTasks = listTasks.filter((t, i) => {
     if (t.indent === 0) {
-      // only include parent if not completed
       return !t.completed;
     }
-    // for subtasks, include until parent and all siblings are completed
     let j = i - 1;
     while (j >= 0 && listTasks[j].indent === 1) j--;
     const parent = listTasks[j];
+    if (!parent) return false; // Prevents undefined error
     let allSibsCompleted = true;
     for (
       let k = j + 1;
@@ -163,18 +162,17 @@ export default function MyList() {
         break;
       }
     }
-    // show subtask until parent+siblings complete
     return !(parent.completed && allSibsCompleted);
   });
+
   const completedTasks = listTasks.filter((t, i) => {
     if (t.indent === 0) {
-      // only parents that are completed
       return t.completed;
     }
-    // for subtasks, only include once parent and all siblings are completed
     let j = i - 1;
     while (j >= 0 && listTasks[j].indent === 1) j--;
     const parent = listTasks[j];
+    if (!parent) return false; // Prevents undefined error
     let allSibsCompleted = true;
     for (
       let k = j + 1;
