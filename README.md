@@ -1,26 +1,62 @@
-#### Title: DivideNDo
+# Title: DivideNDo
 
-#### Description:
+The totally super generic todo app!
 
-#### Project Structure (make sure the list what each file does):
+![home screen of the mobile appilication](previewimage.png)
 
-#### Tech Stack:
+## Tech Stack:
+ * Expo & React-Native
+ * Supabase
 
-- Supabase
-- Expo & React-Native
+## Current Features
 
-#### Misc Notes:
+- Magic Link Authentication
+- Creation and Modification of Tasks and Lists
+- Themed UI with dark/light mode support
+- Persistent local storage
+- Basic settings functionality
 
-`feature/` introduction of a feature
 
-`enhancement/` rework or enhancement of an existing feature
+## How to run
 
-`demo/` for display, this branch is not complete enough to go to develop but is complete enough to present to others
+Make sure you have the following installed:
+- [Expo CLI](https://docs.expo.dev/get-started/installation/)
+- [Xcode](https://developer.apple.com/xcode/) (required for iOS builds)
+- [Android Studio](https://developer.android.com/studio) (required for Android builds)
+- [Node.js](https://nodejs.org/) (recommended version: LTS)
 
-`e/` on a commit message means erroring commit, project will experience poor runtime behavior
+**1. Install dependencies:**
+```sh
+npm install
+```
 
-`r/` on a commit miessage means revertable or droppable, removing the commit from the git history is the intention
+**2. Start the development server:**
+```sh
+npx expo start
+```
+This will open the Expo Dev Tools in your browser.
 
-`t/` on a commit message means complete but untested, test and if code on commit does not work, revert/drop the commit
+**3. Run the app:**
+- **On iOS:** Press `i` in the Expo Dev Tools or terminal (requires Xcode).
+- **On Android:** Press `a` in the Expo Dev Tools or terminal (requires Android Studio or an Android device).
+- **On your device:** Scan the QR code in Expo Dev Tools using the Expo Go app.
+
+**4. Building standalone apps:**
+- **iOS:**
+    ```sh
+    npx expo run:ios
+
+    # if you want to run with debug mode
+    EXPO_DEBUG=true npx expo run:ios
+    ```
+- **Android:**
+    ```sh
+    npx expo run:android
+
+     # if you want to run with debug mode
+    EXPO_DEBUG=true npx expo run:android
+    ```
+
+For more details, see the [Expo documentation](https://docs.expo.dev/).
 
 #### Author: Michael Elder
