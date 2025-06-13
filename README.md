@@ -1,26 +1,53 @@
-#### Title: DivideNDo
+# Title: DivideNDo
 
-#### Description:
+The totally super generic todo app!
 
-#### Project Structure (make sure the list what each file does):
+![home screen of the mobile appilicatiob](previewimage.png)
 
-#### Tech Stack:
+## Tech Stack:
+ * Expo & React-Native
+ * Supabase
 
-- Supabase
-- Expo & React-Native
+## How to run
 
-#### Misc Notes:
+Make sure you have the following installed:
+- [Expo CLI](https://docs.expo.dev/get-started/installation/)
+- [Xcode](https://developer.apple.com/xcode/) (required for iOS builds)
+- [Android Studio](https://developer.android.com/studio) (required for Android builds)
+- [Node.js](https://nodejs.org/) (recommended version: LTS)
 
-`feature/` introduction of a feature
+**1. Install dependencies:**
+```sh
+npm install
+```
 
-`enhancement/` rework or enhancement of an existing feature
+**2. Start the development server:**
+```sh
+npx expo start
+```
+This will open the Expo Dev Tools in your browser.
 
-`demo/` for display, this branch is not complete enough to go to develop but is complete enough to present to others
+**3. Run the app:**
+- **On iOS:** Press `i` in the Expo Dev Tools or terminal (requires Xcode).
+- **On Android:** Press `a` in the Expo Dev Tools or terminal (requires Android Studio or an Android device).
+- **On your device:** Scan the QR code in Expo Dev Tools using the Expo Go app.
 
-`e/` on a commit message means erroring commit, project will experience poor runtime behavior
+**4. Building standalone apps:**
+- **iOS:**
+    ```sh
+    npx expo run:ios
 
-`r/` on a commit miessage means revertable or droppable, removing the commit from the git history is the intention
+    # if you want to run with debug mode
+    EXPO_DEBUG=true npx expo run:ios
+    ```
+- **Android:**
+    ```sh
+    npx expo run:android
 
-`t/` on a commit message means complete but untested, test and if code on commit does not work, revert/drop the commit
+     # if you want to run with debug mode
+    EXPO_DEBUG=true npx expo run:android
+    ```
+
+For more details, see the [Expo documentation](https://docs.expo.dev/).
 
 #### Author: Michael Elder
