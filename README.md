@@ -2,12 +2,21 @@
 
 The totally super generic todo app!
 
-![home screen of the mobile appilicatiob](previewimage.png)
+![home screen of the mobile appilication](previewimage.png)
 
 ## Tech Stack:
 
 - Expo & React-Native
 - Supabase
+
+## Current Features
+
+- Magic Link Authentication
+- Creation and Modification of Tasks and Lists
+- Themed UI with dark/light mode support
+- Persistent local storage
+- Basic settings functionality
+
 
 ## How to run
 
