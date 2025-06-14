@@ -24,7 +24,7 @@ const BUTTON_WIDTH = SCREEN_WIDTH * 0.7;
 
 export default function WelcomeScreen() {
   console.log("WelcomeScreen rendered");
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const isDark = theme === "dark";
   useFocusEffect(React.useCallback(() => {}, [theme]));
   const router = useRouter();
@@ -53,7 +53,6 @@ export default function WelcomeScreen() {
             backgroundColor: isDark
               ? colors.dark.background
               : colors.light.background,
-            // paddingTop: Platform.OS === "android" ? 32 : 0, // Add padding for Android
           },
         ]}
       >
@@ -68,8 +67,7 @@ export default function WelcomeScreen() {
         >
           <TouchableOpacity
             onPress={() => {
-              console.log("Theme icon pressed. Toggling theme...");
-              toggleTheme();
+              router.push("/TESTUIscreen");
             }}
           >
             <FISignatureIcon

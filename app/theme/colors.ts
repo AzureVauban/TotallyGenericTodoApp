@@ -43,8 +43,16 @@ export const dark = {
   calendarBackground: "rgb(39, 39, 42)", // <-- Add this line
 };
 
-// zinc
-export const colors = { light, dark }; //? include for single entry point
+export const NaniColors = {
+  new_primary: "rgb(41, 45, 50)", // New primary color for dark mode
+  new_secondary: "rgb(217, 217, 217)", // New secondary color for dark mode
+  new_accent: "rgb(232, 103, 88)", // New accent color for dark mode
+  new_accentcompliment: "rgb(180, 77, 65)", // New accent compliment for dark mode
+  new_accent2: "rgb(59, 130, 246)", // New accent color for dark mode
+  new_accent2compliment: "rgb(37, 83, 159)", // New accent compliment for dark mode
+};
+
+export const colors = { light, dark, NaniColors }; //? include for single entry point
 
 // Default export to satisfy Expo Router's routing rules
 export default function ColorsModule() {

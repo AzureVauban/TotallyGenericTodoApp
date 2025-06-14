@@ -15,7 +15,8 @@ export default function IndexRedirect() {
     // Defer navigation to the next tick to ensure layout is mounted
     const timeout = setTimeout(() => {
       if (!isUserLoggedIn) {
-        router.replace("/welcome");
+        //router.replace("/welcome");
+        router.replace("/authentication/login"); //! Temporary redirect to TESTUIscreen
       } else {
         router.replace("/home");
       }

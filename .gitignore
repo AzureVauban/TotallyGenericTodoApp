@@ -69,3 +69,6 @@ assets/soundeffects/
 !email-templates/*.html
 clean.py
 logs
+
+
+figmas
