@@ -1,4 +1,4 @@
-# Title: DivideNDo
+# Title: Totally Generic Todo App
 
 The totally super generic todo app!
 
