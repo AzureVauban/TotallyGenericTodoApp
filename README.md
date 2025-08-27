@@ -30,7 +30,7 @@ Make sure you have the following installed:
 **1. Install dependencies:**
 
 ```sh
-npm install
+npx expo install
 ```
 
 **2. Start the development server:**
